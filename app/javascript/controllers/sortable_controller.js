@@ -17,7 +17,7 @@ export default class extends Controller {
       dragClass: "sortable-drag",
       handle: ".task-card-surface",
       delay: 180,
-      delayOnTouchOnly: false,
+      delayOnTouchOnly: true,
       touchStartThreshold: 5,
       fallbackTolerance: 4,
       emptyInsertThreshold: 50,

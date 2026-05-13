@@ -11,7 +11,7 @@ export default class extends Controller {
     if (this.element.classList.contains("sortable-chosen") || this.element.classList.contains("sortable-drag")) return
 
     const ignored = event.target.closest(
-      "button, form, input, textarea, select, [data-dropdown-target='menu'], [data-action*='dropdown']"
+      "button, form, input, textarea, select, [data-dropdown-target='button'], [data-dropdown-target='menu']"
     )
     if (ignored) return
 
