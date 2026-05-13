@@ -7,8 +7,9 @@
     onmouseenter="this.style.borderColor='rgba(255,255,255,0.08)'"
     onmouseleave="this.style.borderColor='rgba(255,255,255,0.05)'"
     <% if has_current_user %>
-      data-controller="dropdown delete-confirm"
-      data-action="contextmenu->dropdown#openAtCursor"
+      data-controller="task-card dropdown delete-confirm"
+      data-action="click->task-card#open contextmenu->dropdown#openAtCursor"
+      data-task-card-url-value="<%= board_task_path(task.board, task) %>"
       data-delete-confirm-item-name-value="<%= h(task.name.truncate(30)) %>"
     <% end %>
     data-task-id="<%= task.id %>"
@@ -126,7 +127,7 @@
     has_metadata = show_priority || subtask_total > 0
   %>
 
-  <%= link_to board_task_path(task.board, task), class: "task-card-surface block cursor-grab active:cursor-grabbing", data: { turbo_frame: "task_panel" } do %>
+  <div class="task-card-surface block cursor-grab active:cursor-grabbing select-none">
     <%# Task Title %>
     <div style="font-size:13px;font-weight:600;color:<%= is_done ? '#555' : '#ddd' %>;line-height:1.35;<%= 'margin-bottom:7px' if has_metadata %>">
       <%= task.name %>
@@ -153,5 +154,5 @@
       </div>
     <% end %>
 
-  <% end %>
+  </div>
 </li>

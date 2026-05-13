@@ -6,11 +6,12 @@ export default class extends Controller {
   async open(event) {
     if (!this.hasUrlValue) return
     if (event.defaultPrevented) return
-    if (event.button !== 0) return
+    if (typeof event.button === "number" && event.button !== 0) return
     if (window.getSelection && window.getSelection().toString()) return
+    if (this.element.classList.contains("sortable-chosen") || this.element.classList.contains("sortable-drag")) return
 
     const ignored = event.target.closest(
-      ".task-drag-handle, button, form, input, textarea, select, [data-dropdown-target='menu'], [data-action*='dropdown'], a"
+      "button, form, input, textarea, select, [data-dropdown-target='menu'], [data-action*='dropdown']"
     )
     if (ignored) return
 
