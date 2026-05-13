@@ -2,9 +2,10 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["source", "label"]
+  static values = { text: String }
 
   async copy() {
-    const text = this.sourceTarget.textContent || this.sourceTarget.value
+    const text = this.hasTextValue ? this.textValue : (this.sourceTarget.textContent || this.sourceTarget.value)
     
     try {
       await navigator.clipboard.writeText(text)
