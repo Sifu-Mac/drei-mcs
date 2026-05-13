@@ -5,7 +5,7 @@ Deployment auf `mission.digitalbackup.cloud` hinter Traefik.
 
 ## Voraussetzungen
 - Docker + Docker Compose auf dem Zielhost
-- laufendes Traefik mit externer Docker-Network, Standard hier: `traefik`
+- laufendes Traefik auf dem Host mit Docker-Provider
 - DNS für `mission.digitalbackup.cloud` zeigt auf den Host
 
 ## Start
@@ -22,11 +22,8 @@ docker compose --env-file .env.production up -d --build
 - `SECRET_KEY_BASE=...`
 - `POSTGRES_PASSWORD=...`
 - `DATABASE_URL=postgresql://...`
-- `TRAEFIK_NETWORK=traefik`
-
 ## Hinweise
 - Diese Version nutzt `SOLID_QUEUE_IN_PUMA=1` für ein schlankes Single-Web-Service-Setup.
-- Falls dein Traefik-Netz anders heißt, `TRAEFIK_NETWORK` anpassen.
 - GitHub OAuth ist optional.
 
 ## Offene fachliche Umbauten

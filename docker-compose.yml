@@ -13,8 +13,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-    networks:
-      - internal
 
   web:
     build:
@@ -45,25 +43,15 @@ services:
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
     volumes:
       - mcs-storage:/rails/storage
-    expose:
-      - "3000"
+    ports:
+      - "${PORT}:3000"
     labels:
       - traefik.enable=true
-      - traefik.docker.network=${TRAEFIK_NETWORK:-traefik}
-      - traefik.http.routers.mission.rule=Host(`${APP_HOST}`)
-      - traefik.http.routers.mission.entrypoints=websecure
-      - traefik.http.routers.mission.tls=true
-      - traefik.http.services.mission.loadbalancer.server.port=3000
-    networks:
-      - internal
-      - traefik
+      - traefik.http.routers.mission-control-system.rule=Host(`${APP_HOST}`)
+      - traefik.http.routers.mission-control-system.entrypoints=websecure
+      - traefik.http.routers.mission-control-system.tls.certresolver=letsencrypt
+      - traefik.http.services.mission-control-system.loadbalancer.server.port=3000
 
 volumes:
   mcs-postgres:
   mcs-storage:
-
-networks:
-  internal:
-  traefik:
-    external: true
-    name: ${TRAEFIK_NETWORK:-traefik}
