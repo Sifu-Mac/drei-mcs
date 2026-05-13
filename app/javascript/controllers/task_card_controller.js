@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static values = { url: String }
 
-  open(event) {
+  async open(event) {
     if (!this.hasUrlValue) return
     if (event.defaultPrevented) return
     if (event.button !== 0) return
@@ -16,7 +16,25 @@ export default class extends Controller {
 
     const frame = document.getElementById("task_panel")
     if (frame) {
-      frame.src = this.urlValue
+      const response = await fetch(this.urlValue, {
+        headers: {
+          "Accept": "text/html"
+        },
+        credentials: "same-origin"
+      })
+
+      if (!response.ok) return
+
+      const html = await response.text()
+      const doc = new DOMParser().parseFromString(html, "text/html")
+      const returnedFrame = doc.getElementById("task_panel")
+
+      if (returnedFrame) {
+        frame.replaceWith(returnedFrame)
+      } else {
+        frame.innerHTML = html
+      }
+
       return
     }
 
