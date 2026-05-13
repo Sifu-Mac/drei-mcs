@@ -170,6 +170,30 @@ Grund:
 
 ---
 
+## Arbeitslogik festgelegt
+
+### Startregel für aktive Bearbeitung
+- **James startet selbstständig**, wenn:
+  - `Owner = James`
+  - `Status = Ready`
+- **Codex startet selbstständig**, wenn:
+  - `Owner = Codex`
+  - `Status = Ready`
+
+### Bedeutung der Status-Spalten
+- `Inbox` = neu, ungeordnet, noch nicht triagiert
+- `Planned` = verstanden und bewusst behalten, aber noch nicht freigegeben
+- `Ready` = klar genug und freigegeben für aktive Bearbeitung
+- `In Progress` = wird gerade bearbeitet
+- `Blocked` = hängt fest, braucht Input oder Fix
+- `Review` = erledigt, wartet auf Prüfung
+- `Done` = abgeschlossen
+
+### Rollenlogik
+- **Sifu** entscheidet Prioritäten und prüft Ergebnisse
+- **James** triagiert, strukturiert, plant und setzt operative Arbeit um
+- **Codex** setzt klar abgegrenzte Dev-Tasks um
+
 ## Nächste sinnvolle Schritte
 1. Account anlegen und echtes UI testen
 2. Status / Owner / Kommentare im echten Flow prüfen
