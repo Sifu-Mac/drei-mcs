@@ -34,18 +34,19 @@
       </div>
       <button type="button"
               data-action="click->task-modal#close"
-              class="h-10 w-10 md:h-auto md:w-auto rounded-full md:rounded-none bg-white/5 md:bg-transparent border border-white/5 md:border-0 text-[#888] text-lg cursor-pointer flex items-center justify-center">✕</button>
+              class="h-9 w-9 rounded-full bg-white/5 border border-white/5 text-[#888] text-base cursor-pointer flex items-center justify-center hover:bg-white/8 transition-colors">✕</button>
     </div>
 
     <!-- Scrollable content -->
     <div class="flex-1 overflow-y-auto px-4 py-4 md:px-5 md:py-5 md:pb-8 flex flex-col gap-5 md:gap-6">
 
       <%# === Auto-save form: title, notes, priority only === %>
-      <%= form_with model: task, url: board_task_path(@board, task), method: :patch, id: dom_id(task, :edit), style: "display:flex;flex-direction:column;gap:24px", data: { task_modal_target: "form" } do |form| %>
+      <%= form_with model: task, url: board_task_path(@board, task), method: :patch, id: dom_id(task, :edit), class: "flex flex-col gap-5", data: { task_modal_target: "form" } do |form| %>
         <%= form.hidden_field :priority, value: task.priority, data: { task_modal_target: "priorityField" } %>
 
         <!-- Title -->
-        <div>
+        <div class="space-y-2">
+          <div class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#5f5f67]">Task</div>
           <%= form.text_field :name,
               placeholder: "Task title",
               class: "w-full bg-transparent border-0 outline-none p-0 text-xl md:text-[20px] font-extrabold tracking-[-0.02em] leading-tight text-[#f0f0f0]",
@@ -53,10 +54,11 @@
         </div>
 
         <!-- Notes -->
-        <div class="mt-1 md:mt-3">
+        <div class="space-y-2">
+          <div class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#5f5f67]">Notes</div>
           <%= form.text_area :description,
               placeholder: "Add notes...",
-              class: "w-full min-h-[140px] md:min-h-[120px] p-3 rounded-xl border border-white/10 bg-white/5 text-[14px] text-[#bbb] resize-y outline-none leading-6",
+              class: "w-full min-h-[140px] md:min-h-[120px] p-3.5 rounded-xl border border-white/10 bg-white/[0.04] text-[14px] text-[#d0d0d5] resize-y outline-none leading-6 placeholder:text-[#666]",
               data: { task_modal_target: "descriptionField", action: "input->task-modal#scheduleAutoSave" } %>
         </div>
 
@@ -65,11 +67,12 @@
       <% end %>
 
       <%# === Details section: status, priority, agent — outside form === %>
-      <div>
-        <div class="text-[13px] font-bold text-[#e0e0e0] mb-3.5">Details</div>
+      <div class="rounded-2xl border border-white/6 bg-white/[0.02] p-4 md:p-5">
+        <div class="text-[13px] font-bold text-[#e0e0e0] mb-4">Details</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
 
         <!-- Status row -->
-        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-3" data-controller="dropdown">
+        <div class="space-y-2" data-controller="dropdown">
           <span class="text-xs font-medium text-[#888]">Status</span>
           <div class="relative w-full md:w-auto">
             <button type="button" data-action="click->dropdown#toggle" data-dropdown-target="button" aria-expanded="false"
@@ -112,7 +115,7 @@
           }
           current_p = priority_config[task.priority] || priority_config["none"]
         %>
-        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-3">
+        <div class="space-y-2">
           <span class="text-xs font-medium text-[#888]">Priority</span>
           <button type="button"
                   data-action="click->task-modal#cyclePriority"
@@ -127,27 +130,28 @@
                 <div style="width:5px;height:5px;border-radius:50%;background:<%= current_p[:color] %>"></div>
               <% end %>
             <% end %>
+            <span data-task-modal-target="priorityLabel" style="font-size:12px;font-weight:700;color:#d4d4d8;line-height:1"><%= task.priority == "none" ? "None" : task.priority.titleize %></span>
           </button>
         </div>
 
         <!-- Owner row -->
-        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-3">
+        <div class="space-y-2">
           <span class="text-xs font-medium text-[#888]">Owner</span>
           <%= select_tag "task[owner]",
               options_for_select(owner_labels.map { |key, label| [label, key] }, task.owner),
               form: dom_id(task, :edit),
               id: nil,
-              class: "w-full md:w-[100px] h-11 md:h-[30px] px-3 md:px-2 rounded-lg md:rounded-[7px] bg-white/5 border border-white/10 text-[#ccc] text-sm md:text-xs font-semibold outline-none",
+              class: "w-full h-11 px-3 rounded-lg bg-white/5 border border-white/10 text-[#ccc] text-sm font-semibold outline-none",
               data: { action: "change->task-modal#scheduleAutoSave" } %>
         </div>
 
         <!-- Agent row -->
-        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div class="space-y-2">
           <span class="text-xs font-medium text-[#888]">Agent</span>
           <% if task.assigned_to_agent? %>
             <button type="button"
                     data-action="click->task-modal#toggleAgent"
-                    class="w-full md:w-[100px] h-11 md:h-[30px] flex items-center justify-center gap-2 rounded-lg md:rounded-[7px] cursor-pointer transition-all"
+                    class="w-full h-11 flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all"
                     style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.2)">
               <span style="font-size:11px">🤖</span>
               <span style="font-size:11px;font-weight:600;color:#fbbf24">Assigned</span>
@@ -157,19 +161,20 @@
             <% if agent_connected %>
               <button type="button"
                       data-action="click->task-modal#toggleAgent"
-                      class="w-full md:w-[100px] h-11 md:h-[30px] flex items-center justify-center gap-2 rounded-lg md:rounded-[7px] cursor-pointer transition-all"
+                      class="w-full h-11 flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all"
                       style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)">
                 <span style="font-size:11px">🤖</span>
-                <span style="font-size:11px;font-weight:600;color:#555">Assign</span>
+                <span style="font-size:11px;font-weight:600;color:#aaa">Assign</span>
               </button>
             <% else %>
-              <span class="w-full md:w-[100px] h-11 md:h-[30px] flex items-center justify-center gap-2 rounded-lg md:rounded-[7px] cursor-not-allowed"
+              <span class="w-full h-11 flex items-center justify-center gap-2 rounded-lg cursor-not-allowed"
                     style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)">
                 <span style="font-size:11px">🤖</span>
-                <span style="font-size:11px;font-weight:600;color:#555">Assign</span>
+                <span style="font-size:11px;font-weight:600;color:#666">Assign unavailable</span>
               </span>
             <% end %>
           <% end %>
+        </div>
         </div>
       </div>
 
@@ -235,7 +240,7 @@
       <% end %>
 
       <!-- Comments -->
-      <div>
+      <div class="rounded-2xl border border-white/6 bg-white/[0.02] p-4 md:p-5">
         <div style="font-size:13px;font-weight:700;color:#e0e0e0;margin-bottom:14px">Comments</div>
         <div style="display:flex;flex-direction:column;gap:12px">
           <%= render "boards/comments/form", board: @board, task: task %>
@@ -244,7 +249,7 @@
       </div>
 
       <!-- Activity Feed -->
-      <div>
+      <div class="rounded-2xl border border-white/6 bg-white/[0.02] p-4 md:p-5">
         <div style="font-size:13px;font-weight:700;color:#e0e0e0;margin-bottom:14px">Activity</div>
         <%= render "shared/task_activities", task: task %>
       </div>
@@ -256,13 +261,7 @@
         <button type="button"
                 data-action="click->task-modal#close"
                 class="flex-1 md:flex-none min-h-11 px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-[#aaa] text-sm md:text-xs font-bold cursor-pointer">
-          Done
-        </button>
-        <button type="button"
-                data-action="click->task-modal#save"
-                data-task-modal-target="saveButton"
-                class="hidden md:inline-flex items-center justify-center px-3.5 py-2.5 rounded-[10px] border-0 bg-[#60a5fa] text-[#0b1220] text-xs font-extrabold cursor-pointer">
-          Save
+          Close
         </button>
       </div>
     </div>

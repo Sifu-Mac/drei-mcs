@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="task-modal"
 export default class extends Controller {
-  static targets = ["modal", "backdrop", "form", "nameField", "descriptionField", "submitButton", "priorityField", "priorityButton", "statusPill", "statusDot", "statusLabel", "saveButton", "saveStatus"]
+  static targets = ["modal", "backdrop", "form", "nameField", "descriptionField", "submitButton", "priorityField", "priorityButton", "priorityLabel", "statusPill", "statusDot", "statusLabel", "saveStatus"]
   static values = { taskId: Number, updateUrl: String, assignUrl: String, unassignUrl: String }
 
   connect() {
@@ -146,6 +146,9 @@ export default class extends Controller {
     // Update button visuals
     btn.style.background = cfg.bg
     btn.style.border = `1px solid ${cfg.border}`
+    if (this.hasPriorityLabelTarget) {
+      this.priorityLabelTarget.textContent = next === "none" ? "None" : next.charAt(0).toUpperCase() + next.slice(1)
+    }
 
     // Rebuild dots
     btn.innerHTML = ""
@@ -159,6 +162,14 @@ export default class extends Controller {
         dot.style.cssText = `width:5px;height:5px;border-radius:50%;background:${cfg.color}`
         btn.appendChild(dot)
       }
+    }
+
+    if (this.hasPriorityLabelTarget) {
+      const label = document.createElement("span")
+      label.dataset.taskModalTarget = "priorityLabel"
+      label.style.cssText = "font-size:12px;font-weight:700;color:#d4d4d8;line-height:1"
+      label.textContent = next === "none" ? "None" : next.charAt(0).toUpperCase() + next.slice(1)
+      btn.appendChild(label)
     }
 
     this.save()
