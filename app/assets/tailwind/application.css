@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+@theme {
+  /* ========================================
+     DESIGN SYSTEM v2 — Neutral Dark Palette
+     ======================================== */
+
+  /* Backgrounds (3-layer depth system) */
+  --color-bg-base: #161619;
+  --color-bg-surface: #161619;
+  --color-bg-elevated: #1a1a1e;
+  --color-bg-card: #1e1e22;
+  --color-bg-dropdown: #222226;
+
+  /* Text */
+  --color-content: #f0f0f0;
+  --color-content-secondary: #bbb;
+  --color-content-muted: #888;
+  --color-content-dim: #555;
+  --color-content-ghost: #444;
+  --color-content-dimmed: #333;
+
+  /* Borders */
+  --color-border: rgba(255, 255, 255, 0.05);
+  --color-border-card: rgba(255, 255, 255, 0.04);
+  --color-border-hover: rgba(255, 255, 255, 0.08);
+  --color-border-active: rgba(255, 255, 255, 0.12);
+
+  /* Project colors */
+  --color-project-red: #ef4444;
+  --color-project-green: #34d399;
+  --color-project-amber: #fbbf24;
+  --color-project-blue: #60a5fa;
+  --color-project-purple: #a78bfa;
+
+  /* Functional / Status */
+  --color-status-success: #34d399;
+  --color-status-warning: #fbbf24;
+  --color-status-error: #ef4444;
+  --color-status-info: #60a5fa;
+  --color-agent: #fbbf24;
+
+  /* Legacy compat — referenced in views not yet migrated */
+  --color-bg-hover: #222226;
+  --color-accent: #ef4444;
+  --color-accent-hover: #dc2626;
+  --color-accent-muted: rgba(239, 68, 68, 0.3);
+  --color-content-inverse: #0c0c0f;
+  --color-border-accent: rgba(239, 68, 68, 0.3);
+
+  /* Font */
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
+
+  /* Animations */
+  --animate-fade-up: fadeUp 0.3s ease both;
+  --animate-slide-in: slideIn 0.2s ease both;
+  --animate-drop-in: dropIn 0.12s ease both;
+  --animate-cmd-in: cmdIn 0.2s ease both;
+  --animate-pulse-dot: pulse 2s ease-in-out infinite;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html, body {
+    font-family: var(--font-body);
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-bg-base);
+  }
+
+  /* Selection styling */
+  ::selection {
+    background: #fbbf24;
+    color: #161619;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.14);
+  }
+}
+
+/* Keyframes */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes cmdIn {
+  from { opacity: 0; transform: translateX(-50%) scale(0.96); }
+  to { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+/* Agent typing dots */
+@keyframes dotBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.3; }
+  50% { transform: translateY(-3px); opacity: 1; }
+}
+.cmd-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fbbf24;
+  animation: dotBounce 1s ease infinite;
+}
+
+/* Column drag highlight — disabled, ghost card is sufficient */
+.column-drag-over {
+}

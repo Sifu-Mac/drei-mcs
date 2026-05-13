@@ -1,0 +1,82 @@
+<%# Board-specific modals — Board Settings only (New Board modal is in shared/navbar) %>
+
+<script>
+  function selectEditBoardIcon(btn, icon) {
+    document.getElementById('edit-board-icon-field').value = icon;
+    document.querySelectorAll('#edit-icon-group button').forEach(b => {
+      b.classList.remove('ring-2', 'ring-accent');
+    });
+    btn.classList.add('ring-2', 'ring-accent');
+  }
+</script>
+
+<%# Board Settings Modal %>
+<div id="board-settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+  <div class="absolute inset-0 bg-black/60" onclick="document.getElementById('board-settings-modal').classList.add('hidden')"></div>
+  <div class="relative bg-bg-surface border border-white/[0.08] rounded-xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden" style="box-shadow: 0 12px 40px rgba(0,0,0,0.5);">
+    <div class="px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
+      <span class="text-sm font-bold text-content">Board Settings</span>
+      <button type="button"
+              onclick="document.getElementById('board-settings-modal').classList.add('hidden')"
+              class="p-2 rounded-lg text-content-muted hover:text-content hover:bg-white/[0.04] transition-colors cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <%= form_with model: @board, url: board_path(@board), method: :patch, class: "p-5 space-y-4" do |form| %>
+      <div>
+        <label class="block text-sm font-medium text-content-secondary mb-2">Board Name</label>
+        <%= form.text_field :name,
+            required: true,
+            placeholder: "e.g., Work, Personal, Side Project",
+            class: "w-full px-3 py-2 text-sm bg-bg-card border border-white/[0.08] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-content placeholder-content-muted" %>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-content-secondary mb-2">Icon</label>
+        <div class="flex flex-wrap gap-2" id="edit-icon-group">
+          <% edit_icons = Board::DEFAULT_ICONS.dup %>
+          <% if current_user.agent_last_active_at.present? && current_user.agent_emoji.present? && !edit_icons.include?(current_user.agent_emoji) %>
+            <% edit_icons << current_user.agent_emoji %>
+          <% end %>
+          <% if @board.icon.present? && !edit_icons.include?(@board.icon) %>
+            <% edit_icons << @board.icon %>
+          <% end %>
+          <% edit_icons.each do |icon| %>
+            <button type="button"
+                    onclick="selectEditBoardIcon(this, '<%= icon %>')"
+                    data-icon="<%= icon %>"
+                    class="w-10 h-10 flex items-center justify-center rounded-lg bg-bg-card hover:bg-white/[0.08] transition-colors text-xl cursor-pointer <%= icon == @board.icon ? 'ring-2 ring-accent' : '' %>">
+              <%= icon %>
+            </button>
+          <% end %>
+        </div>
+        <%= form.hidden_field :icon, value: @board.icon, id: "edit-board-icon-field" %>
+      </div>
+
+      <div class="flex items-center justify-between pt-2">
+        <% if @boards.count > 1 %>
+          <%= link_to board_path(@board),
+              method: :delete,
+              data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this board? All tasks will be permanently deleted." },
+              class: "text-sm text-status-error hover:text-status-error/80 transition-colors cursor-pointer" do %>
+            Delete board
+          <% end %>
+        <% else %>
+          <span></span>
+        <% end %>
+
+        <div class="flex items-center gap-3">
+          <button type="button"
+                  onclick="document.getElementById('board-settings-modal').classList.add('hidden')"
+                  class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-content-secondary transition-colors cursor-pointer">
+            Cancel
+          </button>
+          <%= form.submit "Save Changes", class: "px-3 py-1.5 text-xs font-semibold rounded-lg bg-accent text-content hover:bg-accent-hover transition-colors cursor-pointer" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

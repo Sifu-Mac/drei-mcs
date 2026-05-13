@@ -1,0 +1,80 @@
+<%
+  column_labels = {
+    "inbox" => "Inbox",
+    "up_next" => "Up Next",
+    "in_progress" => "In Progress",
+    "in_review" => "In Review",
+    "done" => "Done"
+  }
+  column_dot_colors = {
+    "inbox" => "#666",
+    "up_next" => "#60a5fa",
+    "in_progress" => "#fbbf24",
+    "in_review" => "#a78bfa",
+    "done" => "#34d399"
+  }
+%>
+
+<div class="flex-1 min-w-0 flex flex-col h-full overflow-hidden"
+     data-controller="inline-add"
+     data-inline-add-status-value="<%= status %>"
+     data-inline-add-url-value="<%= board_tasks_path(@board) %>"
+     data-status="<%= status %>">
+  <%# Column Header %>
+  <div class="flex items-center gap-2" style="padding:6px 8px 10px">
+    <div class="rounded-full" style="width:7px;height:7px;background:<%= column_dot_colors[status] %>"></div>
+    <span style="font-size:13px;font-weight:700;color:#bbb"><%= column_labels[status] %></span>
+    <span id="column-<%= status %>-count" style="font-size:11px;font-weight:600;color:#444;background:rgba(255,255,255,0.04);padding:0 7px;border-radius:5px;line-height:20px"><%= tasks.count %></span>
+  </div>
+
+  <%# Tasks List %>
+  <ul id="column-<%= status %>"
+      class="flex-1 flex flex-col gap-[5px] min-h-[2rem] overflow-y-hidden hover:overflow-y-auto transition-all duration-[120ms] list-none m-0"
+      style="border-radius:10px;padding:6px;background:rgba(255,255,255,0.01);border:2px solid transparent"
+      data-controller="sortable"
+      data-sortable-group-value="board"
+      data-sortable-status-value="<%= status %>"
+      data-sortable-url-value="<%= update_task_status_board_path(@board) %>">
+    <% tasks.each do |task| %>
+      <%= render "boards/task_card", task: task %>
+    <% end %>
+  </ul>
+
+  <%# Inline Add Card Form (hidden by default) %>
+  <div data-inline-add-target="form" class="hidden px-1.5 py-1.5">
+    <div class="bg-bg-elevated rounded-lg border border-border p-2">
+      <textarea data-inline-add-target="input"
+                data-action="keydown->inline-add#handleKeydown"
+                placeholder="Enter a title for this card..."
+                rows="3"
+                class="w-full bg-transparent text-sm text-content placeholder-content-muted resize-none focus:outline-none"></textarea>
+      <div class="flex items-center gap-2 mt-2">
+        <button type="button"
+                data-action="click->inline-add#submit"
+                class="px-3 py-1.5 text-xs font-semibold rounded bg-accent text-content hover:bg-accent-hover transition-colors cursor-pointer">
+          Add card
+        </button>
+        <button type="button"
+                data-action="click->inline-add#cancel"
+                class="p-1.5 text-content-muted hover:text-content transition-colors cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <%# Add Card Button %>
+  <div data-inline-add-target="button" class="px-1.5 py-1">
+    <button type="button"
+            data-action="click->inline-add#show"
+            class="w-full flex items-center gap-1.5 rounded-lg cursor-pointer border-none bg-transparent transition-colors"
+            style="padding:8px 10px;font-size:12px;font-weight:500;color:#333"
+            onmouseenter="this.style.color='#666'"
+            onmouseleave="this.style.color='#333'">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M14 8H2M8 2V14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Add a card
+    </button>
+  </div>
+</div>
