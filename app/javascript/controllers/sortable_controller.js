@@ -15,7 +15,7 @@ export default class extends Controller {
       animation: 150,
       ghostClass: "sortable-ghost",
       dragClass: "sortable-drag",
-      handle: ".task-card-surface",
+      handle: ".task-drag-handle",
       delay: 180,
       delayOnTouchOnly: true,
       touchStartThreshold: 5,
