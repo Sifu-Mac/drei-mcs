@@ -11,7 +11,14 @@
         <%= link_to "← Back to board", board_path(@board), class: "text-xs text-content-muted hover:text-content transition-colors" %>
         <h1 class="mt-2 text-2xl font-extrabold text-content font-display"><%= @task.name %></h1>
       </div>
-      <div class="text-xs text-content-muted"><%= @task.board.icon %> <%= @task.board.name %></div>
+      <div class="flex items-center gap-3">
+        <div class="text-xs text-content-muted"><%= @task.board.icon %> <%= @task.board.name %></div>
+        <%= button_to "Delete task",
+            board_task_path(@board, @task),
+            method: :delete,
+            data: { turbo_confirm: "Task wirklich löschen?" },
+            class: "px-3 py-1.5 text-xs font-semibold rounded-md bg-red-500/12 text-red-400 border border-red-500/20 hover:bg-red-500/18 transition-colors cursor-pointer" %>
+      </div>
     </div>
 
     <%= form_with model: [@board, @task], class: "space-y-5" do |form| %>
