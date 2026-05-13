@@ -69,6 +69,6 @@ Rails.application.routes.draw do
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # Root: landing page for visitors, dashboard for logged-in users
-  root "pages#home"
+  # Root: direct to sign-in
+  root "sessions#new"
 end
