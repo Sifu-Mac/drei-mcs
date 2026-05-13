@@ -246,5 +246,22 @@
         <%= render "shared/task_activities", task: task %>
       </div>
     </div>
+
+    <div style="padding:14px 20px;border-top:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;background:#1a1a1e">
+      <span data-task-modal-target="saveStatus" style="font-size:11px;font-weight:600;color:#666">Auto-save active</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button type="button"
+                data-action="click->task-modal#close"
+                style="padding:9px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);color:#aaa;font-size:12px;font-weight:700;cursor:pointer">
+          Close
+        </button>
+        <button type="button"
+                data-action="click->task-modal#save"
+                data-task-modal-target="saveButton"
+                style="padding:9px 14px;border-radius:10px;border:none;background:#60a5fa;color:#0b1220;font-size:12px;font-weight:800;cursor:pointer">
+          Save
+        </button>
+      </div>
+    </div>
   </div>
 </div>

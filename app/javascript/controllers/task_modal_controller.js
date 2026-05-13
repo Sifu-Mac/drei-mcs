@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="task-modal"
 export default class extends Controller {
-  static targets = ["modal", "backdrop", "form", "nameField", "descriptionField", "submitButton", "priorityField", "priorityButton", "statusPill", "statusDot", "statusLabel"]
+  static targets = ["modal", "backdrop", "form", "nameField", "descriptionField", "submitButton", "priorityField", "priorityButton", "statusPill", "statusDot", "statusLabel", "saveButton", "saveStatus"]
   static values = { taskId: Number, updateUrl: String, assignUrl: String, unassignUrl: String }
 
   connect() {
@@ -20,6 +20,9 @@ export default class extends Controller {
     document.removeEventListener("keydown", this.boundHandleKeydown)
     if (this.autoSaveTimeout) {
       clearTimeout(this.autoSaveTimeout)
+    }
+    if (this.saveStateTimer) {
+      clearTimeout(this.saveStateTimer)
     }
   }
 
@@ -71,12 +74,16 @@ export default class extends Controller {
     }, 200)
   }
 
-  save() {
+  save(event) {
+    if (event) event.preventDefault()
+
     const form = this.formTarget
     const formData = new FormData(form)
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
 
-    fetch(form.action, {
+    this.setSaveState("saving")
+
+    return fetch(form.action, {
       method: 'PATCH',
       body: formData,
       headers: {
@@ -84,9 +91,13 @@ export default class extends Controller {
         'X-CSRF-Token': csrfToken
       }
     }).then(response => {
-      if (response.ok) return response.text()
+      if (!response.ok) throw new Error('save failed')
+      return response.text()
     }).then(html => {
       if (html) this._handleTurboResponse(html)
+      this.setSaveState("saved")
+    }).catch(() => {
+      this.setSaveState("error")
     })
   }
 
@@ -94,6 +105,7 @@ export default class extends Controller {
     if (this.autoSaveTimeout) {
       clearTimeout(this.autoSaveTimeout)
     }
+    this.setSaveState("pending")
     this.autoSaveTimeout = setTimeout(() => {
       this.save()
       this.autoSaveTimeout = null
@@ -249,6 +261,31 @@ export default class extends Controller {
     // Store card updates for when modal closes
     if (otherStreams) {
       this.pendingTurboStream = otherStreams
+    }
+  }
+
+  setSaveState(state) {
+    if (!this.hasSaveStatusTarget) return
+
+    const states = {
+      pending: { text: 'Unsaved changes', color: '#fbbf24' },
+      saving: { text: 'Saving…', color: '#60a5fa' },
+      saved: { text: 'Saved', color: '#34d399' },
+      error: { text: 'Save failed', color: '#ef4444' }
+    }
+
+    const cfg = states[state] || { text: 'Auto-save active', color: '#666' }
+    this.saveStatusTarget.textContent = cfg.text
+    this.saveStatusTarget.style.color = cfg.color
+
+    if (state === 'saved') {
+      clearTimeout(this.saveStateTimer)
+      this.saveStateTimer = setTimeout(() => {
+        if (this.hasSaveStatusTarget) {
+          this.saveStatusTarget.textContent = 'Auto-save active'
+          this.saveStatusTarget.style.color = '#666'
+        }
+      }, 1500)
     }
   }
 }
