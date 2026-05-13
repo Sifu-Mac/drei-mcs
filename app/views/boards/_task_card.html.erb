@@ -2,8 +2,8 @@
 <% is_done = task.status == "done" %>
 <% board_color = task.board.color || "red" %>
 <li id="task_<%= task.id %>"
-    class="group cursor-grab transition-all duration-150 <%= 'opacity-50' if is_done %>"
-    style="padding:12px 14px;background:rgba(255,255,255,0.035);border-radius:10px;border:1px solid rgba(255,255,255,0.05)"
+    class="group transition-all duration-150 <%= 'opacity-50' if is_done %>"
+    style="position:relative;padding:12px 14px;background:rgba(255,255,255,0.035);border-radius:10px;border:1px solid rgba(255,255,255,0.05)"
     onmouseenter="this.style.borderColor='rgba(255,255,255,0.08)'"
     onmouseleave="this.style.borderColor='rgba(255,255,255,0.05)'"
     <% if has_current_user %>
@@ -14,6 +14,16 @@
     data-task-id="<%= task.id %>"
     data-task-status="<%= task.status %>"
     data-task-position="<%= task.position %>">
+
+  <div class="task-drag-handle"
+       title="Drag card"
+       style="position:absolute;top:10px;right:10px;z-index:2;display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;cursor:grab;color:#555;background:rgba(255,255,255,0.02)"
+       onmouseenter="this.style.background='rgba(255,255,255,0.05)';this.style.color='#888'"
+       onmouseleave="this.style.background='rgba(255,255,255,0.02)';this.style.color='#555'">
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+      <circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/>
+    </svg>
+  </div>
 
   <%# Context Menu (right-click) - only rendered when current_user is available (not during broadcasts) %>
   <% if has_current_user %>
