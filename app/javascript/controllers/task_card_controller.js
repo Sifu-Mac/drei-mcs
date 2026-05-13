@@ -1,5 +1,4 @@
 import { Controller } from "@hotwired/stimulus"
-import { Turbo } from "@hotwired/turbo-rails"
 
 export default class extends Controller {
   static values = { url: String }
@@ -15,6 +14,12 @@ export default class extends Controller {
     )
     if (ignored) return
 
-    Turbo.visit(this.urlValue, { frame: "task_panel" })
+    const frame = document.getElementById("task_panel")
+    if (frame) {
+      frame.src = this.urlValue
+      return
+    }
+
+    window.location.href = this.urlValue
   }
 }
