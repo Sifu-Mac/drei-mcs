@@ -43,8 +43,8 @@ services:
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
     volumes:
       - mcs-storage:/rails/storage
-    ports:
-      - "${PORT}:3000"
+    expose:
+      - "3000"
     labels:
       - traefik.enable=true
       - traefik.http.routers.mission-control-system.rule=Host(`${APP_HOST}`)
