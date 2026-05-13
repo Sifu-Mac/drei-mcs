@@ -194,11 +194,19 @@ Grund:
 - **James** triagiert, strukturiert, plant und setzt operative Arbeit um
 - **Codex** setzt klar abgegrenzte Dev-Tasks um
 
+## Mobile QA / Board-Fix
+- Mobile QA auf Live-Instanz bestätigt: Board mit 7 Spalten nebeneinander ist auf Handy unbrauchbar.
+- Mobile Board wurde auf horizontales Ein-Spalten-/Swipe-Verhalten umgestellt.
+- Zusätzliche mobile Status-Navigation eingebaut, um direkt zwischen Spalten zu springen.
+- Spalten sind mobil jetzt full-width statt gequetscht; verschachteltes Scrollen im Spaltenkörper wurde reduziert.
+- Task-Overlay bleibt als nächster Mobile-Fix offen.
+
 ## Nächste sinnvolle Schritte
-1. Account anlegen und echtes UI testen
-2. Status / Owner / Kommentare im echten Flow prüfen
-3. Owner sichtbarer machen, falls nötig
-4. Kommentar-UI nachschärfen, falls nötig
-5. später optional kleines Type-Set
-6. später MCS-Task für VPS-Hardening anlegen
-7. später Repo-Pulls auf VPS via SSH Deploy Key sauberer machen
+1. Mobile Board-Fix auf VPS deployen und live gegenprüfen
+2. mobiles Task-Overlay vereinfachen
+3. Status / Owner / Kommentare im echten Flow prüfen
+4. Owner sichtbarer machen, falls nötig
+5. Kommentar-UI nachschärfen, falls nötig
+6. später optional kleines Type-Set
+7. später MCS-Task für VPS-Hardening anlegen
+8. später Repo-Pulls auf VPS via SSH Deploy Key sauberer machen

@@ -1,5 +1,7 @@
-<div class="flex-1 min-w-0 flex flex-col h-full overflow-hidden"
+<div id="board-column-<%= status %>"
+     class="w-[calc(100vw-32px)] shrink-0 snap-start md:flex-1 md:min-w-0 flex flex-col h-auto md:h-full overflow-visible md:overflow-hidden"
      data-controller="inline-add"
+     data-board-target="column"
      data-inline-add-status-value="<%= status %>"
      data-inline-add-url-value="<%= board_tasks_path(@board) %>"
      data-status="<%= status %>">
@@ -12,7 +14,7 @@
 
   <%# Tasks List %>
   <ul id="column-<%= status %>"
-      class="flex-1 flex flex-col gap-[5px] min-h-[2rem] overflow-y-hidden hover:overflow-y-auto transition-all duration-[120ms] list-none m-0"
+      class="flex-1 flex flex-col gap-[5px] min-h-[2rem] overflow-visible md:overflow-y-hidden md:hover:overflow-y-auto transition-all duration-[120ms] list-none m-0"
       style="border-radius:10px;padding:6px;background:rgba(255,255,255,0.01);border:2px solid transparent"
       data-controller="sortable"
       data-sortable-group-value="board"

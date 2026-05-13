@@ -2,9 +2,12 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="board"
 export default class extends Controller {
+  static targets = ["columnsViewport", "column", "columnTab"]
+
   connect() {
     // Animate cards on page load with staggered delays
     this.animateCardsEntrance()
+    this.updateActiveColumnTab()
   }
 
   openNewTaskModal(event) {
@@ -35,6 +38,55 @@ export default class extends Controller {
           card.style.transform = ''
         }, 300)
       }, i * 40) // 40ms stagger between each card
+    })
+  }
+
+  scrollToColumn(event) {
+    const { status } = event.params
+    const column = this.columnTargets.find((target) => target.dataset.status === status)
+    if (!column) return
+
+    column.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" })
+    this.setActiveTab(status)
+  }
+
+  handleColumnsScroll() {
+    window.clearTimeout(this.scrollTimer)
+    this.scrollTimer = window.setTimeout(() => this.updateActiveColumnTab(), 50)
+  }
+
+  updateActiveColumnTab() {
+    if (!this.hasColumnsViewportTarget || window.innerWidth >= 768) return
+
+    const viewportRect = this.columnsViewportTarget.getBoundingClientRect()
+    const viewportCenter = viewportRect.left + viewportRect.width / 2
+
+    let activeStatus = null
+    let bestDistance = Infinity
+
+    this.columnTargets.forEach((column) => {
+      const rect = column.getBoundingClientRect()
+      const center = rect.left + rect.width / 2
+      const distance = Math.abs(center - viewportCenter)
+
+      if (distance < bestDistance) {
+        bestDistance = distance
+        activeStatus = column.dataset.status
+      }
+    })
+
+    if (activeStatus) this.setActiveTab(activeStatus)
+  }
+
+  setActiveTab(status) {
+    this.columnTabTargets.forEach((tab) => {
+      const active = tab.dataset.boardStatusParam === status
+      tab.classList.toggle("bg-white/10", active)
+      tab.classList.toggle("text-stone-100", active)
+      tab.classList.toggle("border-white/15", active)
+      tab.classList.toggle("bg-white/5", !active)
+      tab.classList.toggle("text-[#888]", !active)
+      tab.classList.toggle("border-white/8", !active)
     })
   }
 }
