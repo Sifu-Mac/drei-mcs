@@ -49,5 +49,6 @@
     <% if current_user %>
       <%= render "shared/command_bar" %>
     <% end %>
+    <%= turbo_frame_tag "admin_panel" if current_user %>
   </body>
 </html>

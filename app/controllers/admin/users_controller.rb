@@ -16,6 +16,8 @@ module Admin
           tasks_count: user.tasks.count
         }
       end
+
+      render layout: false if turbo_frame_request?
     end
 
     def create
@@ -26,6 +28,19 @@ module Admin
       else
         index
         render :index, status: :unprocessable_entity
+      end
+    end
+
+    def destroy
+      user = User.find(params[:id])
+
+      if user == current_user
+        redirect_to admin_users_path, alert: "You cannot delete your own account."
+      elsif user.admin? && User.where(admin: true).count <= 1
+        redirect_to admin_users_path, alert: "Cannot delete the last admin."
+      else
+        user.destroy!
+        redirect_to admin_users_path, notice: "User deleted."
       end
     end
 

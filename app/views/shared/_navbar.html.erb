@@ -204,6 +204,7 @@
           <% end %>
           <% if current_user.admin? %>
             <%= link_to admin_root_path,
+                data: { turbo_frame: "admin_panel" },
                 class: "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] font-medium text-[#999] hover:bg-white/[0.04] transition-colors" do %>
               <svg width="15" height="15" viewBox="0 0 16 16" fill="none" class="opacity-35">
                 <path d="M3 3H13V6H3V3ZM3 8H13V13H3V8Z" stroke="#888" stroke-width="1.5" stroke-linejoin="round"/>

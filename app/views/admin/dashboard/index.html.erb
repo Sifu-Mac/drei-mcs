@@ -1,6 +1,7 @@
 <% content_for :title, "Admin Dashboard - #{app_name}" %>
 <% content_for :nav_center, "Admin Dashboard" %>
 
+<% dashboard_content = capture do %>
 <section id="admin-dashboard" class="max-w-lg mx-auto space-y-6">
   <!-- Welcome message -->
   <div class="bg-stone-100 dark:bg-white/10 p-5 rounded-md">
@@ -45,3 +46,12 @@
     </div>
   </div>
 </section>
+<% end %>
+
+<% if turbo_frame_request? %>
+  <%= render "admin/shared/overlay", title: "Admin Dashboard" do %>
+    <%= dashboard_content %>
+  <% end %>
+<% else %>
+  <%= dashboard_content %>
+<% end %>

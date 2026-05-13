@@ -1,6 +1,7 @@
 <% content_for :title, "Users - Admin - #{app_name}" %>
 <% content_for :nav_center, "Users - Admin" %>
 
+<% users_content = capture do %>
 <section id="admin-users" class="space-y-6">
   <!-- Header with back link -->
   <div class="flex items-center gap-3">
@@ -62,7 +63,16 @@
           <% @users.each do |user_data| %>
             <tr class="hover:bg-stone-200 dark:hover:bg-white/20 transition-colors">
               <td class="px-5 py-4 text-sm text-stone-900 dark:text-stone-100">
-                <%= user_data[:email] %>
+                <div class="flex items-center justify-between gap-3">
+                  <span><%= user_data[:email] %></span>
+                  <% unless user_data[:user] == current_user %>
+                    <%= button_to "Delete",
+                        admin_user_path(user_data[:user]),
+                        method: :delete,
+                        data: { turbo_confirm: "User wirklich löschen?" },
+                        class: "px-2.5 py-1 text-xs font-semibold rounded bg-red-500/12 text-red-400 border border-red-500/20 hover:bg-red-500/18 transition-colors cursor-pointer" %>
+                  <% end %>
+                </div>
               </td>
               <td class="px-5 py-4 text-sm text-stone-600 dark:text-purple-100">
                 <%= user_data[:created_at].strftime("%b %d, %Y") %>
@@ -92,3 +102,12 @@
     Total: <%= pluralize(@users.count, 'user') %>
   </div>
 </section>
+<% end %>
+
+<% if turbo_frame_request? %>
+  <%= render "admin/shared/overlay", title: "Admin Users" do %>
+    <%= users_content %>
+  <% end %>
+<% else %>
+  <%= users_content %>
+<% end %>

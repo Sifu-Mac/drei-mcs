@@ -1,0 +1,22 @@
+<%= turbo_frame_tag "admin_panel" do %>
+  <div data-controller="admin-modal">
+    <div data-admin-modal-target="backdrop"
+         data-action="click->admin-modal#close"
+         class="hidden opacity-0 transition-opacity duration-200 ease-out"
+         style="position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);z-index:220"></div>
+
+    <div data-admin-modal-target="modal"
+         class="hidden opacity-0 scale-95 transition-all duration-200 ease-out"
+         style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(1100px,calc(100vw - 32px));height:min(88vh,900px);background:#1a1a1e;border:1px solid rgba(255,255,255,0.06);border-radius:18px;display:flex;flex-direction:column;z-index:221;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+      <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+        <div style="font-size:14px;font-weight:800;color:#e0e0e0"><%= title %></div>
+        <button type="button"
+                data-action="click->admin-modal#close"
+                style="background:none;border:none;cursor:pointer;color:#666;font-size:20px">✕</button>
+      </div>
+      <div style="flex:1;overflow:auto;padding:20px 20px 28px">
+        <%= yield %>
+      </div>
+    </div>
+  </div>
+<% end %>
