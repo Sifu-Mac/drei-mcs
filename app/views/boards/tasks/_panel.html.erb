@@ -25,21 +25,20 @@
   </div>
   <!-- Centered Modal -->
   <div data-task-modal-target="modal"
-       class="hidden opacity-0 scale-95 transition-all duration-200 ease-out"
-       style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(920px,calc(100vw - 32px));height:min(86vh,900px);background:#1a1a1e;border:1px solid rgba(255,255,255,0.06);border-radius:18px;display:flex;flex-direction:column;z-index:201;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
+       class="hidden opacity-0 transition-all duration-200 ease-out fixed inset-0 z-[201] flex flex-col bg-[#1a1a1e] md:inset-auto md:top-1/2 md:left-1/2 md:h-[min(86vh,900px)] md:w-[min(920px,calc(100vw-32px))] md:-translate-x-1/2 md:-translate-y-1/2 md:scale-95 md:rounded-[18px] md:border md:border-white/10 md:shadow-[0_30px_80px_rgba(0,0,0,0.55)] overflow-hidden">
 
     <!-- Header — status pill + close -->
-    <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-      <div data-task-modal-target="statusPill" style="font-size:11px;font-weight:700;color:#ccc;background:rgba(255,255,255,0.06);padding:4px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.08)">
+    <div class="px-4 py-3 md:px-5 md:py-4 border-b border-white/5 flex items-center justify-between gap-3 shrink-0">
+      <div data-task-modal-target="statusPill" class="text-[11px] font-bold text-[#ccc] bg-white/5 px-3 py-1 rounded-md border border-white/10">
         <%= status_labels[task.status] %>
       </div>
       <button type="button"
               data-action="click->task-modal#close"
-              style="background:none;border:none;cursor:pointer;color:#444;font-size:18px">✕</button>
+              class="h-10 w-10 md:h-auto md:w-auto rounded-full md:rounded-none bg-white/5 md:bg-transparent border border-white/5 md:border-0 text-[#888] text-lg cursor-pointer flex items-center justify-center">✕</button>
     </div>
 
     <!-- Scrollable content -->
-    <div style="flex:1;overflow-y:auto;padding:20px 20px 32px;display:flex;flex-direction:column;gap:24px">
+    <div class="flex-1 overflow-y-auto px-4 py-4 md:px-5 md:py-5 md:pb-8 flex flex-col gap-5 md:gap-6">
 
       <%# === Auto-save form: title, notes, priority only === %>
       <%= form_with model: task, url: board_task_path(@board, task), method: :patch, id: dom_id(task, :edit), style: "display:flex;flex-direction:column;gap:24px", data: { task_modal_target: "form" } do |form| %>
@@ -49,15 +48,15 @@
         <div>
           <%= form.text_field :name,
               placeholder: "Task title",
-              style: "width:100%;font-size:20px;font-weight:800;color:#f0f0f0;letter-spacing:-0.02em;line-height:1.3;background:transparent;border:none;outline:none;padding:0;font-family:inherit",
+              class: "w-full bg-transparent border-0 outline-none p-0 text-xl md:text-[20px] font-extrabold tracking-[-0.02em] leading-tight text-[#f0f0f0]",
               data: { task_modal_target: "nameField", action: "input->task-modal#scheduleAutoSave" } %>
         </div>
 
         <!-- Notes -->
-        <div style="margin-top:20px">
+        <div class="mt-1 md:mt-3">
           <%= form.text_area :description,
               placeholder: "Add notes...",
-              style: "width:100%;min-height:120px;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);font-size:13px;color:#bbb;resize:vertical;outline:none;line-height:1.6;font-family:inherit",
+              class: "w-full min-h-[140px] md:min-h-[120px] p-3 rounded-xl border border-white/10 bg-white/5 text-[14px] text-[#bbb] resize-y outline-none leading-6",
               data: { task_modal_target: "descriptionField", action: "input->task-modal#scheduleAutoSave" } %>
         </div>
 
@@ -67,21 +66,21 @@
 
       <%# === Details section: status, priority, agent — outside form === %>
       <div>
-        <div style="font-size:13px;font-weight:700;color:#e0e0e0;margin-bottom:14px">Details</div>
+        <div class="text-[13px] font-bold text-[#e0e0e0] mb-3.5">Details</div>
 
         <!-- Status row -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px" data-controller="dropdown">
-          <span style="font-size:12px;font-weight:500;color:#888">Status</span>
-          <div style="position:relative">
+        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-3" data-controller="dropdown">
+          <span class="text-xs font-medium text-[#888]">Status</span>
+          <div class="relative w-full md:w-auto">
             <button type="button" data-action="click->dropdown#toggle" data-dropdown-target="button" aria-expanded="false"
-                    style="display:flex;align-items:center;gap:7px;padding:5px 12px;border-radius:8px;cursor:pointer;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);transition:all 0.12s">
+                    class="w-full md:w-auto min-h-11 flex items-center justify-between gap-2 px-3 py-2 rounded-lg cursor-pointer bg-white/5 border border-white/10 transition-all text-left">
               <div data-task-modal-target="statusDot" style="width:6px;height:6px;border-radius:50%;background:<%= status_dot_colors[task.status] %>"></div>
-              <span data-task-modal-target="statusLabel" style="font-size:12px;font-weight:600;color:#ccc"><%= status_labels[task.status] %></span>
+              <span data-task-modal-target="statusLabel" class="text-xs font-semibold text-[#ccc] flex-1"><%= status_labels[task.status] %></span>
               <svg width="10" height="10" viewBox="0 0 16 16" fill="none" style="opacity:0.3">
                 <path d="M4 6L8 10L12 6" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
-            <div data-dropdown-target="menu" class="hidden" style="position:absolute;top:calc(100% + 4px);right:0;width:180px;padding:4px;border-radius:10px;background:#222226;border:1px solid rgba(255,255,255,0.08);box-shadow:0 12px 40px rgba(0,0,0,0.5);z-index:10;animation:dropIn 0.12s ease both">
+            <div data-dropdown-target="menu" class="hidden absolute top-[calc(100%+4px)] right-0 w-full md:w-[180px] p-1 rounded-[10px] bg-[#222226] border border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.5)] z-10">
               <% status_labels.each do |status_key, status_label| %>
                 <button type="button"
                         data-action="click->task-modal#changeStatus"
@@ -113,13 +112,14 @@
           }
           current_p = priority_config[task.priority] || priority_config["none"]
         %>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <span style="font-size:12px;font-weight:500;color:#888">Priority</span>
+        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-3">
+          <span class="text-xs font-medium text-[#888]">Priority</span>
           <button type="button"
                   data-action="click->task-modal#cyclePriority"
                   data-task-modal-target="priorityButton"
                   data-priority-value="<%= task.priority %>"
-                  style="width:100px;height:30px;border-radius:7px;cursor:pointer;background:<%= current_p[:bg] %>;border:1px solid <%= current_p[:border] %>;display:flex;align-items:center;justify-content:center;gap:2px;transition:all 0.12s">
+                  class="w-full md:w-[100px] h-11 md:h-[30px] rounded-lg md:rounded-[7px] cursor-pointer flex items-center justify-center gap-2 transition-all"
+                  style="background:<%= current_p[:bg] %>;border:1px solid <%= current_p[:border] %>">
             <% if current_p[:dots] == 0 %>
               <div style="width:5px;height:5px;border-radius:50%;background:#555;opacity:0.3"></div>
             <% else %>
@@ -131,23 +131,24 @@
         </div>
 
         <!-- Owner row -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <span style="font-size:12px;font-weight:500;color:#888">Owner</span>
+        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-3">
+          <span class="text-xs font-medium text-[#888]">Owner</span>
           <%= select_tag "task[owner]",
               options_for_select(owner_labels.map { |key, label| [label, key] }, task.owner),
               form: dom_id(task, :edit),
               id: nil,
-              style: "width:100px;height:30px;padding:0 8px;border-radius:7px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);color:#ccc;font-size:12px;font-weight:600;outline:none",
+              class: "w-full md:w-[100px] h-11 md:h-[30px] px-3 md:px-2 rounded-lg md:rounded-[7px] bg-white/5 border border-white/10 text-[#ccc] text-sm md:text-xs font-semibold outline-none",
               data: { action: "change->task-modal#scheduleAutoSave" } %>
         </div>
 
         <!-- Agent row -->
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <span style="font-size:12px;font-weight:500;color:#888">Agent</span>
+        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <span class="text-xs font-medium text-[#888]">Agent</span>
           <% if task.assigned_to_agent? %>
             <button type="button"
                     data-action="click->task-modal#toggleAgent"
-                    style="width:100px;height:30px;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:7px;cursor:pointer;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.2);transition:all 0.12s">
+                    class="w-full md:w-[100px] h-11 md:h-[30px] flex items-center justify-center gap-2 rounded-lg md:rounded-[7px] cursor-pointer transition-all"
+                    style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.2)">
               <span style="font-size:11px">🤖</span>
               <span style="font-size:11px;font-weight:600;color:#fbbf24">Assigned</span>
             </button>
@@ -156,12 +157,14 @@
             <% if agent_connected %>
               <button type="button"
                       data-action="click->task-modal#toggleAgent"
-                      style="width:100px;height:30px;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:7px;cursor:pointer;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);transition:all 0.12s">
+                      class="w-full md:w-[100px] h-11 md:h-[30px] flex items-center justify-center gap-2 rounded-lg md:rounded-[7px] cursor-pointer transition-all"
+                      style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)">
                 <span style="font-size:11px">🤖</span>
                 <span style="font-size:11px;font-weight:600;color:#555">Assign</span>
               </button>
             <% else %>
-              <span style="width:100px;height:30px;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:7px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);cursor:not-allowed">
+              <span class="w-full md:w-[100px] h-11 md:h-[30px] flex items-center justify-center gap-2 rounded-lg md:rounded-[7px] cursor-not-allowed"
+                    style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)">
                 <span style="font-size:11px">🤖</span>
                 <span style="font-size:11px;font-weight:600;color:#555">Assign</span>
               </span>
@@ -247,18 +250,18 @@
       </div>
     </div>
 
-    <div style="padding:14px 20px;border-top:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;background:#1a1a1e">
-      <span data-task-modal-target="saveStatus" style="font-size:11px;font-weight:600;color:#666">Auto-save active</span>
-      <div style="display:flex;align-items:center;gap:10px">
+    <div class="px-4 py-3 md:px-5 md:py-3.5 border-t border-white/5 flex flex-col md:flex-row md:items-center md:justify-between gap-3 shrink-0 bg-[#1a1a1e]">
+      <span data-task-modal-target="saveStatus" class="text-[11px] font-semibold text-[#666]">Auto-save active</span>
+      <div class="flex items-center gap-2 md:gap-2.5 w-full md:w-auto">
         <button type="button"
                 data-action="click->task-modal#close"
-                style="padding:9px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);color:#aaa;font-size:12px;font-weight:700;cursor:pointer">
-          Close
+                class="flex-1 md:flex-none min-h-11 px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-[#aaa] text-sm md:text-xs font-bold cursor-pointer">
+          Done
         </button>
         <button type="button"
                 data-action="click->task-modal#save"
                 data-task-modal-target="saveButton"
-                style="padding:9px 14px;border-radius:10px;border:none;background:#60a5fa;color:#0b1220;font-size:12px;font-weight:800;cursor:pointer">
+                class="hidden md:inline-flex items-center justify-center px-3.5 py-2.5 rounded-[10px] border-0 bg-[#60a5fa] text-[#0b1220] text-xs font-extrabold cursor-pointer">
           Save
         </button>
       </div>
