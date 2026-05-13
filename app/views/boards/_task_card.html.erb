@@ -139,7 +139,7 @@
     has_metadata = show_priority || subtask_total > 0 || has_agent || has_hint || has_owner
   %>
 
-  <%= link_to board_task_path(task.board, task), class: "block pr-8", data: { turbo_frame: "_top" } do %>
+  <%= link_to board_task_path(task.board, task), class: "block pr-8", data: { turbo_frame: "task_panel" } do %>
     <%# Task Title %>
     <div style="font-size:13px;font-weight:600;color:<%= is_done ? '#555' : '#ddd' %>;line-height:1.35;<%= 'margin-bottom:7px' if has_metadata %>">
       <%= task.name %>
