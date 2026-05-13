@@ -24,11 +24,10 @@ Rails.application.routes.draw do
 
   namespace :admin do
     root to: "dashboard#index"
-    resources :users, only: [ :index ]
+    resources :users, only: [ :index, :create ]
   end
 
   resource :session, only: [:new, :create, :destroy]
-  resource :registration, only: [:new, :create]
   get "/auth/:provider/callback", to: "omniauth_callbacks#github", as: :omniauth_callback
   get "/auth/failure", to: "omniauth_callbacks#failure"
   resources :passwords, param: :token

@@ -19,6 +19,7 @@ class User < ApplicationRecord
   validates :password, length: { minimum: 8 }, if: :password_required?
   validates :password, confirmation: true, if: :password_required?
 
+  after_create :ensure_first_admin
   after_create_commit :create_onboarding_board
 
   validates :email_address, presence: true,
@@ -92,6 +93,10 @@ class User < ApplicationRecord
 
   def create_onboarding_board
     Board.create_onboarding_for(self)
+  end
+
+  def ensure_first_admin
+    self.update_column(:admin, true) if User.where(admin: true).where.not(id: id).none?
   end
 
   def avatar_changed?

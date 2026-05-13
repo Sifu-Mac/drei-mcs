@@ -9,6 +9,42 @@
     <% end %>
   </div>
 
+  <div class="bg-stone-100 dark:bg-white/10 rounded-md p-5 space-y-4">
+    <h2 class="text-sm font-semibold text-stone-900 dark:text-stone-100">Create user</h2>
+
+    <%= form_with model: @new_user, url: admin_users_path, class: "space-y-4" do |form| %>
+      <% if @new_user.errors.any? %>
+        <div class="p-3 rounded-md bg-red-500/10 text-red-400 text-xs">
+          <%= @new_user.errors.full_messages.join(", ") %>
+        </div>
+      <% end %>
+
+      <div class="grid gap-4 md:grid-cols-3">
+        <div>
+          <label class="block text-xs font-semibold text-stone-700 dark:text-purple-100 mb-1.5">Email</label>
+          <%= form.email_field :email_address, required: true, class: "w-full rounded-md px-3 py-2 text-sm bg-white dark:bg-white/5 border border-stone-300 dark:border-white/10 text-stone-900 dark:text-stone-100" %>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-stone-700 dark:text-purple-100 mb-1.5">Password</label>
+          <%= form.password_field :password, required: true, class: "w-full rounded-md px-3 py-2 text-sm bg-white dark:bg-white/5 border border-stone-300 dark:border-white/10 text-stone-900 dark:text-stone-100" %>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-stone-700 dark:text-purple-100 mb-1.5">Confirm password</label>
+          <%= form.password_field :password_confirmation, required: true, class: "w-full rounded-md px-3 py-2 text-sm bg-white dark:bg-white/5 border border-stone-300 dark:border-white/10 text-stone-900 dark:text-stone-100" %>
+        </div>
+      </div>
+
+      <label class="inline-flex items-center gap-2 text-sm text-stone-700 dark:text-purple-100">
+        <%= form.check_box :admin %>
+        Create as admin
+      </label>
+
+      <div>
+        <%= form.submit "Create user", class: "px-4 py-2 rounded-md text-xs font-semibold bg-stone-900 text-white dark:bg-white dark:text-stone-900 cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+
   <!-- Users table -->
   <div class="bg-stone-100 dark:bg-white/10 rounded-md overflow-hidden">
     <div class="overflow-x-auto">
@@ -18,6 +54,7 @@
             <th class="px-5 py-3 text-left text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Email</th>
             <th class="px-5 py-3 text-left text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Created</th>
             <th class="px-5 py-3 text-left text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Last Login</th>
+            <th class="px-5 py-3 text-center text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Role</th>
             <th class="px-5 py-3 text-center text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Tasks</th>
           </tr>
         </thead>
@@ -36,6 +73,9 @@
                 <% else %>
                   <span class="text-stone-400 dark:text-white/40">Never</span>
                 <% end %>
+              </td>
+              <td class="px-5 py-4 text-sm text-center text-stone-900 dark:text-stone-100 font-semibold">
+                <%= user_data[:user].admin? ? "Admin" : "User" %>
               </td>
               <td class="px-5 py-4 text-sm text-center text-stone-900 dark:text-stone-100 font-semibold">
                 <%= user_data[:tasks_count] %>

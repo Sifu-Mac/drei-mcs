@@ -38,8 +38,9 @@
       <%= form.submit "Sign in", class: "cursor-pointer inline-flex items-center space-x-2 p-3 bg-accent text-content rounded-md hover:bg-accent-hover transition-colors duration-200 text-xs font-semibold" %>
       <div class="flex items-center gap-3">
         <%= link_to "Forgot password?", new_password_path, class: "text-xs text-content-secondary hover:text-content transition-colors" %>
-        <%= link_to "Sign up", new_registration_path, class: "text-xs text-content-secondary hover:text-content transition-colors" %>
       </div>
     </div>
   <% end %>
+
+  <p class="text-xs text-content-muted">Account creation is restricted. Ask an admin to create your user.</p>
 </div>

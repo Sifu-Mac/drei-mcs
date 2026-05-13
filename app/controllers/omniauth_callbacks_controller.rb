@@ -9,6 +9,13 @@ class OmniauthCallbacksController < ApplicationController
       return
     end
 
+    user = User.find_by(email_address: auth.info.email.to_s.downcase.strip)
+
+    unless user
+      redirect_to new_session_path, alert: "Account creation is restricted. Ask an admin to create your user first."
+      return
+    end
+
     user = User.find_or_create_from_github(auth)
 
     if user.persisted?
