@@ -36,10 +36,10 @@ export default class extends Controller {
       this.backdropTarget.classList.remove("opacity-0")
     }, 10)
 
-    // Show panel (slide in from right)
+    // Show centered modal
     this.modalTarget.classList.remove("hidden")
     setTimeout(() => {
-      this.modalTarget.classList.remove("translate-x-full")
+      this.modalTarget.classList.remove("opacity-0", "scale-95")
     }, 10)
   }
 
@@ -51,8 +51,8 @@ export default class extends Controller {
       this.save()
     }
 
-    // Hide panel (slide out to right)
-    this.modalTarget.classList.add("translate-x-full")
+    // Hide modal
+    this.modalTarget.classList.add("opacity-0", "scale-95")
     this.backdropTarget.classList.add("opacity-0")
 
     setTimeout(() => {

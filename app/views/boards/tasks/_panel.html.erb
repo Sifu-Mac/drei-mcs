@@ -1,4 +1,4 @@
-<%# Task edit slide-in panel for kanban board %>
+<%# Task edit modal for kanban board %>
 <%
   status_labels = Task::STATUS_LABELS
   status_dot_colors = Task::STATUS_COLORS
@@ -20,16 +20,16 @@
   <!-- Backdrop -->
   <div data-task-modal-target="backdrop"
        data-action="click->task-modal#close"
-       style="position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200"
+       style="position:fixed;inset:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);z-index:200"
        class="hidden opacity-0 transition-opacity duration-200 ease-out">
   </div>
-  <!-- Slide-in Panel -->
+  <!-- Centered Modal -->
   <div data-task-modal-target="modal"
-       class="hidden translate-x-full transition-transform duration-200 ease-out"
-       style="position:fixed;top:0;right:0;width:400px;height:100vh;background:#1a1a1e;border-left:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;z-index:201;overflow:hidden">
+       class="hidden opacity-0 scale-95 transition-all duration-200 ease-out"
+       style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(920px,calc(100vw - 32px));height:min(86vh,900px);background:#1a1a1e;border:1px solid rgba(255,255,255,0.06);border-radius:18px;display:flex;flex-direction:column;z-index:201;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.55)">
 
     <!-- Header — status pill + close -->
-    <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between">
+    <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
       <div data-task-modal-target="statusPill" style="font-size:11px;font-weight:700;color:#ccc;background:rgba(255,255,255,0.06);padding:4px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.08)">
         <%= status_labels[task.status] %>
       </div>
