@@ -4,7 +4,8 @@ class Boards::TasksController < ApplicationController
 
   def show
     @api_token = current_user.api_token
-    render layout: false
+    @boards = current_user.boards
+    render layout: false if turbo_frame_request?
   end
 
   def new
