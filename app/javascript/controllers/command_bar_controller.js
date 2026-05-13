@@ -126,8 +126,8 @@ export default class extends Controller {
       return
     }
 
-    const statusLabels = { inbox: "Inbox", up_next: "Up Next", in_progress: "In Progress", in_review: "In Review", done: "Done" }
-    const statusDots = { inbox: "#888", up_next: "#60a5fa", in_progress: "#fbbf24", in_review: "#a78bfa", done: "#34d399" }
+    const statusLabels = { inbox: "Inbox", planned: "Planned", ready: "Ready", in_progress: "In Progress", blocked: "Blocked", review: "Review", done: "Done" }
+    const statusDots = { inbox: "#888", planned: "#94a3b8", ready: "#60a5fa", in_progress: "#fbbf24", blocked: "#ef4444", review: "#a78bfa", done: "#34d399" }
 
     this.searchResultsTarget.innerHTML = `
       <div class="px-2 py-1">

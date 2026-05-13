@@ -27,9 +27,11 @@ class BoardsController < ApplicationController
     # Group tasks by status
     @columns = {
       inbox: @tasks.inbox.order(position: :asc),
-      up_next: @tasks.up_next.order(position: :asc),
+      planned: @tasks.planned.order(position: :asc),
+      ready: @tasks.ready.order(position: :asc),
       in_progress: @tasks.in_progress.order(position: :asc),
-      in_review: @tasks.in_review.order(position: :asc),
+      blocked: @tasks.blocked.order(position: :asc),
+      review: @tasks.review.order(position: :asc),
       done: @tasks.done.order(position: :asc)
     }
 

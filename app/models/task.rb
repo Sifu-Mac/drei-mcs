@@ -1,15 +1,43 @@
 class Task < ApplicationRecord
+  STATUS_VALUES = { inbox: 0, planned: 1, ready: 2, in_progress: 3, blocked: 4, review: 5, done: 6 }.freeze
+  STATUS_LABELS = {
+    "inbox" => "Inbox",
+    "planned" => "Planned",
+    "ready" => "Ready",
+    "in_progress" => "In Progress",
+    "blocked" => "Blocked",
+    "review" => "Review",
+    "done" => "Done"
+  }.freeze
+  STATUS_COLORS = {
+    "inbox" => "#666",
+    "planned" => "#94a3b8",
+    "ready" => "#60a5fa",
+    "in_progress" => "#fbbf24",
+    "blocked" => "#ef4444",
+    "review" => "#a78bfa",
+    "done" => "#34d399"
+  }.freeze
+  OWNER_VALUES = { sifu: 0, james: 1, codex: 2 }.freeze
+  OWNER_LABELS = {
+    "sifu" => "Sifu",
+    "james" => "James",
+    "codex" => "Codex"
+  }.freeze
+
   belongs_to :user
   belongs_to :board
   has_many :activities, class_name: "TaskActivity", dependent: :destroy
   has_many :subtasks, dependent: :destroy
 
   enum :priority, { none: 0, low: 1, medium: 2, high: 3 }, default: :none, prefix: true
-  enum :status, { inbox: 0, up_next: 1, in_progress: 2, in_review: 3, done: 4 }, default: :inbox
+  enum :status, STATUS_VALUES, default: :inbox
+  enum :owner, OWNER_VALUES, default: :sifu, prefix: true
 
   validates :name, presence: true
   validates :priority, inclusion: { in: priorities.keys }
   validates :status, inclusion: { in: statuses.keys }
+  validates :owner, inclusion: { in: owners.keys }
 
   # Activity tracking - must be declared before callbacks that use it
   attr_accessor :activity_source, :actor_name, :actor_emoji, :activity_note
@@ -27,6 +55,7 @@ class Task < ApplicationRecord
 
   # Position management - acts_as_list functionality without the gem
   before_create :set_position
+  before_validation :sync_blocked_and_status
   before_save :sync_completed_with_status
   before_update :track_completion_time, if: :will_save_change_to_status?
 
@@ -46,7 +75,27 @@ class Task < ApplicationRecord
     update!(assigned_to_agent: false, assigned_at: nil)
   end
 
+  def status_label
+    STATUS_LABELS[status] || status.to_s.titleize
+  end
+
+  def owner_label
+    OWNER_LABELS[owner] || owner.to_s.titleize
+  end
+
   private
+
+  def sync_blocked_and_status
+    if status == "done"
+      self.blocked = false
+    elsif blocked?
+      self.status = "blocked" unless status == "done"
+    elsif status == "blocked"
+      self.blocked = true
+    else
+      self.blocked = false
+    end
+  end
 
   def set_position
     return if position.present?

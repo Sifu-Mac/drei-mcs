@@ -125,7 +125,8 @@
     p_cfg = priority_dot_config[task.priority]
     has_agent = task.assigned_to_agent?
     has_hint = task.respond_to?(:agent_hint) && task.agent_hint.present? && !is_done
-    has_metadata = show_priority || subtask_total > 0 || has_agent || has_hint
+    has_owner = task.owner.present?
+    has_metadata = show_priority || subtask_total > 0 || has_agent || has_hint || has_owner
   %>
 
   <%= link_to board_task_path(task.board, task), data: { turbo_frame: "task_panel" }, class: "block" do %>
@@ -135,8 +136,8 @@
     <%= task.name %>
   </div>
 
-  <%# Priority dots + subtasks row %>
-  <% if show_priority || subtask_total > 0 %>
+  <%# Priority dots + subtasks + owner row %>
+  <% if show_priority || subtask_total > 0 || has_owner %>
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       <% if show_priority %>
         <div style="display:flex;align-items:center;gap:2px">
@@ -153,12 +154,18 @@
           </div>
         </div>
       <% end %>
+      <% if has_owner %>
+        <div style="display:flex;align-items:center;gap:4px;padding:2px 6px;border-radius:999px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06)">
+          <span style="font-size:9px">👤</span>
+          <span style="font-size:10px;font-weight:600;color:#888"><%= task.owner_label %></span>
+        </div>
+      <% end %>
     </div>
   <% end %>
 
   <%# Agent status pill %>
   <% if has_agent %>
-    <% agent_done = task.status == "done" || task.status == "in_review" %>
+    <% agent_done = task.status == "done" || task.status == "review" %>
     <div style="display:flex;align-items:center;gap:4px;margin-top:8px;padding:3px 7px;border-radius:6px;background:<%= agent_done ? 'rgba(52,211,153,0.08)' : 'rgba(251,191,36,0.08)' %>;border:1px solid <%= agent_done ? 'rgba(52,211,153,0.10)' : 'rgba(251,191,36,0.10)' %>;width:fit-content">
       <span style="font-size:9px">🤖</span>
       <span style="font-size:9px;font-weight:600;color:<%= agent_done ? '#34d399' : '#fbbf24' %>"><%= agent_done ? 'Review' : 'Working' %></span>

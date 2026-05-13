@@ -25,20 +25,20 @@ class Board < ApplicationRecord
 
     tasks = [
       {
-        name: "👋 Welcome to ClawDeck!",
-        description: "Your mission control for AI agents. Drag tasks between columns, and your agent picks up what you assign. Think of it as a shared kanban with your AI coworker.",
-        status: "up_next",
+        name: "👋 Welcome to Mission Control!",
+        description: "This is your shared operating board for projects, tasks and agent work. Move cards through the workflow and keep owners explicit.",
+        status: "ready",
         position: 0
       },
       {
         name: "🔗 Connect your agent",
-        description: "Go to Settings → copy the integration prompt → paste it into your agent's config. Once connected, you'll see your agent appear in the header.",
+        description: "Go to Settings → copy the integration prompt → paste it into your agent config. Once connected, you'll see the agent in the header.",
         status: "inbox",
         position: 0
       },
       {
         name: "✅ Assign your first task",
-        description: "Create a task, then right-click → \"Assign to Agent\". Your agent will pick it up and start working. Watch the activity feed for updates!",
+        description: "Create a task, set the owner, then assign it when an agent should execute it. Watch the activity feed for updates.",
         status: "inbox",
         position: 1
       },
@@ -62,8 +62,8 @@ class Board < ApplicationRecord
       },
       {
         name: "🎯 Try it yourself!",
-        description: "Delete these cards and create your first real task. Be specific — your agent works best with clear instructions.",
-        status: "up_next",
+        description: "Delete these cards and create your first real task. Keep scope and ownership clear.",
+        status: "ready",
         position: 1
       }
     ]

@@ -4,7 +4,7 @@ module Api
       before_action :set_task, only: [ :show, :update, :destroy, :complete, :claim, :unclaim, :assign, :unassign ]
 
       # GET /api/v1/tasks/next - get next task for agent to work on
-      # Returns highest priority unclaimed task in "up_next" status
+      # Returns highest priority unclaimed task in "ready" status
       # Returns 204 No Content if no tasks available or user has auto_mode disabled
       def next
         # Check if user has agent auto mode enabled
@@ -14,7 +14,7 @@ module Api
         end
 
         @task = current_user.tasks
-          .where(status: :up_next, blocked: false, agent_claimed_at: nil)
+          .where(status: :ready, blocked: false, agent_claimed_at: nil)
           .reorder(priority: :desc, position: :asc)
           .first
 
@@ -182,7 +182,7 @@ module Api
       end
 
       def task_params
-        params.require(:task).permit(:name, :description, :priority, :due_date, :status, :blocked, :board_id, tags: [])
+        params.require(:task).permit(:name, :description, :priority, :due_date, :status, :owner, :blocked, :board_id, tags: [])
       end
 
       def task_json(task)
@@ -193,6 +193,8 @@ module Api
           description: task.description,
           priority: task.priority,
           status: task.status,
+          owner: task.owner,
+          owner_label: task.owner_label,
           blocked: task.blocked,
           tags: task.tags || [],
           completed: task.completed,

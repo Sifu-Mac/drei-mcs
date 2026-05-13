@@ -25,6 +25,7 @@
         <% end %>
 
         <%= form.hidden_field :priority, value: @task.priority || "none", data: { new_task_modal_target: "priorityField" } %>
+        <%= form.hidden_field :status, value: "inbox" %>
 
         <!-- Title -->
         <div>
@@ -48,8 +49,6 @@
           <h3 class="text-sm font-semibold text-content mb-4 font-display">Details</h3>
 
           <div class="space-y-4">
-<%= form.hidden_field :status, value: "inbox" %>
-
             <!-- Priority -->
             <div class="flex items-center justify-between">
               <span class="text-sm text-content-muted">Priority</span>
@@ -79,6 +78,14 @@
                   </div>
                 </button>
               </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-content-muted">Owner</span>
+              <%= form.select :owner,
+                  Task::OWNER_LABELS.map { |key, label| [label, key] },
+                  {},
+                  class: "bg-bg-elevated border border-border rounded-md px-3 py-1.5 text-sm text-content focus:outline-none focus:ring-0" %>
             </div>
 
           </div>

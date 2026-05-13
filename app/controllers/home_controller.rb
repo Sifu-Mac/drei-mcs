@@ -3,9 +3,10 @@ class HomeController < ApplicationController
     @user = current_user
     @boards = current_user.boards
 
-    # Today's tasks: due today + active tasks (up_next, in_progress)
+    # Today's tasks: due today + active tasks (ready, in_progress)
     @today_tasks = current_user.tasks
-      .where("due_date = ? OR status IN (?)", Date.today, [1, 2]) # up_next=1, in_progress=2
+      .where(due_date: Date.today)
+      .or(current_user.tasks.where(status: [:ready, :in_progress]))
       .where(completed: false)
       .includes(:board)
       .reorder(position: :asc)
@@ -56,7 +57,7 @@ class HomeController < ApplicationController
     # Summary counts
     @completed_count = @week_stats.sum { |d| d[:you] + d[:agent] }
     @in_progress_count = current_user.tasks.where(status: :in_progress, completed: false).count
-    @upcoming_count = current_user.tasks.where(status: [:inbox, :up_next], completed: false).count
+    @upcoming_count = current_user.tasks.where(status: [:inbox, :planned, :ready], completed: false).count
     @completed_today_count = @completed_today.count
   end
 end

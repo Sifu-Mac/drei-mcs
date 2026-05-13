@@ -5,7 +5,7 @@ class TaskActivity < ApplicationRecord
   validates :action, presence: true
 
   ACTIONS = %w[created updated moved].freeze
-  TRACKED_FIELDS = %w[name due_date].freeze
+  TRACKED_FIELDS = %w[name due_date owner].freeze
 
   scope :recent, -> { order(created_at: :desc) }
 
@@ -94,9 +94,11 @@ class TaskActivity < ApplicationRecord
   def format_status(status)
     case status
     when "inbox" then "Inbox"
-    when "up_next" then "Up Next"
+    when "planned" then "Planned"
+    when "ready" then "Ready"
     when "in_progress" then "In Progress"
-    when "in_review" then "In Review"
+    when "blocked" then "Blocked"
+    when "review" then "Review"
     when "done" then "Done"
     else status.to_s.titleize
     end
@@ -108,6 +110,8 @@ class TaskActivity < ApplicationRecord
     case field
     when "priority"
       Task.priorities.key(value)&.humanize || value.to_s
+    when "owner"
+      Task::OWNER_LABELS[Task.owners.key(value)] || value.to_s.titleize
     when "due_date"
       value.is_a?(Date) ? value.strftime("%b %d, %Y") : value.to_s
     else

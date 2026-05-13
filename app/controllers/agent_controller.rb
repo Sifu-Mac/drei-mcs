@@ -44,12 +44,12 @@ class AgentController < ApplicationController
       lines << "#{name} — already in progress" unless lines.length >= 5
     end
 
-    # High priority up_next tasks to fill remaining slots
+    # High priority ready tasks to fill remaining slots
     if lines.length < 3
-      up_next = tasks.where(status: :up_next).order(priority: :desc, position: :asc)
-                     .limit(3 - lines.length).pluck(:name, :priority)
-      up_next.each do |name, priority|
-        label = priority == "high" ? "high priority" : "up next"
+      ready = tasks.where(status: :ready).order(priority: :desc, position: :asc)
+                   .limit(3 - lines.length).pluck(:name, :priority)
+      ready.each do |name, priority|
+        label = priority == "high" ? "high priority" : "ready"
         lines << "#{name} — #{label}"
       end
     end

@@ -110,11 +110,11 @@ Include these headers with every request so your human knows who's connected:
 ### Polling for assigned tasks (every 30s or on heartbeat):
 1. Call `GET /tasks?assigned=true` to get tasks assigned to you
 2. Pick the first task (oldest assignment)
-3. Move it to "in_progress" and start working
+3. Move it to `in_progress` and start working
 
 ### When working on a task:
-- **Need help:** Set `blocked: true` — your human will unblock you
-- **Finished:** Move to "in_review" (needs human review) or "done" (complete)
+- **Need help:** Move it to `blocked` — your human will unblock you
+- **Finished:** Move to `review` (needs human review) or `done` (complete)
 
 ### You can also:
 - Create new tasks (ideas, follow-ups, things you noticed)
@@ -134,7 +134,7 @@ Returns tasks assigned to you, ordered by assignment time (oldest first).
 
 **Update task:**
 `PATCH /tasks/:id`
-Body: `{ "status": "in_progress" }` or `{ "blocked": true }`
+Body: `{ "status": "in_progress" }` or `{ "status": "blocked" }`
 
 **Complete task:**
 `PATCH /tasks/:id/complete`
@@ -145,9 +145,11 @@ Body: `{ "name": "Task title", "status": "inbox" }`
 
 ## Statuses
 - `inbox` — New, not prioritized
-- `up_next` — Prioritized, waiting to be assigned
+- `planned` — Captured, but not ready yet
+- `ready` — Prioritized and ready to execute
 - `in_progress` — You're working on it
-- `in_review` — Done, needs human review
+- `blocked` — Stuck and waiting for input
+- `review` — Done, needs human review
 - `done` — Complete
 
 ## Priorities
@@ -155,7 +157,7 @@ Body: `{ "name": "Task title", "status": "inbox" }`
 
 ## Tips
 - Poll for assigned tasks frequently — your human assigns work explicitly
-- When stuck, mark blocked — your human will unblock you
+- When stuck, move the task to `blocked`
 - Create tasks for things you notice but can't tackle now</pre>
       </div>
       <div class="flex items-center gap-3 mt-2">

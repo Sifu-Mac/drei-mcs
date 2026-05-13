@@ -23,7 +23,7 @@ export default class extends Controller {
       },
       body: JSON.stringify({
         task: {
-          status: newCompleted ? "done" : "up_next",
+          status: newCompleted ? "done" : "ready",
           activity_source: "web"
         }
       })

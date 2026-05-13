@@ -1,20 +1,3 @@
-<%
-  column_labels = {
-    "inbox" => "Inbox",
-    "up_next" => "Up Next",
-    "in_progress" => "In Progress",
-    "in_review" => "In Review",
-    "done" => "Done"
-  }
-  column_dot_colors = {
-    "inbox" => "#666",
-    "up_next" => "#60a5fa",
-    "in_progress" => "#fbbf24",
-    "in_review" => "#a78bfa",
-    "done" => "#34d399"
-  }
-%>
-
 <div class="flex-1 min-w-0 flex flex-col h-full overflow-hidden"
      data-controller="inline-add"
      data-inline-add-status-value="<%= status %>"
@@ -22,8 +5,8 @@
      data-status="<%= status %>">
   <%# Column Header %>
   <div class="flex items-center gap-2" style="padding:6px 8px 10px">
-    <div class="rounded-full" style="width:7px;height:7px;background:<%= column_dot_colors[status] %>"></div>
-    <span style="font-size:13px;font-weight:700;color:#bbb"><%= column_labels[status] %></span>
+    <div class="rounded-full" style="width:7px;height:7px;background:<%= Task::STATUS_COLORS[status] %>"></div>
+    <span style="font-size:13px;font-weight:700;color:#bbb"><%= Task::STATUS_LABELS[status] %></span>
     <span id="column-<%= status %>-count" style="font-size:11px;font-weight:600;color:#444;background:rgba(255,255,255,0.04);padding:0 7px;border-radius:5px;line-height:20px"><%= tasks.count %></span>
   </div>
 
