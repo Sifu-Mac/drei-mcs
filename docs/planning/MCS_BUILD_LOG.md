@@ -207,9 +207,16 @@ Grund:
 - Spalten wurden für Sidebar-Layout schmaler, aber klarer und höher gehalten.
 - Karten-Drag wurde von der Ecke auf die ganze Karte umgestellt (kurzer Hold statt Mini-Handle).
 
+## Architekturentscheidung: keine kurzfristige Pseudo-Lösung
+- Für Mission Control reicht ein separater James-User allein **nicht** aus.
+- Live-Test bestätigt: James sieht aktuell nur sein eigenes Onboarding-Board, nicht Sifus echtes Board.
+- Daraus folgt: MCS braucht **Shared Workspace / Shared Boards** als echten Architektur-Umbau.
+- Kurzfristige Workarounds über Sifus Token wurden bewusst verworfen.
+- Architekturplan dafür wurde in `docs/planning/MCS_IMPLEMENTATION_PLAN.md` als neue Phase festgehalten.
+
 ## Nächste sinnvolle Schritte
-1. UI-Reduktion + Overlay-Fix auf VPS deployen und live gegenprüfen
-2. Status / Owner / Kommentare im echten Flow prüfen
+1. Shared Workspace / Shared Boards planen und umsetzen
+2. danach echten Multi-Actor-Flow mit Sifu, James, Codex testen
 3. Kommentar-UI nachschärfen, falls nötig
 4. später optional kleines Type-Set
 5. später MCS-Task für VPS-Hardening anlegen
