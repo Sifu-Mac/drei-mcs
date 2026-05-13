@@ -41,7 +41,7 @@ class Boards::TasksController < ApplicationController
     if @task.update(task_params)
       respond_to do |format|
         format.turbo_stream
-        format.html { redirect_to board_path(@board), notice: "Task updated." }
+        format.html { redirect_to(request.referer.presence || board_task_path(@board, @task), notice: "Task updated.") }
       end
     else
       render :edit, status: :unprocessable_entity, layout: false
