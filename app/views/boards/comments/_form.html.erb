@@ -1,5 +1,5 @@
 <div id="task-comment-form-<%= task.id %>">
-  <%= form_with model: [board, task, task.comments.new], data: { controller: "comment-form" } do |form| %>
+  <%= form_with model: task.comments.new, url: board_task_comments_path(board, task), data: { controller: "comment-form" } do |form| %>
     <div style="display:flex;flex-direction:column;gap:8px">
       <%= form.text_area :body,
           rows: 2,
