@@ -15,16 +15,6 @@
     data-task-status="<%= task.status %>"
     data-task-position="<%= task.position %>">
 
-  <div class="task-drag-handle"
-       title="Drag card"
-       style="position:absolute;top:8px;right:8px;z-index:2;display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;cursor:grab;color:#666;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.05)"
-       onmouseenter="this.style.background='rgba(255,255,255,0.08)';this.style.color='#aaa'"
-       onmouseleave="this.style.background='rgba(255,255,255,0.04)';this.style.color='#666'">
-    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-      <circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/>
-    </svg>
-  </div>
-
   <%# Context Menu (right-click) - only rendered when current_user is available (not during broadcasts) %>
   <% if has_current_user %>
     <button data-dropdown-target="button" class="hidden" aria-expanded="false"></button>
@@ -136,7 +126,7 @@
     has_metadata = show_priority || subtask_total > 0
   %>
 
-  <%= link_to board_task_path(task.board, task), class: "block pr-8", data: { turbo_frame: "task_panel" } do %>
+  <%= link_to board_task_path(task.board, task), class: "task-card-surface block cursor-grab active:cursor-grabbing", data: { turbo_frame: "task_panel" } do %>
     <%# Task Title %>
     <div style="font-size:13px;font-weight:600;color:<%= is_done ? '#555' : '#ddd' %>;line-height:1.35;<%= 'margin-bottom:7px' if has_metadata %>">
       <%= task.name %>

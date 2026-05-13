@@ -1,0 +1,26 @@
+<aside class="hidden lg:flex lg:w-[220px] xl:w-[240px] shrink-0 flex-col border-r border-white/5 bg-[#141417]">
+  <div class="px-4 py-4 border-b border-white/5">
+    <div class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#555]">Boards</div>
+  </div>
+
+  <div class="flex-1 overflow-y-auto px-2 py-3 space-y-1.5">
+    <% @boards.each do |board| %>
+      <% active = @board&.id == board.id %>
+      <%= link_to board_path(board),
+          class: "flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors #{active ? 'bg-white/8' : 'hover:bg-white/4'}",
+          data: { turbo_frame: "_top" } do %>
+        <span class="text-base leading-none"><%= board.icon %></span>
+        <span class="text-[13px] font-semibold truncate #{active ? 'text-[#f0f0f0]' : 'text-[#9a9aa3]'}"><%= board.name %></span>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="px-3 py-3 border-t border-white/5">
+    <button type="button"
+            onclick="document.getElementById('new-board-modal').classList.remove('hidden')"
+            class="w-full flex items-center justify-center gap-2 rounded-xl bg-white/5 hover:bg-white/8 text-[#cfcfd5] text-[13px] font-semibold px-3 py-2.5 transition-colors cursor-pointer">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      New board
+    </button>
+  </div>
+</aside>

@@ -1,5 +1,5 @@
 <div id="board-column-<%= status %>"
-     class="w-[calc(100vw-32px)] shrink-0 snap-start md:flex-1 md:min-w-0 flex flex-col h-auto md:h-full overflow-visible md:overflow-hidden"
+     class="w-[calc(100vw-32px)] shrink-0 snap-start md:w-[280px] lg:w-[300px] xl:w-[320px] md:flex-none flex flex-col h-auto md:h-full overflow-visible md:overflow-hidden"
      data-controller="inline-add"
      data-board-target="column"
      data-inline-add-status-value="<%= status %>"
@@ -54,9 +54,9 @@
   <div data-inline-add-target="button" class="px-1.5 py-1">
     <button type="button"
             data-action="click->inline-add#show"
-            class="w-full flex items-center justify-center gap-2 rounded-xl cursor-pointer transition-colors border border-white/10 bg-white/5 hover:bg-white/10"
-            style="padding:11px 12px;font-size:13px;font-weight:700;color:#d4d4d8">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14 8H2M8 2V14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            class="w-full flex items-center gap-2 rounded-lg cursor-pointer border-none bg-transparent transition-colors hover:text-[#f0f0f0]"
+            style="padding:8px 4px;font-size:13px;font-weight:600;color:#a1a1aa">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M14 8H2M8 2V14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       Add a card
     </button>
   </div>

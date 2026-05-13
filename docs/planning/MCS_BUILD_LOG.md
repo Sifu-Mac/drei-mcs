@@ -202,7 +202,10 @@ Grund:
 - Home wurde aus dem Hauptfluss genommen; Auth-Redirects gehen jetzt direkt ins Board.
 - Header wurde reduziert: kein Home-Tab, kein Command-K-Hinweis, keine sichtbare Board-Settings-Aktion im Header.
 - Karten wurden entschlackt: Owner-/Agent-Lärm aus der Kartenansicht entfernt.
-- Add-a-card wurde sichtbarer gemacht.
+- Add-a-card wurde nach Feedback wieder entschärft: nur heller Text, kein konkurrierender Button-Look.
+- Desktop-Board bekam eine linke Sidebar mit allen Boards auf einen Blick.
+- Spalten wurden für Sidebar-Layout schmaler, aber klarer und höher gehalten.
+- Karten-Drag wurde von der Ecke auf die ganze Karte umgestellt (kurzer Hold statt Mini-Handle).
 
 ## Nächste sinnvolle Schritte
 1. UI-Reduktion + Overlay-Fix auf VPS deployen und live gegenprüfen
