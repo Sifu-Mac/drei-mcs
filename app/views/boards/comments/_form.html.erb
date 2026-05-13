@@ -1,0 +1,17 @@
+<div id="task-comment-form-<%= task.id %>">
+  <%= form_with model: [board, task, task.comments.new], data: { controller: "comment-form" } do |form| %>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <%= form.text_area :body,
+          rows: 2,
+          placeholder: "Write a comment...",
+          style: "width:100%;min-height:44px;max-height:120px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);font-size:12px;color:#bbb;resize:none;outline:none;line-height:1.5;font-family:inherit",
+          data: { comment_form_target: "input", action: "input->comment-form#autoResize keydown->comment-form#submitOnEnter" } %>
+      <% if local_assigns[:comment].present? && comment.errors.any? %>
+        <div style="font-size:11px;font-weight:500;color:#ef4444"><%= comment.errors.full_messages.join(", ") %></div>
+      <% end %>
+      <div style="display:flex;justify-content:flex-end">
+        <%= form.submit "Comment", style: "padding:7px 12px;border-radius:8px;background:#60a5fa;border:none;color:#0b1220;font-size:11px;font-weight:700;cursor:pointer" %>
+      </div>
+    </div>
+  <% end %>
+</div>

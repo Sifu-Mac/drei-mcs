@@ -1,0 +1,7 @@
+<%= turbo_stream.replace "task-comments-#{@task.id}" do %>
+  <%= render "boards/comments/list", task: @task %>
+<% end %>
+
+<%= turbo_stream.replace "task-comment-form-#{@task.id}" do %>
+  <%= render "boards/comments/form", board: @board, task: @task, comment: (@comment.persisted? ? nil : @comment) %>
+<% end %>

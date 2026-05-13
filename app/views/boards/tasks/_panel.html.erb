@@ -231,6 +231,15 @@
         </div>
       <% end %>
 
+      <!-- Comments -->
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#e0e0e0;margin-bottom:14px">Comments</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <%= render "boards/comments/form", board: @board, task: task %>
+          <%= render "boards/comments/list", task: task %>
+        </div>
+      </div>
+
       <!-- Activity Feed -->
       <div>
         <div style="font-size:13px;font-weight:700;color:#e0e0e0;margin-bottom:14px">Activity</div>

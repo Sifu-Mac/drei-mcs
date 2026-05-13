@@ -1,0 +1,12 @@
+<div id="task-comments-<%= task.id %>">
+  <% comments = task.comments.includes(:user).chronological %>
+  <% if comments.any? %>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <% comments.each do |comment| %>
+        <%= render "boards/comments/comment", comment: comment %>
+      <% end %>
+    </div>
+  <% else %>
+    <div style="font-size:12px;font-weight:500;color:#444;font-style:italic">No comments yet</div>
+  <% end %>
+</div>

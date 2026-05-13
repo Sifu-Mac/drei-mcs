@@ -45,6 +45,7 @@ Rails.application.routes.draw do
         patch :unassign
       end
       resources :subtasks, only: [ :create, :update, :destroy ], controller: "boards/subtasks"
+      resources :comments, only: [ :create ], controller: "boards/comments"
     end
   end
 

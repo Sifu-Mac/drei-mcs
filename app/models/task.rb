@@ -28,6 +28,7 @@ class Task < ApplicationRecord
   belongs_to :user
   belongs_to :board
   has_many :activities, class_name: "TaskActivity", dependent: :destroy
+  has_many :comments, class_name: "TaskComment", dependent: :destroy
   has_many :subtasks, dependent: :destroy
 
   enum :priority, { none: 0, low: 1, medium: 2, high: 3 }, default: :none, prefix: true

@@ -4,6 +4,7 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :boards, dependent: :destroy
   has_many :tasks, dependent: :destroy
+  has_many :task_comments, dependent: :destroy
   has_many :api_tokens, dependent: :destroy
   has_one_attached :avatar
 

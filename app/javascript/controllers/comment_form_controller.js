@@ -14,8 +14,6 @@ export default class extends Controller {
       event.preventDefault()
       if (this.inputTarget.value.trim()) {
         this.element.requestSubmit()
-        this.inputTarget.value = ""
-        this.autoResize()
       }
     }
   }
