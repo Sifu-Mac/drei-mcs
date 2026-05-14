@@ -4,7 +4,7 @@ class Boards::TasksController < ApplicationController
 
   def show
     @api_token = current_user.api_token
-    @boards = current_user.boards
+    @boards = current_user.accessible_boards
     render layout: false if turbo_frame_request?
   end
 
@@ -89,7 +89,7 @@ class Boards::TasksController < ApplicationController
   private
 
   def set_board
-    @board = current_user.boards.find(params[:board_id])
+    @board = current_user.accessible_boards.find(params[:board_id])
   end
 
   def set_task

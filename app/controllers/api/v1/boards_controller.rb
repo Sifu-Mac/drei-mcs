@@ -5,7 +5,7 @@ module Api
 
       # GET /api/v1/boards
       def index
-        @boards = current_user.boards
+        @boards = current_user.accessible_boards
           .left_joins(:tasks)
           .select("boards.*, COUNT(tasks.id) as tasks_count_cache")
           .group("boards.id")
@@ -20,7 +20,8 @@ module Api
 
       # POST /api/v1/boards
       def create
-        @board = current_user.boards.new(board_params)
+        workspace = current_user.current_workspace || current_user.owned_workspaces.create!(name: "Mission Control")
+        @board = workspace.boards.new(board_params.merge(user: current_user))
 
         if @board.save
           render json: board_json(@board), status: :created
@@ -40,7 +41,7 @@ module Api
 
       # DELETE /api/v1/boards/:id
       def destroy
-        if current_user.boards.count <= 1
+        if @board.workspace.boards.count <= 1
           render json: { error: "Cannot delete your only board" }, status: :unprocessable_entity
         else
           @board.destroy!
@@ -51,7 +52,7 @@ module Api
       private
 
       def set_board
-        @board = current_user.boards.find(params[:id])
+        @board = current_user.accessible_boards.find(params[:id])
       end
 
       def board_params
@@ -66,7 +67,8 @@ module Api
           color: board.color,
           tasks_count: use_cached_count ? (board.tasks_count_cache || 0) : board.tasks.count,
           created_at: board.created_at.iso8601,
-          updated_at: board.updated_at.iso8601
+          updated_at: board.updated_at.iso8601,
+          workspace_id: board.workspace_id
         }
 
         if include_tasks

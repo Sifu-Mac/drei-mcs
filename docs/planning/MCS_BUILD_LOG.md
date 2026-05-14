@@ -214,10 +214,35 @@ Grund:
 - Kurzfristige Workarounds über Sifus Token wurden bewusst verworfen.
 - Architekturplan dafür wurde in `docs/planning/MCS_IMPLEMENTATION_PLAN.md` als neue Phase festgehalten.
 
+## 2026-05-14
+
+### Shared Workspace Umbau gestartet
+Umgesetzt im Code:
+- neue Modelle `Workspace` und `WorkspaceMembership`
+- neue Migration für `workspaces`, `workspace_memberships` und `boards.workspace_id`
+- bestehende Controller von `current_user.boards` / `current_user.tasks` auf workspace-basierten Zugriff umgestellt
+- Board-/Task-API liefert jetzt auch `workspace_id`
+- neue User werden jetzt automatisch dem primären Mission-Control-Workspace hinzugefügt
+- nur der allererste User bekommt beim frischen Setup noch das Onboarding-Board; weitere User landen direkt im gemeinsamen Workspace
+
+### Migrationslogik für Bestandsdaten
+Geplant/abgebildet in der Migration:
+- erster Bestands-User wird Owner des primären Workspace `Mission Control`
+- dessen bestehende Boards werden in diesen gemeinsamen Workspace verschoben
+- weitere Bestands-User bekommen eigene Alt-Workspaces für ihre bisherigen privaten Boards
+- alle Bestands-User werden zusätzlich Mitglied im primären gemeinsamen Workspace
+
+### Kleiner QA-Fix nebenbei
+- `/icon.svg` als echte Datei ergänzt, damit der 404 im Browser weg ist
+
+### Offener Punkt
+- lokaler Rails-/Ruby-Check war in dieser OpenClaw-Umgebung nicht möglich, weil hier weder `ruby` noch `bundle` verfügbar sind
+- echte Verifikation muss deshalb beim nächsten Lauf im App-Container oder auf dem VPS per `rails db:migrate` + kurzer UI/API-Prüfung passieren
+
 ## Nächste sinnvolle Schritte
-1. Shared Workspace / Shared Boards planen und umsetzen
-2. danach echten Multi-Actor-Flow mit Sifu, James, Codex testen
-3. Kommentar-UI nachschärfen, falls nötig
-4. später optional kleines Type-Set
+1. Migration auf der laufenden Instanz ausführen
+2. mit Sifu-, James- und Codex-User echte gemeinsame Board-Sicht prüfen
+3. danach Restfehler aus dem Shared-Workspace-Umbau glattziehen
+4. später optional Workspace-/Member-UI sauber ergänzen
 5. später MCS-Task für VPS-Hardening anlegen
 6. später Repo-Pulls auf VPS via SSH Deploy Key sauberer machen

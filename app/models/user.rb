@@ -6,6 +6,9 @@ class User < ApplicationRecord
   has_many :tasks, dependent: :destroy
   has_many :task_comments, dependent: :destroy
   has_many :api_tokens, dependent: :destroy
+  has_many :workspace_memberships, dependent: :destroy
+  has_many :workspaces, through: :workspace_memberships
+  has_many :owned_workspaces, class_name: "Workspace", foreign_key: :owner_id, dependent: :destroy
   has_one_attached :avatar
 
   # Primary API token for agent integration
@@ -20,7 +23,7 @@ class User < ApplicationRecord
   validates :password, confirmation: true, if: :password_required?
 
   after_create :ensure_first_admin
-  after_create_commit :create_onboarding_board
+  after_create_commit :ensure_workspace_setup
 
   validates :email_address, presence: true,
                            uniqueness: { case_sensitive: false },
@@ -84,6 +87,34 @@ class User < ApplicationRecord
     oauth_user? && !password_user?
   end
 
+  def accessible_boards
+    Board.joins(workspace: :workspace_memberships)
+         .where(workspace_memberships: { user_id: id })
+         .distinct
+  end
+
+  def accessible_tasks
+    Task.joins(board: { workspace: :workspace_memberships })
+        .where(workspace_memberships: { user_id: id })
+        .distinct
+  end
+
+  def current_workspace
+    collaboration_workspace || owned_workspaces.ordered.first || workspaces.ordered.first
+  end
+
+  def collaboration_workspace
+    workspaces
+      .left_joins(:workspace_memberships)
+      .group("workspaces.id")
+      .order(Arel.sql("COUNT(workspace_memberships.id) DESC"), :created_at)
+      .first
+  end
+
+  def workspace_owner?(workspace)
+    workspace_memberships.find_by(workspace_id: workspace.id)&.owner?
+  end
+
   private
 
   def password_required?
@@ -91,8 +122,16 @@ class User < ApplicationRecord
     !oauth_user? && (new_record? || password.present?)
   end
 
-  def create_onboarding_board
-    Board.create_onboarding_for(self)
+  def ensure_workspace_setup
+    workspace = Workspace.primary_collaboration_workspace
+
+    if workspace.nil?
+      workspace = owned_workspaces.create!(name: "Mission Control")
+      Board.create_onboarding_for(self, workspace: workspace)
+      return
+    end
+
+    workspace.add_member(self, role: :member) unless workspace.members.exists?(id: id)
   end
 
   def ensure_first_admin

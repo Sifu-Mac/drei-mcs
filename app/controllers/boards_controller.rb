@@ -2,13 +2,13 @@ class BoardsController < ApplicationController
   before_action :set_board, only: [:show, :update, :destroy, :update_task_status]
 
   def index
-    # Redirect to the first board
-    @board = current_user.boards.first
+    @board = current_user.accessible_boards.reorder(:position, :created_at).first
+
     if @board
       redirect_to board_path(@board)
     else
-      # Create a default board if none exists
-      @board = current_user.boards.create!(name: "Personal", icon: "📋", color: "gray")
+      workspace = current_user.current_workspace || current_user.owned_workspaces.create!(name: "Mission Control")
+      @board = workspace.boards.create!(user: current_user, name: "Mission Control", icon: "📋", color: "gray")
       redirect_to board_path(@board)
     end
   end
@@ -39,14 +39,15 @@ class BoardsController < ApplicationController
     @all_tags = @board.tasks.where.not(tags: []).pluck(:tags).flatten.uniq.sort
 
     # Get all boards for the sidebar
-    @boards = current_user.boards
+    @boards = current_user.accessible_boards
 
     # Get API token for agent status display
     @api_token = current_user.api_token
   end
 
   def create
-    @board = current_user.boards.new(board_params)
+    workspace = current_user.current_workspace || current_user.owned_workspaces.create!(name: "Mission Control")
+    @board = workspace.boards.new(board_params.merge(user: current_user))
 
     if @board.save
       redirect_to board_path(@board), notice: "Board created."
@@ -65,7 +66,7 @@ class BoardsController < ApplicationController
 
   def destroy
     # Don't allow deleting the last board
-    if current_user.boards.count <= 1
+    if @board.workspace.boards.count <= 1
       redirect_to board_path(@board), alert: "Cannot delete your only board."
       return
     end
@@ -96,7 +97,7 @@ class BoardsController < ApplicationController
   private
 
   def set_board
-    @board = current_user.boards.find(params[:id])
+    @board = current_user.accessible_boards.find(params[:id])
   end
 
   def board_params

@@ -1,5 +1,6 @@
 class Board < ApplicationRecord
   belongs_to :user
+  belongs_to :workspace
   has_many :tasks, dependent: :destroy
 
   validates :name, presence: true
@@ -16,8 +17,9 @@ class Board < ApplicationRecord
   # Available board icons (emojis)
   DEFAULT_ICONS = %w[📋 📝 🎯 🚀 💡 🔧 📊 🎨 📚 🏠 💼 🎮 🎵 📸 ✨ 🦞].freeze
 
-  def self.create_onboarding_for(user)
-    board = user.boards.create!(
+  def self.create_onboarding_for(user, workspace: user.current_workspace)
+    board = workspace.boards.create!(
+      user: user,
       name: "Getting Started",
       icon: "🚀",
       color: "blue"
@@ -80,7 +82,7 @@ class Board < ApplicationRecord
   def set_position
     return if position.present? && position > 0
 
-    max_position = user.boards.unscoped.where(user_id: user_id).maximum(:position) || 0
+    max_position = workspace.boards.unscoped.where(workspace_id: workspace_id).maximum(:position) || 0
     self.position = max_position + 1
   end
 end

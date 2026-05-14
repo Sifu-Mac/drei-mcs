@@ -17,7 +17,10 @@ class AgentController < ApplicationController
   private
 
   def tasks
-    @tasks ||= current_user.tasks.unscoped.where(user_id: current_user.id)
+    @tasks ||= Task.unscoped
+                   .joins(board: { workspace: :workspace_memberships })
+                   .where(workspace_memberships: { user_id: current_user.id })
+                   .distinct
   end
 
   def build_focus_response
@@ -80,7 +83,7 @@ class AgentController < ApplicationController
     # Agent activity this week
     agent_completions = TaskActivity
       .joins(:task)
-      .where(tasks: { user_id: current_user.id })
+      .where(tasks: { id: tasks.select(:id) })
       .where(actor_type: "agent")
       .where("task_activities.created_at >= ?", week_start)
       .count
@@ -149,7 +152,7 @@ class AgentController < ApplicationController
       end
 
     elsif q.match?(/board|project/)
-      boards = current_user.boards.includes(:tasks)
+      boards = current_user.accessible_boards.includes(:tasks)
       lines = boards.map do |b|
         open_count = b.tasks.reject(&:completed).length
         "#{b.icon} #{b.name} — #{open_count} open tasks"

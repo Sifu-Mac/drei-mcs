@@ -52,7 +52,7 @@ class Boards::SubtasksController < ApplicationController
   private
 
   def set_board
-    @board = current_user.boards.find(params[:board_id])
+    @board = current_user.accessible_boards.find(params[:board_id])
   end
 
   def set_task

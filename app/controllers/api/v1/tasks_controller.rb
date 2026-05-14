@@ -13,7 +13,7 @@ module Api
           return
         end
 
-        @task = current_user.tasks
+        @task = current_user.accessible_tasks
           .where(status: :ready, blocked: false, agent_claimed_at: nil)
           .reorder(priority: :desc, position: :asc)
           .first
@@ -34,7 +34,7 @@ module Api
         end
 
         # Tasks in progress that agent claimed
-        @tasks = current_user.tasks
+        @tasks = current_user.accessible_tasks
           .where(status: :in_progress)
           .where.not(agent_claimed_at: nil)
 
@@ -71,7 +71,7 @@ module Api
 
       # GET /api/v1/tasks - all tasks for current user
       def index
-        @tasks = current_user.tasks
+        @tasks = current_user.accessible_tasks
 
         # Filter by board
         if params[:board_id].present?
@@ -101,6 +101,10 @@ module Api
           @tasks = @tasks.where(priority: params[:priority])
         end
 
+        if params[:owner].present? && Task.owners.key?(params[:owner])
+          @tasks = @tasks.where(owner: params[:owner])
+        end
+
         # Filter by agent assignment
         if params[:assigned].present?
           assigned = ActiveModel::Type::Boolean.new.cast(params[:assigned])
@@ -122,9 +126,10 @@ module Api
         # Assign to specified board or default to user's first board
         board_id = params.dig(:task, :board_id) || params[:board_id]
         board = if board_id.present?
-          current_user.boards.find(board_id)
+          current_user.accessible_boards.find(board_id)
         else
-          current_user.boards.first || current_user.boards.create!(name: "Personal", icon: "📋", color: "gray")
+          workspace = current_user.current_workspace || current_user.owned_workspaces.create!(name: "Mission Control")
+          current_user.accessible_boards.first || workspace.boards.create!(user: current_user, name: "Mission Control", icon: "📋", color: "gray")
         end
 
         @task = board.tasks.new(task_params)
@@ -171,7 +176,7 @@ module Api
       private
 
       def set_task
-        @task = current_user.tasks.find(params[:id])
+        @task = current_user.accessible_tasks.find(params[:id])
       end
 
       def set_task_activity_info(task)
@@ -205,6 +210,7 @@ module Api
           assigned_at: task.assigned_at&.iso8601,
           agent_claimed_at: task.agent_claimed_at&.iso8601,
           board_id: task.board_id,
+          workspace_id: task.board.workspace_id,
           url: "#{app_url}/boards/#{task.board_id}/tasks/#{task.id}",
           created_at: task.created_at.iso8601,
           updated_at: task.updated_at.iso8601
