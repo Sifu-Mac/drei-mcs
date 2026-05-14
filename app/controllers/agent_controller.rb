@@ -152,7 +152,7 @@ class AgentController < ApplicationController
       end
 
     elsif q.match?(/board|project/)
-      boards = current_user.accessible_boards.includes(:tasks)
+      boards = current_user.current_workspace_boards.includes(:tasks)
       lines = boards.map do |b|
         open_count = b.tasks.reject(&:completed).length
         "#{b.icon} #{b.name} — #{open_count} open tasks"

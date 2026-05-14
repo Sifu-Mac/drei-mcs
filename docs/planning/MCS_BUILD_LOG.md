@@ -239,6 +239,11 @@ Geplant/abgebildet in der Migration:
 - lokaler Rails-/Ruby-Check war in dieser OpenClaw-Umgebung nicht möglich, weil hier weder `ruby` noch `bundle` verfügbar sind
 - echte Verifikation muss deshalb beim nächsten Lauf im App-Container oder auf dem VPS per `rails db:migrate` + kurzer UI/API-Prüfung passieren
 
+### Nachtest: Workspace-Scoping war noch zu breit
+- James konnte nach dem ersten Umbau zwar mehrere Boards sehen, aber noch Boards aus mehreren Workspaces gleichzeitig.
+- Dadurch landete der Login auf einem falschen `Getting Started`-Board statt sauber im gemeinsamen Arbeitskontext.
+- Fix im Code: Board-/Task-Queries und Navbar auf `current_workspace_*` umgestellt statt global auf alle zugänglichen Workspaces.
+
 ## Nächste sinnvolle Schritte
 1. Migration auf der laufenden Instanz ausführen
 2. mit Sifu-, James- und Codex-User echte gemeinsame Board-Sicht prüfen

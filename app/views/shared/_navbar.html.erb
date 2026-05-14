@@ -1,6 +1,6 @@
 <%# Unified navbar — 52px, used on both board and non-board pages %>
 <%# Determine which board to show in switcher %>
-<% navbar_boards = authenticated? ? (defined?(@boards) && @boards ? @boards : current_user.accessible_boards) : [] %>
+<% navbar_boards = authenticated? ? (defined?(@boards) && @boards ? @boards : current_user.current_workspace_boards) : [] %>
 <% navbar_current_board = @board || navbar_boards.first %>
 
 <header class="relative flex-shrink-0 flex items-center justify-between h-[52px] bg-transparent" style="position: sticky; top: 0; z-index: 100; background: #161619; padding: 0 24px; border-bottom: 1px solid rgba(255,255,255,0.06);">

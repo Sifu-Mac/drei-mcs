@@ -1,7 +1,7 @@
 class BoardController < ApplicationController
   def show
     @board_page = true
-    @tasks = current_user.accessible_tasks
+    @tasks = current_user.current_workspace_tasks
 
     # Filter by tag if specified
     if params[:tag].present?
@@ -21,21 +21,21 @@ class BoardController < ApplicationController
     }
 
     # Get all unique tags for the sidebar filter
-    @all_tags = current_user.accessible_tasks.where.not(tags: []).pluck(:tags).flatten.uniq.sort
+    @all_tags = current_user.current_workspace_tasks.where.not(tags: []).pluck(:tags).flatten.uniq.sort
   end
 
   def update_task_status
     # Update positions for all tasks in the column
     if params[:task_ids].present?
       params[:task_ids].each_with_index do |task_id, index|
-        task = current_user.accessible_tasks.find(task_id)
+        task = current_user.current_workspace_tasks.find(task_id)
         task.update_columns(position: index + 1)
       end
     end
 
     # If a specific task changed status (moved between columns)
     if params[:id].present? && params[:status].present?
-      @task = current_user.accessible_tasks.find(params[:id])
+      @task = current_user.current_workspace_tasks.find(params[:id])
       @task.activity_source = "web"
       @task.update!(status: params[:status])
     end

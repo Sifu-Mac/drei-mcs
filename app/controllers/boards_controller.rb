@@ -2,7 +2,7 @@ class BoardsController < ApplicationController
   before_action :set_board, only: [:show, :update, :destroy, :update_task_status]
 
   def index
-    @board = current_user.accessible_boards.reorder(:position, :created_at).first
+    @board = current_user.current_workspace_boards.reorder(:position, :created_at).first
 
     if @board
       redirect_to board_path(@board)
@@ -39,7 +39,7 @@ class BoardsController < ApplicationController
     @all_tags = @board.tasks.where.not(tags: []).pluck(:tags).flatten.uniq.sort
 
     # Get all boards for the sidebar
-    @boards = current_user.accessible_boards
+    @boards = current_user.current_workspace_boards
 
     # Get API token for agent status display
     @api_token = current_user.api_token
@@ -97,7 +97,7 @@ class BoardsController < ApplicationController
   private
 
   def set_board
-    @board = current_user.accessible_boards.find(params[:id])
+    @board = current_user.current_workspace_boards.find(params[:id])
   end
 
   def board_params

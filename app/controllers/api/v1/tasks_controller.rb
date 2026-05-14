@@ -13,7 +13,7 @@ module Api
           return
         end
 
-        @task = current_user.accessible_tasks
+        @task = current_user.current_workspace_tasks
           .where(status: :ready, blocked: false, agent_claimed_at: nil)
           .reorder(priority: :desc, position: :asc)
           .first
@@ -34,7 +34,7 @@ module Api
         end
 
         # Tasks in progress that agent claimed
-        @tasks = current_user.accessible_tasks
+        @tasks = current_user.current_workspace_tasks
           .where(status: :in_progress)
           .where.not(agent_claimed_at: nil)
 
@@ -71,7 +71,7 @@ module Api
 
       # GET /api/v1/tasks - all tasks for current user
       def index
-        @tasks = current_user.accessible_tasks
+        @tasks = current_user.current_workspace_tasks
 
         # Filter by board
         if params[:board_id].present?
@@ -126,10 +126,10 @@ module Api
         # Assign to specified board or default to user's first board
         board_id = params.dig(:task, :board_id) || params[:board_id]
         board = if board_id.present?
-          current_user.accessible_boards.find(board_id)
+          current_user.current_workspace_boards.find(board_id)
         else
           workspace = current_user.current_workspace || current_user.owned_workspaces.create!(name: "Mission Control")
-          current_user.accessible_boards.first || workspace.boards.create!(user: current_user, name: "Mission Control", icon: "📋", color: "gray")
+          current_user.current_workspace_boards.first || workspace.boards.create!(user: current_user, name: "Mission Control", icon: "📋", color: "gray")
         end
 
         @task = board.tasks.new(task_params)
@@ -176,7 +176,7 @@ module Api
       private
 
       def set_task
-        @task = current_user.accessible_tasks.find(params[:id])
+        @task = current_user.current_workspace_tasks.find(params[:id])
       end
 
       def set_task_activity_info(task)

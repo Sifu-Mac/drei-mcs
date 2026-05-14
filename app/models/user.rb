@@ -99,6 +99,16 @@ class User < ApplicationRecord
         .distinct
   end
 
+  def current_workspace_boards
+    Board.where(workspace_id: current_workspace&.id)
+  end
+
+  def current_workspace_tasks
+    Task.joins(:board)
+        .where(boards: { workspace_id: current_workspace&.id })
+        .distinct
+  end
+
   def current_workspace
     collaboration_workspace || owned_workspaces.ordered.first || workspaces.ordered.first
   end

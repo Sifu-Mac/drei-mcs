@@ -5,7 +5,7 @@ module Api
 
       # GET /api/v1/boards
       def index
-        @boards = current_user.accessible_boards
+        @boards = current_user.current_workspace_boards
           .left_joins(:tasks)
           .select("boards.*, COUNT(tasks.id) as tasks_count_cache")
           .group("boards.id")
@@ -52,7 +52,7 @@ module Api
       private
 
       def set_board
-        @board = current_user.accessible_boards.find(params[:id])
+        @board = current_user.current_workspace_boards.find(params[:id])
       end
 
       def board_params
