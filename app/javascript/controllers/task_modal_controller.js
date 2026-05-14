@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 // Connects to data-controller="task-modal"
 export default class extends Controller {
   static targets = ["modal", "backdrop", "form", "nameField", "descriptionField", "submitButton", "priorityField", "priorityButton", "priorityLabel", "statusPill", "statusDot", "statusLabel", "saveStatus"]
-  static values = { taskId: Number, updateUrl: String, assignUrl: String, unassignUrl: String }
+  static values = { taskId: Number, updateUrl: String, assignUrl: String, unassignUrl: String, deleteUrl: String }
 
   connect() {
     this.boundHandleKeydown = this.handleKeydown.bind(this)
@@ -242,6 +242,31 @@ export default class extends Controller {
         const taskLink = document.querySelector(`[data-task-id="${this.taskIdValue}"] a[data-turbo-frame="task_panel"]`)
         if (taskLink) taskLink.click()
       }
+    })
+  }
+
+  deleteTask() {
+    if (!this.deleteUrlValue) return
+    if (!window.confirm('Task wirklich löschen?')) return
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
+
+    fetch(this.deleteUrlValue, {
+      method: 'DELETE',
+      headers: {
+        'Accept': 'text/vnd.turbo-stream.html',
+        'X-CSRF-Token': csrfToken
+      }
+    }).then(response => {
+      if (!response.ok) throw new Error('delete failed')
+      return response.text()
+    }).then(html => {
+      if (html) {
+        Turbo.renderStreamMessage(html)
+      }
+      this.close()
+    }).catch(() => {
+      this.setSaveState('error')
     })
   }
 
