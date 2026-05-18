@@ -62,8 +62,8 @@
 
     <div class="space-y-3">
       <h2 class="text-sm font-bold text-content">Comments</h2>
-      <%= render "boards/comments/form", board: @board, task: @task %>
       <%= render "boards/comments/list", task: @task %>
+      <%= render "boards/comments/form", board: @board, task: @task %>
     </div>
 
     <div class="space-y-3">

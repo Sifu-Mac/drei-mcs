@@ -2,15 +2,15 @@
   <%= form_with model: task.comments.new, url: board_task_comments_path(board, task), data: { controller: "comment-form" } do |form| %>
     <div style="display:flex;flex-direction:column;gap:10px">
       <%= form.text_area :body,
-          rows: 2,
+          rows: 3,
           placeholder: "Write a comment...",
-          style: "width:100%;min-height:48px;max-height:140px;padding:12px 13px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);font-size:13px;color:#d0d0d5;resize:none;outline:none;line-height:1.55;font-family:inherit",
+          style: "width:100%;min-height:64px;max-height:180px;padding:14px 15px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);font-size:15px;color:#e3e3e8;resize:none;outline:none;line-height:1.65;font-family:inherit",
           data: { comment_form_target: "input", action: "input->comment-form#autoResize keydown->comment-form#submitOnEnter" } %>
       <% if local_assigns[:comment].present? && comment.errors.any? %>
         <div style="font-size:11px;font-weight:500;color:#ef4444"><%= comment.errors.full_messages.join(", ") %></div>
       <% end %>
       <div style="display:flex;justify-content:flex-end">
-        <%= form.submit "Post comment", style: "padding:9px 14px;border-radius:10px;background:#60a5fa;border:none;color:#0b1220;font-size:12px;font-weight:800;cursor:pointer" %>
+        <%= form.submit "Post comment", style: "padding:10px 15px;border-radius:10px;background:#60a5fa;border:none;color:#0b1220;font-size:13px;font-weight:800;cursor:pointer" %>
       </div>
     </div>
   <% end %>
