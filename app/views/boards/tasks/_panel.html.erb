@@ -244,8 +244,8 @@
       <div class="rounded-2xl border border-white/6 bg-white/[0.02] p-4 md:p-5">
         <div style="font-size:13px;font-weight:700;color:#e0e0e0;margin-bottom:14px">Comments</div>
         <div style="display:flex;flex-direction:column;gap:12px">
-          <%= render "boards/comments/form", board: @board, task: task %>
           <%= render "boards/comments/list", task: task %>
+          <%= render "boards/comments/form", board: @board, task: task %>
         </div>
       </div>
 

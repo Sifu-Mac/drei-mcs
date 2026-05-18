@@ -7,6 +7,9 @@ class TaskComment < ApplicationRecord
   scope :chronological, -> { order(created_at: :asc) }
 
   def author_label
-    user&.agent_name.presence || user&.email_address.to_s.split("@").first.presence || "Unknown"
+    return user.email_address.to_s.split("@").first.tr("._-", " ").titleize if user&.email_address.present?
+    return user.agent_name if user&.agent_name.present?
+
+    "Unknown"
   end
 end
