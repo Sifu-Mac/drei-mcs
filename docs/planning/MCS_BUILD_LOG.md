@@ -1,14 +1,14 @@
 # MCS Build Log
 
 ## Zweck
-Kurzes laufendes Protokoll für den Umbau von ClawDeck zu Mission Control System (MCS).
+Kurzes laufendes Protokoll für den Umbau von DREI Asset Review zu DREI Asset Review (MCS).
 
 ---
 
 ## 2026-05-13
 
 ### Zielbild festgelegt
-- ClawDeck wird zu einem selbstgehosteten **Mission Control System** für Zusammenarbeit zwischen **Sifu, James, Codex**.
+- DREI Asset Review wird zu einem selbstgehosteten **DREI Asset Review** für Zusammenarbeit zwischen **Sifu, James, Codex**.
 - Mehrere getrennte Projekte müssen unterstützt werden.
 - Deployment-Ziel: `mission.digitalbackup.cloud`
 - VPS-Hardening bewusst **verschoben**, später als MCS-Task.
@@ -19,8 +19,8 @@ Kurzes laufendes Protokoll für den Umbau von ClawDeck zu Mission Control System
 
 ### Repo und Basisimport
 - privates GitHub-Repo erstellt:
-  - `https://github.com/Sifu-Mac/mission-control-system`
-- ClawDeck als Basis importiert und lokal für MCS angepasst.
+  - `https://github.com/Sifu-Mac/drei-mcs`
+- DREI Asset Review als Basis importiert und lokal für MCS angepasst.
 
 ### Docker-Deployment gebaut
 Angelegt / angepasst:
@@ -55,7 +55,7 @@ Commit:
 
 ### Deployment auf VPS
 Pfad:
-- `/docker/mission-control-system`
+- `/docker/drei-mcs`
 
 Ergebnis:
 - App live auf `https://mission.digitalbackup.cloud`
@@ -76,7 +76,7 @@ Wichtig:
 
 ## Produktumbau Phase 1: Branding
 
-### ClawDeck → Mission Control
+### DREI Asset Review → DREI Asset Review
 Sichtbares Branding umgestellt:
 - Layout-Titel
 - Meta-/PWA-Namen
@@ -87,10 +87,10 @@ Sichtbares Branding umgestellt:
 - Admin-Titel
 
 GitHub-Links umgestellt auf:
-- `https://github.com/Sifu-Mac/mission-control-system`
+- `https://github.com/Sifu-Mac/drei-mcs`
 
 Commit:
-- `427519c` — `Rebrand UI from ClawDeck to Mission Control`
+- `427519c` — `Rebrand UI from DREI Asset Review to DREI Asset Review`
 
 ### Root direkt auf Login
 - Landingpage bleibt vorhanden, aber Root zeigt direkt auf Login.
@@ -208,7 +208,7 @@ Grund:
 - Karten-Drag wurde von der Ecke auf die ganze Karte umgestellt (kurzer Hold statt Mini-Handle).
 
 ## Architekturentscheidung: keine kurzfristige Pseudo-Lösung
-- Für Mission Control reicht ein separater James-User allein **nicht** aus.
+- Für DREI Asset Review reicht ein separater James-User allein **nicht** aus.
 - Live-Test bestätigt: James sieht aktuell nur sein eigenes Onboarding-Board, nicht Sifus echtes Board.
 - Daraus folgt: MCS braucht **Shared Workspace / Shared Boards** als echten Architektur-Umbau.
 - Kurzfristige Workarounds über Sifus Token wurden bewusst verworfen.
@@ -222,12 +222,12 @@ Umgesetzt im Code:
 - neue Migration für `workspaces`, `workspace_memberships` und `boards.workspace_id`
 - bestehende Controller von `current_user.boards` / `current_user.tasks` auf workspace-basierten Zugriff umgestellt
 - Board-/Task-API liefert jetzt auch `workspace_id`
-- neue User werden jetzt automatisch dem primären Mission-Control-Workspace hinzugefügt
+- neue User werden jetzt automatisch dem primären DREI Asset Review-Workspace hinzugefügt
 - nur der allererste User bekommt beim frischen Setup noch das Onboarding-Board; weitere User landen direkt im gemeinsamen Workspace
 
 ### Migrationslogik für Bestandsdaten
 Geplant/abgebildet in der Migration:
-- erster Bestands-User wird Owner des primären Workspace `Mission Control`
+- erster Bestands-User wird Owner des primären Workspace `DREI Asset Review`
 - dessen bestehende Boards werden in diesen gemeinsamen Workspace verschoben
 - weitere Bestands-User bekommen eigene Alt-Workspaces für ihre bisherigen privaten Boards
 - alle Bestands-User werden zusätzlich Mitglied im primären gemeinsamen Workspace

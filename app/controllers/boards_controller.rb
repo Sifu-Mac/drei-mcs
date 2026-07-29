@@ -7,8 +7,8 @@ class BoardsController < ApplicationController
     if @board
       redirect_to board_path(@board)
     else
-      workspace = current_user.current_workspace || current_user.owned_workspaces.create!(name: "Mission Control")
-      @board = workspace.boards.create!(user: current_user, name: "Mission Control", icon: "📋", color: "gray")
+      workspace = current_user.current_workspace || current_user.owned_workspaces.create!(name: "DREI Asset Review")
+      @board = workspace.boards.create!(user: current_user, name: "DREI Asset Review", icon: "📋", color: "gray")
       redirect_to board_path(@board)
     end
   end
@@ -46,7 +46,7 @@ class BoardsController < ApplicationController
   end
 
   def create
-    workspace = current_user.current_workspace || current_user.owned_workspaces.create!(name: "Mission Control")
+    workspace = current_user.current_workspace || current_user.owned_workspaces.create!(name: "DREI Asset Review")
     @board = workspace.boards.new(board_params.merge(user: current_user))
 
     if @board.save

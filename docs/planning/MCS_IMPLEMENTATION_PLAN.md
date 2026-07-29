@@ -1,18 +1,18 @@
 # MCS Implementation Plan
 
 ## Phase 1 — technische Basis
-- ClawDeck-Fork als Basis importieren
+- DREI Asset Review-Fork als Basis importieren
 - Docker-first Deployment bauen
 - Traefik-Expose auf `mission.digitalbackup.cloud`
 - PostgreSQL + persistent storage anbinden
 - Self-hosting-Hardcodings entfernen
 
 ## Phase 2 — MCS v1 fachlich
-- Statusmodell von ClawDeck auf MCS anpassen
+- Statusmodell von DREI Asset Review auf MCS anpassen
 - Owner-Modell für `Sifu`, `James`, `Codex`
 - Task-Typen ergänzen
 - Definition of Done ergänzen
-- Branding von ClawDeck auf Mission Control umstellen
+- Branding von DREI Asset Review auf DREI Asset Review umstellen
 
 ## Phase 3 — Arbeitsmodus
 - Übergaben James ↔ Codex sauber abbilden
@@ -35,7 +35,7 @@
 ### Warum das nötig ist
 - aktueller Zustand: jeder User sieht nur eigene Boards/Tasks
 - Folge: James-User und Codex-User sehen Sifus echte Ready-Tasks nicht
-- damit ist die Mission-Control-Idee fachlich noch nicht erfüllt
+- damit ist die DREI Asset Review-Idee fachlich noch nicht erfüllt
 
 ### Zielmodell
 - `Workspace` oder `Project Space` als gemeinsame Hülle

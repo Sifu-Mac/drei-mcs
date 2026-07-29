@@ -29,4 +29,4 @@ docker compose --env-file .env.production up -d --build
 ## Offene fachliche Umbauten
 - Statusmodell auf MCS anpassen
 - Owner-Modell für Sifu/James/Codex ergänzen
-- Branding konsequent auf Mission Control umstellen
+- Branding konsequent auf DREI Asset Review umstellen

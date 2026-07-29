@@ -32,7 +32,7 @@ module ApplicationHelper
   end
 
   def app_name
-    ENV.fetch("APP_NAME", "Mission Control")
+    ENV.fetch("APP_NAME", "DREI Asset Review")
   end
 
   def app_host

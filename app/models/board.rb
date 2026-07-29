@@ -27,7 +27,7 @@ class Board < ApplicationRecord
 
     tasks = [
       {
-        name: "👋 Welcome to Mission Control!",
+        name: "👋 Welcome to DREI Asset Review!",
         description: "This is your shared operating board for projects, tasks and agent work. Move cards through the workflow and keep owners explicit.",
         status: "ready",
         position: 0

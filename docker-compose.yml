@@ -47,10 +47,10 @@ services:
       - "3000"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.mission-control-system.rule=Host(`${APP_HOST}`)
-      - traefik.http.routers.mission-control-system.entrypoints=websecure
-      - traefik.http.routers.mission-control-system.tls.certresolver=letsencrypt
-      - traefik.http.services.mission-control-system.loadbalancer.server.port=3000
+      - traefik.http.routers.drei-mcs.rule=Host(`${APP_HOST}`)
+      - traefik.http.routers.drei-mcs.entrypoints=websecure
+      - traefik.http.routers.drei-mcs.tls.certresolver=letsencrypt
+      - traefik.http.services.drei-mcs.loadbalancer.server.port=3000
 
 volumes:
   mcs-postgres:
