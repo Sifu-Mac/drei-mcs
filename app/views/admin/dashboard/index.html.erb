@@ -44,6 +44,16 @@
         Signups (7 days)
       </div>
     </div>
+
+    <!-- Pending Invites -->
+    <%= link_to admin_invites_path, class: "block bg-bg-surface border border-border p-5 rounded-lg hover:bg-bg-hover transition-colors col-span-2 shadow-sm" do %>
+      <div class="text-3xl font-bold text-content mb-2">
+        <%= @pending_invites %>
+      </div>
+      <div class="text-sm text-content-secondary">
+        Pending Invites
+      </div>
+    <% end %>
   </div>
 </section>
 <% end %>
