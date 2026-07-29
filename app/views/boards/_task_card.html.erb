@@ -135,6 +135,16 @@
   %>
 
   <%= link_to board_task_path(task.board, task), class: "block select-none", data: { turbo_frame: "task_panel" } do %>
+    <% if task.cover_image.attached? %>
+      <div style="margin:-2px 0 10px;border-radius:9px;overflow:hidden;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.05)">
+        <%= image_tag task.cover_image, alt: "", style: "display:block;width:100%;height:auto;max-height:180px;object-fit:cover" %>
+      </div>
+    <% else %>
+      <div aria-hidden="true" style="height:72px;margin:-2px 0 10px;border-radius:9px;background:linear-gradient(135deg,rgba(255,255,255,0.055),rgba(255,255,255,0.018));border:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;color:#555;font-size:18px">
+        ▧
+      </div>
+    <% end %>
+
     <%# Task Title %>
     <div style="font-size:13px;font-weight:600;color:<%= is_done ? '#555' : '#ddd' %>;line-height:1.35;<%= 'margin-bottom:7px' if has_metadata %>">
       <%= task.name %>

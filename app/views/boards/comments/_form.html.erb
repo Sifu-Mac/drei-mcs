@@ -1,5 +1,5 @@
 <div id="task-comment-form-<%= task.id %>">
-  <%= form_with model: task.comments.new, url: board_task_comments_path(board, task), data: { controller: "comment-form" } do |form| %>
+  <%= form_with model: task.comments.new, url: board_task_comments_path(board, task), data: { controller: "comment-form" }, html: { multipart: true } do |form| %>
     <div style="display:flex;flex-direction:column;gap:10px">
       <%= form.text_area :body,
           rows: 3,
@@ -9,7 +9,11 @@
       <% if local_assigns[:comment].present? && comment.errors.any? %>
         <div style="font-size:11px;font-weight:500;color:#ef4444"><%= comment.errors.full_messages.join(", ") %></div>
       <% end %>
-      <div style="display:flex;justify-content:flex-end">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <%= form.file_field :images,
+            multiple: true,
+            accept: "image/jpeg,image/png,image/webp,image/gif",
+            style: "max-width:280px;font-size:12px;color:#888" %>
         <%= form.submit "Post comment", style: "padding:10px 15px;border-radius:10px;background:#60a5fa;border:none;color:#0b1220;font-size:13px;font-weight:800;cursor:pointer" %>
       </div>
     </div>

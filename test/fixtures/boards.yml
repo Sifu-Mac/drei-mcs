@@ -1,0 +1,13 @@
+one:
+  name: Test Board One
+  user: one
+  position: 1
+  icon: "📋"
+  color: gray
+
+two:
+  name: Test Board Two
+  user: two
+  position: 1
+  icon: "📋"
+  color: blue

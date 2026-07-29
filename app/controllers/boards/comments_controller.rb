@@ -30,6 +30,6 @@ class Boards::CommentsController < ApplicationController
   end
 
   def comment_params
-    params.require(:task_comment).permit(:body)
+    params.require(:task_comment).permit(:body, images: [])
   end
 end
