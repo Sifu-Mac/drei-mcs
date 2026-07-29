@@ -1,7 +1,7 @@
 # MCS_GAP_ANALYSIS.md
 
 ## Ziel
-ClawDeck als Basis für ein eigenes **Mission Control System (MCS)** nutzen.
+DREI Asset Review als Basis für ein eigenes **DREI Asset Review (MCS)** nutzen.
 
 Zielzustand:
 - mehrere sauber getrennte Projekte
@@ -13,7 +13,7 @@ Zielzustand:
 ---
 
 ## Kurzurteil
-**Ja, ClawDeck ist eine brauchbare Basis.**
+**Ja, DREI Asset Review ist eine brauchbare Basis.**
 
 Aber:
 - nicht produktionsreif für deinen Ziel-Workflow ohne Anpassungen
@@ -31,7 +31,7 @@ Aber:
 ## Was schon passt
 
 ### 1. Grundidee passt
-ClawDeck ist bereits auf Agent-Zusammenarbeit ausgelegt:
+DREI Asset Review ist bereits auf Agent-Zusammenarbeit ausgelegt:
 - Boards
 - Tasks
 - Aktivitätsfeed
@@ -64,7 +64,7 @@ Das spart viel Basisarbeit.
 
 ### 4. Activity-Logik existiert
 Tasks haben Aktivitäten und Agent-Metadaten.
-Das ist wichtig für Mission Control.
+Das ist wichtig für DREI Asset Review.
 
 ---
 
@@ -105,7 +105,7 @@ Für dein System sollte `Blocked` sichtbar dominanter sein.
 ---
 
 ### A2. Rollenmodell fehlt
-ClawDeck kennt Agenten, aber nicht dein klares Dreieck:
+DREI Asset Review kennt Agenten, aber nicht dein klares Dreieck:
 - Sifu
 - James
 - Codex
@@ -132,7 +132,7 @@ Für MCS brauchst du minimal, aber klar:
 - Blocker
 - Aktivitätslog
 
-ClawDeck hat davon einiges, aber nicht alles sauber genug für dein Zielmodell.
+DREI Asset Review hat davon einiges, aber nicht alles sauber genug für dein Zielmodell.
 
 **Fehlt/unscharf:**
 - Definition of Done
@@ -172,7 +172,7 @@ Dein Stack ist aber:
 Wir sollten nicht deren Standard-Deployment kopieren.
 
 **Empfehlung:**
-- ClawDeck für dein Setup containerisieren bzw. Docker-first aufziehen
+- DREI Asset Review für dein Setup containerisieren bzw. Docker-first aufziehen
 - Traefik-Routing sauber darüber legen
 - Subdomain direkt als Ziel-Domain konfigurieren
 
@@ -180,7 +180,7 @@ Wir sollten nicht deren Standard-Deployment kopieren.
 
 ### B2. Hartcodierte Hosted-URL ist ein echter Fehler
 Im Task-JSON wird aktuell eine URL wie
-`https://clawdeck.io/boards/...`
+`https://drei-mcs.io/boards/...`
 erzeugt.
 
 Das ist für Self-Hosting falsch.
@@ -224,19 +224,19 @@ Für deinen ersten produktiven Einsatz ist wichtig:
 ## C. Produkt-/UX-Gaps
 
 ### C1. Noch zu sehr "ToDo-App"
-ClawDeck wirkt in Teilen noch wie eine ToDo-App mit Agent-Flavor.
-Du willst aber ein echtes Mission Control.
+DREI Asset Review wirkt in Teilen noch wie eine ToDo-App mit Agent-Flavor.
+Du willst aber ein echtes DREI Asset Review.
 
 Das heißt:
 - weniger Consumer-ToDo-Vibe
 - mehr Übersicht, Verantwortung, Übergaben, Blocker, Review
 
 ### C2. Onboarding/Copy/Branding unpassend
-Repo enthält ClawDeck-spezifisches Onboarding und Branding.
+Repo enthält DREI Asset Review-spezifisches Onboarding und Branding.
 Das passt nicht zu deinem System.
 
 **Muss ersetzt werden durch:**
-- MCS / Mission Control Sprache
+- MCS / DREI Asset Review Sprache
 - James/Codex/Sifu Workflow
 - weniger Demo-/Marketing-Ton
 
@@ -348,7 +348,7 @@ Aber nur, wenn wir diszipliniert bleiben:
 - kein sofortiger Großumbau
 
 Der richtige Weg ist:
-**ClawDeck als solides Rohmaterial für MCS v1 verwenden.**
+**DREI Asset Review als solides Rohmaterial für MCS v1 verwenden.**
 
 Nicht perfekt.
 Aber effizient.

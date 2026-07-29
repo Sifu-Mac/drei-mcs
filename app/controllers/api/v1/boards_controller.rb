@@ -20,7 +20,7 @@ module Api
 
       # POST /api/v1/boards
       def create
-        workspace = current_user.current_workspace || current_user.owned_workspaces.create!(name: "Mission Control")
+        workspace = current_user.current_workspace || current_user.owned_workspaces.create!(name: "DREI Asset Review")
         @board = workspace.boards.new(board_params.merge(user: current_user))
 
         if @board.save

@@ -1,11 +1,11 @@
-# Contributing to ClawDeck
+# Contributing to DREI Asset Review
 
-Thank you for your interest in contributing to ClawDeck! 🦞
+Thank you for your interest in contributing to DREI Asset Review! 🦞
 
 ## Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/clawdeck.git`
+2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/drei-mcs.git`
 3. Create a branch: `git checkout -b feature/your-feature`
 4. Make your changes
 5. Run tests: `bin/ci`
@@ -46,4 +46,4 @@ Open a Discussion or join our Discord.
 
 ---
 
-Thank you for helping make ClawDeck better! 🦞
+Thank you for helping make DREI Asset Review better! 🦞

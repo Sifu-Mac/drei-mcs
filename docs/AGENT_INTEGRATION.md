@@ -1,6 +1,6 @@
 # Agent Integration Spec
 
-ClawDeck is designed as a **personal mission control for your AI agent**. This document specifies how an AI agent integrates with ClawDeck via the REST API.
+DREI Asset Review is designed as a **personal asset review for your AI agent**. This document specifies how an AI agent integrates with DREI Asset Review via the REST API.
 
 ---
 
@@ -21,13 +21,13 @@ The agent's personality is part of the product. Names, avatars, emoji — all vi
 
 ### API Token
 
-- User creates an API token in ClawDeck settings
+- User creates an API token in DREI Asset Review settings
 - Agent stores token in its config
 - All API calls use: `Authorization: Bearer <token>`
 
 ```bash
 curl -H "Authorization: Bearer cd_xxxxxxxxxxxx" \
-  https://clawdeck.io/api/v1/tasks
+  https://drei-mcs.io/api/v1/tasks
 ```
 
 ### Agent Identity Headers
@@ -48,7 +48,7 @@ These headers are used to:
 curl -H "Authorization: Bearer cd_xxxxxxxxxxxx" \
      -H "X-Agent-Name: Maxie" \
      -H "X-Agent-Emoji: 🦊" \
-     https://clawdeck.io/api/v1/tasks
+     https://drei-mcs.io/api/v1/tasks
 ```
 
 ---
@@ -57,7 +57,7 @@ curl -H "Authorization: Bearer cd_xxxxxxxxxxxx" \
 
 ```
 ┌─────────────┐        polling         ┌─────────────┐
-│  ClawDeck   │◄──────────────────────►│   Agent     │
+│  DREI Asset Review   │◄──────────────────────►│   Agent     │
 │  (Board)    │       API calls        │             │
 └─────────────┘                        └─────────────┘
 ```
@@ -73,7 +73,7 @@ curl -H "Authorization: Bearer cd_xxxxxxxxxxxx" \
 
 ### Assignment-Based Workflow
 
-Unlike auto-pickup systems, ClawDeck uses **explicit assignment**:
+Unlike auto-pickup systems, DREI Asset Review uses **explicit assignment**:
 
 - Human assigns tasks to the agent using the "Assign to Agent" button
 - Agent polls for `assigned=true` tasks
@@ -87,7 +87,7 @@ Unlike auto-pickup systems, ClawDeck uses **explicit assignment**:
 ### Base URL
 
 ```
-https://clawdeck.io/api/v1
+https://drei-mcs.io/api/v1
 ```
 
 ---
@@ -311,7 +311,7 @@ Content-Type: application/json
 curl -H "Authorization: Bearer cd_xxxxxxxxxxxx" \
      -H "X-Agent-Name: Maxie" \
      -H "X-Agent-Emoji: 🦊" \
-     "https://clawdeck.io/api/v1/tasks?assigned=true&status=up_next"
+     "https://drei-mcs.io/api/v1/tasks?assigned=true&status=up_next"
 ```
 
 ### Start Working on a Task
@@ -436,7 +436,7 @@ The API returns standard HTTP status codes:
 
 ## Summary
 
-ClawDeck provides a visual mission control for your AI agent.
+DREI Asset Review provides a visual asset review for your AI agent.
 
 - Human assigns tasks via UI
 - Agent polls for assigned work

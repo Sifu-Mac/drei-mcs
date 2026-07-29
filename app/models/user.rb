@@ -136,7 +136,7 @@ class User < ApplicationRecord
     workspace = Workspace.primary_collaboration_workspace
 
     if workspace.nil?
-      workspace = owned_workspaces.create!(name: "Mission Control")
+      workspace = owned_workspaces.create!(name: "DREI Asset Review")
       Board.create_onboarding_for(self, workspace: workspace)
       return
     end
