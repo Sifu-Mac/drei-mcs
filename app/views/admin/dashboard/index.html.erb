@@ -36,7 +36,7 @@
     </div>
 
     <!-- Recent Signups -->
-    <div class="bg-stone-100 dark:bg-white/10 p-5 rounded-md hover:bg-stone-200 dark:hover:bg-white/20 transition-colors col-span-2">
+    <div class="bg-stone-100 dark:bg-white/10 p-5 rounded-md hover:bg-stone-200 dark:hover:bg-white/20 transition-colors">
       <div class="text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-100 mb-2">
         <%= @recent_signups %>
       </div>
@@ -44,6 +44,16 @@
         Signups (7 days)
       </div>
     </div>
+
+    <!-- Pending Invites -->
+    <%= link_to admin_invites_path, class: "block bg-stone-100 dark:bg-white/10 p-5 rounded-md hover:bg-stone-200 dark:hover:bg-white/20 transition-colors" do %>
+      <div class="text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-100 mb-2">
+        <%= @pending_invites %>
+      </div>
+      <div class="text-sm text-stone-600 dark:text-purple-100">
+        Pending Invites
+      </div>
+    <% end %>
   </div>
 </section>
 <% end %>

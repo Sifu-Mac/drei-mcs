@@ -25,12 +25,14 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: "dashboard#index"
     resources :users, only: [ :index, :create, :destroy ]
+    resources :invites, only: [ :index, :create, :destroy ]
   end
 
   resource :session, only: [:new, :create, :destroy]
   get "/auth/:provider/callback", to: "omniauth_callbacks#github", as: :omniauth_callback
   get "/auth/failure", to: "omniauth_callbacks#failure"
   resources :passwords, param: :token
+  resources :invites, only: [ :show, :update ], param: :token
   resource :settings, only: [ :show, :update ], controller: "profiles" do
     post :regenerate_api_token
   end
