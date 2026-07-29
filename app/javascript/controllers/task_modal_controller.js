@@ -123,7 +123,7 @@ export default class extends Controller {
 
   static PRIORITY_CYCLE = ["none", "low", "medium", "high"]
   static PRIORITY_CONFIG = {
-    none:   { dots: 0, color: "#555",   bg: "rgba(255,255,255,0.03)",  border: "rgba(255,255,255,0.06)" },
+    none:   { dots: 0, color: "#9ca3af", bg: "#ffffff",                border: "#e5e7eb" },
     low:    { dots: 1, color: "#60a5fa", bg: "rgba(96,165,250,0.10)",  border: "rgba(96,165,250,0.25)" },
     medium: { dots: 2, color: "#fbbf24", bg: "rgba(251,191,36,0.10)",  border: "rgba(251,191,36,0.25)" },
     high:   { dots: 3, color: "#ef4444", bg: "rgba(239,68,68,0.10)",   border: "rgba(239,68,68,0.25)" },
@@ -154,7 +154,7 @@ export default class extends Controller {
     btn.innerHTML = ""
     if (cfg.dots === 0) {
       const dot = document.createElement("div")
-      dot.style.cssText = `width:5px;height:5px;border-radius:50%;background:#555;opacity:0.3`
+      dot.style.cssText = `width:5px;height:5px;border-radius:50%;background:#9ca3af;opacity:0.6`
       btn.appendChild(dot)
     } else {
       for (let i = 0; i < cfg.dots; i++) {
@@ -167,7 +167,7 @@ export default class extends Controller {
     if (this.hasPriorityLabelTarget) {
       const label = document.createElement("span")
       label.dataset.taskModalTarget = "priorityLabel"
-      label.style.cssText = "font-size:12px;font-weight:700;color:#d4d4d8;line-height:1"
+      label.style.cssText = "font-size:12px;font-weight:700;color:#374151;line-height:1"
       label.textContent = next === "none" ? "None" : next.charAt(0).toUpperCase() + next.slice(1)
       btn.appendChild(label)
     }

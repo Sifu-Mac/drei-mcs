@@ -122,26 +122,26 @@ export default class extends Controller {
 
     const shown = results.slice(0, 6)
     if (shown.length === 0) {
-      this.searchResultsTarget.innerHTML = `<div class="py-5 text-center text-xs text-[#444]">No cards found for &ldquo;${this.escapeHtml(this.inputTarget.value.trim())}&rdquo;</div>`
+      this.searchResultsTarget.innerHTML = `<div class="py-5 text-center text-xs text-[#6b7280]">No cards found for &ldquo;${this.escapeHtml(this.inputTarget.value.trim())}&rdquo;</div>`
       return
     }
 
     const statusLabels = { inbox: "Inbox", planned: "Planned", ready: "Ready", in_progress: "In Progress", blocked: "Blocked", review: "Review", done: "Done" }
-    const statusDots = { inbox: "#888", planned: "#94a3b8", ready: "#60a5fa", in_progress: "#fbbf24", blocked: "#ef4444", review: "#a78bfa", done: "#34d399" }
+    const statusDots = { inbox: "#6b7280", planned: "#94a3b8", ready: "#1e5eff", in_progress: "#fbbf24", blocked: "#ef4444", review: "#7c3aed", done: "#16a34a" }
 
     this.searchResultsTarget.innerHTML = `
       <div class="px-2 py-1">
-        <div class="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.06em] text-[#444]">Cards</div>
+        <div class="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.06em] text-[#6b7280]">Cards</div>
         ${shown.map(r => {
           const label = statusLabels[r.status] || r.status
-          const dot = statusDots[r.status] || "#444"
+          const dot = statusDots[r.status] || "#6b7280"
           return `<a href="${r.href}" data-turbo-frame="task_panel" data-action="click->command-bar#close"
-                    class="flex items-center gap-2.5 w-full px-2.5 py-[9px] rounded-lg hover:bg-white/[0.04] transition-colors cursor-pointer no-underline">
+                    class="flex items-center gap-2.5 w-full px-2.5 py-[9px] rounded-lg hover:bg-[#eef2ff] transition-colors cursor-pointer no-underline">
                    <div class="w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:${dot}"></div>
-                   <span class="flex-1 text-[13px] font-medium text-[#ccc] truncate">${this.escapeHtml(r.name)}</span>
+                   <span class="flex-1 text-[13px] font-medium text-[#1f2937] truncate">${this.escapeHtml(r.name)}</span>
                    <div class="flex items-center gap-1">
                      <div class="w-[5px] h-[5px] rounded-full" style="background:${dot}"></div>
-                     <span class="text-[10px] font-medium text-[#444]">${label}</span>
+                     <span class="text-[10px] font-medium text-[#6b7280]">${label}</span>
                    </div>
                  </a>`
         }).join("")}
@@ -268,13 +268,13 @@ export default class extends Controller {
       this.agentMessagesTarget.innerHTML = `
         <div class="py-5 text-center">
           <div class="text-[28px] mb-2.5">⌨️</div>
-          <div class="text-[13px] font-semibold text-[#666]">Query your tasks</div>
-          <div class="text-[11px] font-medium text-[#444] mt-1">Ask about what's overdue, in progress, blocked, or get a summary</div>
+          <div class="text-[13px] font-semibold text-[#374151]">Query your tasks</div>
+          <div class="text-[11px] font-medium text-[#6b7280] mt-1">Ask about what's overdue, in progress, blocked, or get a summary</div>
           <div class="flex gap-[5px] justify-center mt-4 flex-wrap">
             ${["What should I focus on?", "Weekly recap"].map(q =>
               `<button data-action="click->command-bar#chipSend" data-prompt="${this.escapeHtml(q)}"
-                       class="text-[11px] font-medium py-[5px] px-[11px] rounded-[7px] cursor-pointer text-[#999]"
-                       style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.10)">${this.escapeHtml(q)}</button>`
+                       class="text-[11px] font-medium py-[5px] px-[11px] rounded-[7px] cursor-pointer text-[#1e5eff]"
+                       style="background:#eaf1ff;border:1px solid rgba(30,94,255,0.16)">${this.escapeHtml(q)}</button>`
             ).join("")}
           </div>
         </div>`
@@ -284,14 +284,14 @@ export default class extends Controller {
     let html = ""
     this.messages.forEach(m => {
       if (m.type === "user") {
-        html += `<div class="self-end max-w-[88%] whitespace-pre-wrap" style="padding:9px 13px;border-radius:12px 12px 3px 12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.08);color:#ddd;font-size:12.5px;line-height:1.55">${this.escapeHtml(m.text)}</div>`
+        html += `<div class="self-end max-w-[88%] whitespace-pre-wrap" style="padding:9px 13px;border-radius:12px 12px 3px 12px;background:#1e5eff;border:1px solid #1e5eff;color:#fff;font-size:12.5px;line-height:1.55">${this.escapeHtml(m.text)}</div>`
       } else {
-        html += `<div class="self-start max-w-[88%] whitespace-pre-wrap" style="padding:9px 13px;border-radius:12px 12px 12px 3px;background:rgba(251,191,36,0.05);border:1px solid rgba(251,191,36,0.08);color:#bbb;font-size:12.5px;line-height:1.55">${this.escapeHtml(m.text)}</div>`
+        html += `<div class="self-start max-w-[88%] whitespace-pre-wrap" style="padding:9px 13px;border-radius:12px 12px 12px 3px;background:#f9fafb;border:1px solid #e5e7eb;color:#374151;font-size:12.5px;line-height:1.55">${this.escapeHtml(m.text)}</div>`
       }
     })
 
     if (this.typing) {
-      html += `<div class="self-start" style="padding:9px 13px;border-radius:12px 12px 12px 3px;background:rgba(251,191,36,0.05);border:1px solid rgba(251,191,36,0.08);display:flex;align-items:center;gap:6px">
+      html += `<div class="self-start" style="padding:9px 13px;border-radius:12px 12px 12px 3px;background:#f9fafb;border:1px solid #e5e7eb;display:flex;align-items:center;gap:6px">
         <div style="display:flex;gap:3px">
           <div class="cmd-dot" style="animation-delay:0s"></div>
           <div class="cmd-dot" style="animation-delay:0.15s"></div>
@@ -323,7 +323,7 @@ export default class extends Controller {
     if (this.modeValue === "agent") {
       this.modeIconTarget.innerHTML = `<span class="text-base">🤖</span>`
     } else {
-      this.modeIconTarget.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="opacity:0.3"><circle cx="7" cy="7" r="5" stroke="#888" stroke-width="1.5"/><path d="M11 11L14 14" stroke="#888" stroke-width="1.5" stroke-linecap="round"/></svg>`
+      this.modeIconTarget.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="opacity:0.7"><circle cx="7" cy="7" r="5" stroke="#6b7280" stroke-width="1.5"/><path d="M11 11L14 14" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round"/></svg>`
     }
   }
 

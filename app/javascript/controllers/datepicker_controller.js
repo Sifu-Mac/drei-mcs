@@ -170,7 +170,7 @@ export default class extends Controller {
 
       let classes = 'h-8 w-8 rounded-md text-xs transition-colors cursor-pointer '
       if (isSelected) {
-        classes += 'bg-accent text-content hover:bg-accent-hover'
+        classes += 'bg-accent text-content-inverse hover:bg-accent-hover'
       } else if (isToday) {
         classes += 'text-accent font-semibold hover:bg-bg-elevated'
       } else {
