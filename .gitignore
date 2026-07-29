@@ -46,3 +46,6 @@
 
 tpush/
 .DS_Store
+
+# Local Postgres backup dumps (may contain sensitive data, never commit)
+/backups/

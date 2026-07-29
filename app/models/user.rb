@@ -11,6 +11,8 @@ class User < ApplicationRecord
   has_many :owned_workspaces, class_name: "Workspace", foreign_key: :owner_id, dependent: :destroy
   has_one_attached :avatar
 
+  attr_accessor :invited_role
+
   # Primary API token for agent integration
   def api_token
     api_tokens.first || api_tokens.create!(name: "Default")
@@ -141,7 +143,7 @@ class User < ApplicationRecord
       return
     end
 
-    workspace.add_member(self, role: :member) unless workspace.members.exists?(id: id)
+    workspace.add_member(self, role: invited_role || :member) unless workspace.members.exists?(id: id)
   end
 
   def ensure_first_admin

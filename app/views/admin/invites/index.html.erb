@@ -1,0 +1,105 @@
+<% content_for :title, "Invites - Admin - #{app_name}" %>
+<% content_for :nav_center, "Invites - Admin" %>
+
+<% invites_content = capture do %>
+<section id="admin-invites" class="space-y-6">
+  <!-- Header with back link -->
+  <div class="flex items-center gap-3">
+    <%= link_to admin_root_path, class: "text-stone-600 dark:text-purple-100 hover:text-stone-900 dark:hover:text-stone-100 transition-colors" do %>
+      ← Back to Dashboard
+    <% end %>
+  </div>
+
+  <div class="bg-stone-100 dark:bg-white/10 rounded-md p-5 space-y-4">
+    <h2 class="text-sm font-semibold text-stone-900 dark:text-stone-100">Invite user</h2>
+
+    <%= form_with model: @new_invite, url: admin_invites_path, class: "space-y-4" do |form| %>
+      <% if @new_invite.errors.any? %>
+        <div class="p-3 rounded-md bg-red-500/10 text-red-400 text-xs">
+          <%= @new_invite.errors.full_messages.join(", ") %>
+        </div>
+      <% end %>
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <div>
+          <label class="block text-xs font-semibold text-stone-700 dark:text-purple-100 mb-1.5">Email</label>
+          <%= form.email_field :email, required: true, class: "w-full rounded-md px-3 py-2 text-sm bg-white dark:bg-white/5 border border-stone-300 dark:border-white/10 text-stone-900 dark:text-stone-100" %>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-stone-700 dark:text-purple-100 mb-1.5">Role</label>
+          <%= form.select :role, [["Internal", "internal"], ["Client", "client"]], {}, class: "w-full rounded-md px-3 py-2 text-sm bg-white dark:bg-white/5 border border-stone-300 dark:border-white/10 text-stone-900 dark:text-stone-100" %>
+        </div>
+      </div>
+
+      <div>
+        <%= form.submit "Send invite", class: "px-4 py-2 rounded-md text-xs font-semibold bg-stone-900 text-white dark:bg-white dark:text-stone-900 cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Invites table -->
+  <div class="bg-stone-100 dark:bg-white/10 rounded-md overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-stone-200 dark:bg-white/20">
+          <tr>
+            <th class="px-5 py-3 text-left text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Email</th>
+            <th class="px-5 py-3 text-center text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Role</th>
+            <th class="px-5 py-3 text-center text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Status</th>
+            <th class="px-5 py-3 text-left text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Invited by</th>
+            <th class="px-5 py-3 text-left text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Created</th>
+            <th class="px-5 py-3 text-left text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-stone-200 dark:divide-white/10">
+          <% @invites.each do |invite| %>
+            <tr class="hover:bg-stone-200 dark:hover:bg-white/20 transition-colors">
+              <td class="px-5 py-4 text-sm text-stone-900 dark:text-stone-100"><%= invite.email %></td>
+              <td class="px-5 py-4 text-sm text-center text-stone-900 dark:text-stone-100 font-semibold">
+                <%= invite.internal? ? "Internal" : "Client" %>
+              </td>
+              <td class="px-5 py-4 text-sm text-center">
+                <span class="px-2 py-0.5 rounded text-xs font-semibold
+                  <%= case invite.status
+                      when "pending" then "bg-emerald-500/12 text-emerald-500"
+                      when "accepted" then "bg-blue-500/12 text-blue-400"
+                      when "revoked" then "bg-red-500/12 text-red-400"
+                      else "bg-stone-500/12 text-stone-400"
+                      end %>">
+                  <%= invite.status.capitalize %>
+                </span>
+              </td>
+              <td class="px-5 py-4 text-sm text-stone-600 dark:text-purple-100"><%= invite.invited_by.email_address %></td>
+              <td class="px-5 py-4 text-sm text-stone-600 dark:text-purple-100">
+                <%= invite.created_at.strftime("%b %d, %Y") %>
+              </td>
+              <td class="px-5 py-4 text-sm text-right">
+                <% if invite.usable? %>
+                  <%= button_to "Revoke",
+                      admin_invite_path(invite),
+                      method: :delete,
+                      data: { turbo_confirm: "Einladung wirklich widerrufen?" },
+                      class: "px-2.5 py-1 text-xs font-semibold rounded bg-red-500/12 text-red-400 border border-red-500/20 hover:bg-red-500/18 transition-colors cursor-pointer" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Summary footer -->
+  <div class="text-sm text-stone-600 dark:text-purple-100 text-center">
+    Total: <%= pluralize(@invites.count, 'invite') %>
+  </div>
+</section>
+<% end %>
+
+<% if turbo_frame_request? %>
+  <%= render "admin/shared/overlay", title: "Admin Invites" do %>
+    <%= invites_content %>
+  <% end %>
+<% else %>
+  <%= invites_content %>
+<% end %>

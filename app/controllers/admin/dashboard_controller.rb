@@ -7,6 +7,7 @@ module Admin
       @total_users = User.count
       @total_tasks = Task.count
       @recent_signups = User.where("created_at >= ?", 7.days.ago).count
+      @pending_invites = Invite.pending.count
 
       render layout: false if turbo_frame_request?
     end
