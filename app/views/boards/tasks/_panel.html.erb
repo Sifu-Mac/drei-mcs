@@ -42,8 +42,29 @@
     <div class="flex-1 overflow-y-auto px-4 py-4 md:px-5 md:py-5 md:pb-8 flex flex-col gap-5 md:gap-6">
 
       <%# === Auto-save form: title, notes, priority only === %>
-      <%= form_with model: task, url: board_task_path(@board, task), method: :patch, id: dom_id(task, :edit), class: "flex flex-col gap-5", data: { task_modal_target: "form" } do |form| %>
+      <%= form_with model: task, url: board_task_path(@board, task), method: :patch, id: dom_id(task, :edit), class: "flex flex-col gap-5", data: { task_modal_target: "form" }, html: { multipart: true } do |form| %>
         <%= form.hidden_field :priority, value: task.priority, data: { task_modal_target: "priorityField" } %>
+
+        <!-- Cover image -->
+        <div class="space-y-2">
+          <div class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#5f5f67]">Cover image</div>
+          <% if task.cover_image.attached? %>
+            <div style="border-radius:16px;overflow:hidden;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)">
+              <%= image_tag task.cover_image, alt: "", style: "display:block;width:100%;height:auto;max-height:380px;object-fit:contain" %>
+            </div>
+          <% else %>
+            <div aria-hidden="true" style="height:180px;border-radius:16px;background:linear-gradient(135deg,rgba(255,255,255,0.055),rgba(255,255,255,0.018));border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:#555;font-size:28px">
+              ▧
+            </div>
+          <% end %>
+          <%= form.file_field :cover_image,
+              accept: "image/jpeg,image/png,image/webp,image/gif",
+              class: "block w-full text-xs text-[#888] file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-white/8 file:text-[#d0d0d5] hover:file:bg-white/12 file:cursor-pointer",
+              data: { action: "change->task-modal#save" } %>
+          <% if task.errors[:cover_image].any? %>
+            <div style="font-size:11px;font-weight:500;color:#ef4444"><%= task.errors[:cover_image].join(", ") %></div>
+          <% end %>
+        </div>
 
         <!-- Title -->
         <div class="space-y-2">

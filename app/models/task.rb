@@ -30,6 +30,7 @@ class Task < ApplicationRecord
   has_many :activities, class_name: "TaskActivity", dependent: :destroy
   has_many :comments, class_name: "TaskComment", dependent: :destroy
   has_many :subtasks, dependent: :destroy
+  has_one_attached :cover_image
 
   enum :priority, { none: 0, low: 1, medium: 2, high: 3 }, default: :none, prefix: true
   enum :status, STATUS_VALUES, default: :inbox
@@ -39,6 +40,7 @@ class Task < ApplicationRecord
   validates :priority, inclusion: { in: priorities.keys }
   validates :status, inclusion: { in: statuses.keys }
   validates :owner, inclusion: { in: owners.keys }
+  validate :cover_image_is_supported
 
   # Activity tracking - must be declared before callbacks that use it
   attr_accessor :activity_source, :actor_name, :actor_emoji, :activity_note
@@ -142,6 +144,18 @@ class Task < ApplicationRecord
     # Track field changes
     tracked_changes = saved_changes.slice(*TaskActivity::TRACKED_FIELDS)
     TaskActivity.record_changes(self, tracked_changes, source: source, actor_name: actor_name, actor_emoji: actor_emoji, note: activity_note) if tracked_changes.any?
+  end
+
+  def cover_image_is_supported
+    return unless cover_image.attached?
+
+    unless cover_image.blob.content_type.in?(MediaUploadValidator::ALLOWED_IMAGE_TYPES)
+      errors.add(:cover_image, "must be a JPEG, PNG, WebP, or GIF image")
+    end
+
+    if cover_image.blob.byte_size > MediaUploadValidator::MAX_IMAGE_SIZE
+      errors.add(:cover_image, "must be 5 MB or smaller")
+    end
   end
 
   # Turbo Streams broadcasts for real-time updates
