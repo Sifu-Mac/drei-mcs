@@ -1,0 +1,31 @@
+services:
+  test-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: drei_mcs_test
+      POSTGRES_USER: drei_mcs_test
+      POSTGRES_PASSWORD: drei_mcs_test_password
+    volumes:
+      - drei-review-test-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+      test-db:
+        condition: service_healthy
+    environment:
+      RAILS_ENV: test
+      SECRET_KEY_BASE: dummy
+      DATABASE_URL: postgresql://drei_mcs_test:drei_mcs_test_password@test-db:5432/drei_mcs_test
+      DB_POOL: 5
+    command: ["bin/rails", "test"]
+
+volumes:
+  drei-review-test-postgres:
