@@ -1,0 +1,14 @@
+admin_owner:
+  workspace: primary
+  user: admin
+  role: owner
+
+one_member:
+  workspace: primary
+  user: one
+  role: member
+
+two_owner:
+  workspace: secondary
+  user: two
+  role: owner

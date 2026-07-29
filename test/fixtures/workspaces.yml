@@ -1,0 +1,8 @@
+primary:
+  name: DREI Asset Review
+  owner: admin
+  created_at: <%= 2.years.ago %>
+
+secondary:
+  name: Two Workspace
+  owner: two
