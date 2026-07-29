@@ -1,0 +1,8 @@
+You have been invited to join DREI Asset Review as a <%= @invite.client? ? "client" : "team member" %>.
+
+Accept your invite here:
+<%= invite_url(@invite.token) %>
+
+This link will expire in <%= distance_of_time_in_words(Time.current, @invite.expires_at) %>.
+
+If you did not expect this invite, you can safely ignore this email.

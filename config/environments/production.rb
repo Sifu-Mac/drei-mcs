@@ -57,6 +57,15 @@ Rails.application.configure do
   # Configure Action Mailer
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: ENV.fetch("SMTP_ADDRESS", nil),
+    port: ENV.fetch("SMTP_PORT", 587).to_i,
+    domain: ENV.fetch("SMTP_DOMAIN", app_host),
+    user_name: ENV.fetch("SMTP_USERNAME", nil),
+    password: ENV.fetch("SMTP_PASSWORD", nil),
+    authentication: ENV.fetch("SMTP_AUTHENTICATION", "plain").to_sym,
+    enable_starttls_auto: ActiveModel::Type::Boolean.new.cast(ENV.fetch("SMTP_ENABLE_STARTTLS_AUTO", "true"))
+  }
 
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: app_host }

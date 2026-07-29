@@ -8,14 +8,14 @@
   <%# Column Header %>
   <div class="flex items-center gap-2" style="padding:6px 8px 10px">
     <div class="rounded-full" style="width:7px;height:7px;background:<%= Task::STATUS_COLORS[status] %>"></div>
-    <span style="font-size:13px;font-weight:700;color:#bbb"><%= Task::STATUS_LABELS[status] %></span>
-    <span id="column-<%= status %>-count" style="font-size:11px;font-weight:600;color:#444;background:rgba(255,255,255,0.04);padding:0 7px;border-radius:5px;line-height:20px"><%= tasks.count %></span>
+    <span style="font-size:13px;font-weight:700;color:#374151"><%= Task::STATUS_LABELS[status] %></span>
+    <span id="column-<%= status %>-count" style="font-size:11px;font-weight:600;color:#6b7280;background:#eef2ff;padding:0 7px;border-radius:5px;line-height:20px"><%= tasks.count %></span>
   </div>
 
   <%# Tasks List %>
   <ul id="column-<%= status %>"
       class="flex-1 flex flex-col gap-[5px] min-h-[2rem] overflow-visible md:overflow-y-hidden md:hover:overflow-y-auto transition-all duration-[120ms] list-none m-0"
-      style="border-radius:10px;padding:6px;background:rgba(255,255,255,0.01);border:2px solid transparent"
+      style="border-radius:12px;padding:6px;background:#eef1f6;border:1px solid #e5e7eb"
       data-controller="sortable"
       data-sortable-group-value="board"
       data-sortable-status-value="<%= status %>"
@@ -36,7 +36,7 @@
       <div class="flex items-center gap-2 mt-2">
         <button type="button"
                 data-action="click->inline-add#submit"
-                class="px-3 py-1.5 text-xs font-semibold rounded bg-accent text-content hover:bg-accent-hover transition-colors cursor-pointer">
+                class="px-3 py-1.5 text-xs font-semibold rounded bg-accent text-content-inverse hover:bg-accent-hover transition-colors cursor-pointer">
           Add card
         </button>
         <button type="button"
@@ -54,8 +54,8 @@
   <div data-inline-add-target="button" class="px-1.5 py-1">
     <button type="button"
             data-action="click->inline-add#show"
-            class="w-full flex items-center gap-2 rounded-lg cursor-pointer border-none bg-transparent transition-colors hover:text-[#f0f0f0]"
-            style="padding:8px 4px;font-size:13px;font-weight:600;color:#a1a1aa">
+            class="w-full flex items-center gap-2 rounded-lg cursor-pointer border-none bg-transparent transition-colors hover:text-accent"
+            style="padding:8px 4px;font-size:13px;font-weight:600;color:#6b7280">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M14 8H2M8 2V14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       Add a card
     </button>

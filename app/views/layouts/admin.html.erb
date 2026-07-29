@@ -10,7 +10,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <%# Theme colors for Safari and other browsers %>
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#1c1917" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: dark)">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%# Fonts %>
@@ -33,7 +33,7 @@
   <body data-controller="turbo-progress">
     <!-- Global Navbar -->
     <%= render "shared/navbar" %>
-    <main class="container max-w-6xl mx-auto text-stone-600 dark:text-purple-100 font-normal text-sm pt-24 px-4">
+    <main class="container max-w-6xl mx-auto text-content-secondary font-normal text-sm pt-24 px-4">
       <%= yield %>
     </main>
   </body>

@@ -46,7 +46,7 @@ export default class extends Controller {
     const card = this.element
     const checkbox = this.checkboxTarget
     const title = this.titleTarget
-    const color = this.colorValue || "#888888"
+    const color = this.colorValue || "#1e5eff"
 
     // Convert hex to rgba
     const hexToRgba = (hex, alpha) => {
@@ -58,22 +58,22 @@ export default class extends Controller {
     }
 
     if (completed) {
-      card.style.background = "rgba(255,255,255,0.015)"
-      card.style.borderColor = "rgba(255,255,255,0.03)"
-      card.style.opacity = "0.35"
+      card.style.background = "#f9fafb"
+      card.style.borderColor = "#e5e7eb"
+      card.style.opacity = "0.55"
       checkbox.style.background = color
       checkbox.style.border = "none"
       checkbox.innerHTML = '<svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.5 12L13 4" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-      title.style.color = "#444"
+      title.style.color = "#9ca3af"
       title.style.textDecoration = "line-through"
     } else {
-      card.style.background = "rgba(255,255,255,0.035)"
-      card.style.borderColor = "rgba(255,255,255,0.06)"
+      card.style.background = "#ffffff"
+      card.style.borderColor = "#e5e7eb"
       card.style.opacity = "1"
       checkbox.style.background = "transparent"
       checkbox.style.border = `2px solid ${hexToRgba(color, 0.25)}`
       checkbox.innerHTML = ""
-      title.style.color = "#ddd"
+      title.style.color = "#1f2937"
       title.style.textDecoration = "none"
     }
   }

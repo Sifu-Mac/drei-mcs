@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - mcs-postgres:/var/lib/postgresql/data
+      - drei-review-postgres:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
@@ -41,17 +41,24 @@ services:
       DB_POOL: ${DB_POOL}
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      SMTP_ADDRESS: ${SMTP_ADDRESS}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_DOMAIN: ${SMTP_DOMAIN}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_AUTHENTICATION: ${SMTP_AUTHENTICATION}
+      SMTP_ENABLE_STARTTLS_AUTO: ${SMTP_ENABLE_STARTTLS_AUTO}
     volumes:
-      - mcs-storage:/rails/storage
+      - drei-review-storage:/rails/storage
     expose:
       - "3000"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.drei-mcs.rule=Host(`${APP_HOST}`)
-      - traefik.http.routers.drei-mcs.entrypoints=websecure
-      - traefik.http.routers.drei-mcs.tls.certresolver=letsencrypt
-      - traefik.http.services.drei-mcs.loadbalancer.server.port=3000
+      - traefik.http.routers.drei-review.rule=Host(`${APP_HOST}`)
+      - traefik.http.routers.drei-review.entrypoints=websecure
+      - traefik.http.routers.drei-review.tls.certresolver=letsencrypt
+      - traefik.http.services.drei-review.loadbalancer.server.port=3000
 
 volumes:
-  mcs-postgres:
-  mcs-storage:
+  drei-review-postgres:
+  drei-review-storage:

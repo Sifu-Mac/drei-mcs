@@ -1,6 +1,7 @@
 one:
   name: Test Board One
   user: one
+  workspace: primary
   position: 1
   icon: "📋"
   color: gray
@@ -8,6 +9,7 @@ one:
 two:
   name: Test Board Two
   user: two
+  workspace: secondary
   position: 1
   icon: "📋"
   color: blue

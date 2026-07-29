@@ -1,0 +1,36 @@
+pending_internal:
+  email: pending-internal@example.com
+  role: internal
+  token: test_invite_pending_internal_token
+  expires_at: <%= 5.days.from_now %>
+  invited_by: admin
+
+pending_client:
+  email: pending-client@example.com
+  role: client
+  token: test_invite_pending_client_token
+  expires_at: <%= 5.days.from_now %>
+  invited_by: admin
+
+expired:
+  email: expired@example.com
+  role: internal
+  token: test_invite_expired_token
+  expires_at: <%= 1.day.ago %>
+  invited_by: admin
+
+revoked:
+  email: revoked@example.com
+  role: internal
+  token: test_invite_revoked_token
+  expires_at: <%= 5.days.from_now %>
+  revoked_at: <%= 1.hour.ago %>
+  invited_by: admin
+
+accepted:
+  email: accepted@example.com
+  role: internal
+  token: test_invite_accepted_token
+  expires_at: <%= 5.days.from_now %>
+  accepted_at: <%= 1.hour.ago %>
+  invited_by: admin

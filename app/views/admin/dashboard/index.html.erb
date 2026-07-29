@@ -4,11 +4,11 @@
 <% dashboard_content = capture do %>
 <section id="admin-dashboard" class="max-w-lg mx-auto space-y-6">
   <!-- Welcome message -->
-  <div class="bg-stone-100 dark:bg-white/10 p-5 rounded-md">
-    <h1 class="text-xl font-semibold tracking-tight text-stone-900 dark:text-stone-100 mb-2">
+  <div class="bg-bg-surface border border-border p-5 rounded-lg shadow-sm">
+    <h1 class="text-xl font-semibold text-content mb-2">
       Welcome, <%= current_user.email_address %>
     </h1>
-    <p class="text-sm text-stone-600 dark:text-purple-100">
+    <p class="text-sm text-content-secondary">
       Admin dashboard for <%= app_name %>
     </p>
   </div>
@@ -16,34 +16,44 @@
   <!-- Stats grid -->
   <div class="grid grid-cols-2 gap-4">
     <!-- Total Users -->
-    <%= link_to admin_users_path, class: "block bg-stone-100 dark:bg-white/10 p-5 rounded-md hover:bg-stone-200 dark:hover:bg-white/20 transition-colors" do %>
-      <div class="text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-100 mb-2">
+    <%= link_to admin_users_path, class: "block bg-bg-surface border border-border p-5 rounded-lg hover:bg-bg-hover transition-colors shadow-sm" do %>
+      <div class="text-3xl font-bold text-content mb-2">
         <%= @total_users %>
       </div>
-      <div class="text-sm text-stone-600 dark:text-purple-100">
+      <div class="text-sm text-content-secondary">
         Total Users
       </div>
     <% end %>
 
     <!-- Total Tasks -->
-    <div class="bg-stone-100 dark:bg-white/10 p-5 rounded-md hover:bg-stone-200 dark:hover:bg-white/20 transition-colors">
-      <div class="text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-100 mb-2">
+    <div class="bg-bg-surface border border-border p-5 rounded-lg hover:bg-bg-hover transition-colors shadow-sm">
+      <div class="text-3xl font-bold text-content mb-2">
         <%= @total_tasks %>
       </div>
-      <div class="text-sm text-stone-600 dark:text-purple-100">
+      <div class="text-sm text-content-secondary">
         Total Tasks
       </div>
     </div>
 
     <!-- Recent Signups -->
-    <div class="bg-stone-100 dark:bg-white/10 p-5 rounded-md hover:bg-stone-200 dark:hover:bg-white/20 transition-colors col-span-2">
-      <div class="text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-100 mb-2">
+    <div class="bg-bg-surface border border-border p-5 rounded-lg hover:bg-bg-hover transition-colors col-span-2 shadow-sm">
+      <div class="text-3xl font-bold text-content mb-2">
         <%= @recent_signups %>
       </div>
-      <div class="text-sm text-stone-600 dark:text-purple-100">
+      <div class="text-sm text-content-secondary">
         Signups (7 days)
       </div>
     </div>
+
+    <!-- Pending Invites -->
+    <%= link_to admin_invites_path, class: "block bg-bg-surface border border-border p-5 rounded-lg hover:bg-bg-hover transition-colors col-span-2 shadow-sm" do %>
+      <div class="text-3xl font-bold text-content mb-2">
+        <%= @pending_invites %>
+      </div>
+      <div class="text-sm text-content-secondary">
+        Pending Invites
+      </div>
+    <% end %>
   </div>
 </section>
 <% end %>

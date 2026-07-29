@@ -1,13 +1,13 @@
-<div id="task_comment_<%= comment.id %>" style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05)">
+<div id="task_comment_<%= comment.id %>" style="padding:12px 14px;border-radius:12px;background:#ffffff;border:1px solid #e5e7eb">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
-    <span style="font-size:13px;font-weight:700;color:#e0e0e0"><%= comment.author_label %></span>
-    <span style="font-size:11px;font-weight:500;color:#666"><%= time_ago_in_words(comment.created_at) %> ago</span>
+    <span style="font-size:13px;font-weight:700;color:#1f2937"><%= comment.author_label %></span>
+    <span style="font-size:11px;font-weight:500;color:#6b7280"><%= time_ago_in_words(comment.created_at) %> ago</span>
   </div>
-  <div style="font-size:14px;font-weight:500;color:#cfcfd6;line-height:1.7;white-space:pre-wrap"><%= simple_format(h(comment.body), {}, wrapper_tag: "div") %></div>
+  <div style="font-size:14px;font-weight:500;color:#374151;line-height:1.7;white-space:pre-wrap"><%= simple_format(h(comment.body), {}, wrapper_tag: "div") %></div>
   <% if comment.images.attached? %>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;margin-top:10px">
       <% comment.images.each do |image| %>
-        <%= link_to url_for(image), target: "_blank", rel: "noopener noreferrer", style: "display:block;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04)" do %>
+        <%= link_to url_for(image), target: "_blank", rel: "noopener noreferrer", style: "display:block;border-radius:10px;overflow:hidden;border:1px solid #e5e7eb;background:#f9fafb" do %>
           <%= image_tag image, alt: image.filename.to_s, style: "display:block;width:100%;height:auto;max-height:220px;object-fit:contain" %>
         <% end %>
       <% end %>

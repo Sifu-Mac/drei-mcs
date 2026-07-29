@@ -1,22 +1,22 @@
 <div data-controller="command-bar" data-command-bar-open-value="false" data-command-bar-mode-value="search">
   <%# Backdrop %>
   <div data-command-bar-target="backdrop" data-action="click->command-bar#close"
-       class="hidden fixed inset-0 bg-black/50 z-[300]"></div>
+       class="hidden fixed inset-0 bg-slate-900/25 backdrop-blur-sm z-[300]"></div>
 
   <%# Centering wrapper %>
   <div data-command-bar-target="dialog"
        class="hidden fixed inset-0 z-[301] flex items-start justify-center pt-[15vh] pointer-events-none">
     <%# Command bar container %>
     <div class="w-[520px] max-w-[calc(100vw-2rem)] max-h-[65vh] flex flex-col pointer-events-auto overflow-hidden animate-drop-in"
-         style="background:#1e1e22;border-radius:16px;border:1px solid rgba(255,255,255,0.08);box-shadow:0 32px 80px rgba(0,0,0,0.5)">
+         style="background:#ffffff;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 32px 80px rgba(15,23,42,0.18)">
 
       <%# Input bar %>
-      <div class="flex items-center gap-2.5" style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06)">
+      <div class="flex items-center gap-2.5" style="padding:14px 18px;border-bottom:1px solid #e5e7eb">
         <%# Mode icon %>
         <div data-command-bar-target="modeIcon" class="flex-shrink-0 flex items-center justify-center">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="opacity:0.3">
-            <circle cx="7" cy="7" r="5" stroke="#888" stroke-width="1.5"/>
-            <path d="M11 11L14 14" stroke="#888" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="7" cy="7" r="5" stroke="#6b7280" stroke-width="1.5"/>
+            <path d="M11 11L14 14" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </div>
         <%# Input %>
@@ -24,16 +24,16 @@
                data-command-bar-target="input"
                data-action="input->command-bar#onInput keydown->command-bar#onInputKeydown"
                placeholder="Search cards or run a command..."
-               class="flex-1 bg-transparent border-none text-sm font-medium text-[#e0e0e0] placeholder-[#555] focus:outline-none focus:ring-0"
+               class="flex-1 bg-transparent border-none text-sm font-medium text-content placeholder-content-muted focus:outline-none focus:ring-0"
                style="font-family:inherit" />
         <%# Back button (agent mode only) %>
         <button type="button"
                 data-command-bar-target="backButton"
                 data-action="click->command-bar#switchToSearch"
                 class="hidden cursor-pointer"
-                style="font-size:10px;font-weight:600;color:#555;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);padding:3px 8px;border-radius:5px">Back</button>
+                style="font-size:10px;font-weight:600;color:#4b5563;background:#f9fafb;border:1px solid #e5e7eb;padding:3px 8px;border-radius:5px">Back</button>
         <%# Esc badge %>
-        <span style="font-size:10px;font-weight:600;color:#333;background:rgba(255,255,255,0.03);padding:3px 7px;border-radius:5px">esc</span>
+        <span style="font-size:10px;font-weight:600;color:#6b7280;background:#f9fafb;border:1px solid #e5e7eb;padding:3px 7px;border-radius:5px">esc</span>
       </div>
 
       <%# Body (scrollable) %>
@@ -44,7 +44,7 @@
 
         <%# Quick actions (shown by default in search mode) %>
         <div data-command-bar-target="actionsPanel" style="padding:4px 8px">
-          <div style="font-size:10px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.06em;padding:6px 10px">Actions</div>
+          <div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.06em;padding:6px 10px">Actions</div>
 
           <% [
             ["agent", "⌨️", "Ask about tasks", "Query your boards"],
@@ -54,15 +54,15 @@
             <button type="button"
                     data-action="click->command-bar#executeAction"
                     data-action-id="<%= action_id %>"
-                    class="flex items-center gap-2.5 w-full rounded-lg cursor-pointer border-none bg-transparent hover:bg-white/[0.04] transition-colors"
+                    class="flex items-center gap-2.5 w-full rounded-lg cursor-pointer border-none bg-transparent hover:bg-bg-hover transition-colors"
                     style="padding:9px 10px;text-align:left">
-              <div class="flex items-center justify-center flex-shrink-0" style="width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.05);font-size:13px">
+              <div class="flex items-center justify-center flex-shrink-0" style="width:28px;height:28px;border-radius:7px;background:#f9fafb;border:1px solid #e5e7eb;font-size:13px">
                 <%= icon %>
               </div>
               <div class="flex-1">
-                <div style="font-size:13px;font-weight:600;color:#ccc"><%= label %></div>
+                <div style="font-size:13px;font-weight:600;color:#1f2937"><%= label %></div>
               </div>
-              <span style="font-size:10px;font-weight:500;color:#333"><%= hint %></span>
+              <span style="font-size:10px;font-weight:500;color:#6b7280"><%= hint %></span>
             </button>
           <% end %>
         </div>

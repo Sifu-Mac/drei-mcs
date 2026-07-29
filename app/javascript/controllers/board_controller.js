@@ -81,12 +81,12 @@ export default class extends Controller {
   setActiveTab(status) {
     this.columnTabTargets.forEach((tab) => {
       const active = tab.dataset.boardStatusParam === status
-      tab.classList.toggle("bg-white/10", active)
-      tab.classList.toggle("text-stone-100", active)
-      tab.classList.toggle("border-white/15", active)
-      tab.classList.toggle("bg-white/5", !active)
-      tab.classList.toggle("text-[#888]", !active)
-      tab.classList.toggle("border-white/8", !active)
+      tab.classList.toggle("bg-accent/10", active)
+      tab.classList.toggle("text-accent", active)
+      tab.classList.toggle("border-accent/30", active)
+      tab.classList.toggle("bg-bg-elevated", !active)
+      tab.classList.toggle("text-content-muted", !active)
+      tab.classList.toggle("border-border", !active)
     })
   }
 }
