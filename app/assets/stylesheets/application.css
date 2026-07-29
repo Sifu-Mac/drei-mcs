@@ -30,18 +30,13 @@
   }
 }
 
-/* Remove default browser focus outline */
-input:focus,
-textarea:focus,
-select:focus {
-  outline: none;
-}
-
-/* Alternative: Use outline-offset to hide blue border completely */
-input,
-textarea,
-select {
-  outline: none;
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #1e5eff;
+  outline-offset: 2px;
 }
 
 /* Prevent scrolling on homepage - mobile overscroll fix */

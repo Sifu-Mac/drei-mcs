@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-title" content="<%= app_name %>">
     <meta name="application-name" content="<%= app_name %>">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#161619">
+    <meta name="theme-color" content="#f6f7f9">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%# Font — Plus Jakarta Sans %>
@@ -27,7 +27,7 @@
     <%= javascript_importmap_tags %>
     <%= render "application/plausible_analytics" %>
   </head>
-  <body class="h-screen overflow-hidden bg-[#161619] text-[#bbb] font-sans" data-controller="turbo-progress">
+  <body class="h-screen overflow-hidden bg-bg-base text-content font-sans" data-controller="turbo-progress">
     <% if @board_page %>
       <%# Board page - full screen, no wrapper %>
       <div class="h-screen flex flex-col bg-bg-base">

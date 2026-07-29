@@ -12,13 +12,13 @@
 
 <%# Board Settings Modal %>
 <div id="board-settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
-  <div class="absolute inset-0 bg-black/60" onclick="document.getElementById('board-settings-modal').classList.add('hidden')"></div>
-  <div class="relative bg-bg-surface border border-white/[0.08] rounded-xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden" style="box-shadow: 0 12px 40px rgba(0,0,0,0.5);">
-    <div class="px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
+  <div class="absolute inset-0 bg-slate-900/25 backdrop-blur-sm" onclick="document.getElementById('board-settings-modal').classList.add('hidden')"></div>
+  <div class="relative bg-bg-surface border border-border rounded-xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden" style="box-shadow:0 24px 70px rgba(15,23,42,0.18);">
+    <div class="px-5 py-4 border-b border-border flex items-center justify-between">
       <span class="text-sm font-bold text-content">Board Settings</span>
       <button type="button"
               onclick="document.getElementById('board-settings-modal').classList.add('hidden')"
-              class="p-2 rounded-lg text-content-muted hover:text-content hover:bg-white/[0.04] transition-colors cursor-pointer">
+              class="p-2 rounded-lg text-content-muted hover:text-content hover:bg-bg-hover transition-colors cursor-pointer">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
         </svg>
@@ -31,7 +31,7 @@
         <%= form.text_field :name,
             required: true,
             placeholder: "e.g., Work, Personal, Side Project",
-            class: "w-full px-3 py-2 text-sm bg-bg-card border border-white/[0.08] rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-content placeholder-content-muted" %>
+            class: "w-full px-3 py-2 text-sm bg-bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-content placeholder-content-muted" %>
       </div>
 
       <div>
@@ -48,7 +48,7 @@
             <button type="button"
                     onclick="selectEditBoardIcon(this, '<%= icon %>')"
                     data-icon="<%= icon %>"
-                    class="w-10 h-10 flex items-center justify-center rounded-lg bg-bg-card hover:bg-white/[0.08] transition-colors text-xl cursor-pointer <%= icon == @board.icon ? 'ring-2 ring-accent' : '' %>">
+                    class="w-10 h-10 flex items-center justify-center rounded-lg bg-bg-card hover:bg-bg-hover border border-border transition-colors text-xl cursor-pointer <%= icon == @board.icon ? 'ring-2 ring-accent' : '' %>">
               <%= icon %>
             </button>
           <% end %>
@@ -71,10 +71,10 @@
         <div class="flex items-center gap-3">
           <button type="button"
                   onclick="document.getElementById('board-settings-modal').classList.add('hidden')"
-                  class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-content-secondary transition-colors cursor-pointer">
+                  class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-bg-elevated hover:bg-bg-hover text-content-secondary border border-border transition-colors cursor-pointer">
             Cancel
           </button>
-          <%= form.submit "Save Changes", class: "px-3 py-1.5 text-xs font-semibold rounded-lg bg-accent text-content hover:bg-accent-hover transition-colors cursor-pointer" %>
+          <%= form.submit "Save Changes", class: "px-3 py-1.5 text-xs font-semibold rounded-lg bg-accent text-content-inverse hover:bg-accent-hover transition-colors cursor-pointer" %>
         </div>
       </div>
     <% end %>

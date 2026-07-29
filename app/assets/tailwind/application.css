@@ -2,51 +2,51 @@
 
 @theme {
   /* ========================================
-     DESIGN SYSTEM v2 — Neutral Dark Palette
+     DESIGN SYSTEM v3 — DREI Light Palette
      ======================================== */
 
   /* Backgrounds (3-layer depth system) */
-  --color-bg-base: #161619;
-  --color-bg-surface: #161619;
-  --color-bg-elevated: #1a1a1e;
-  --color-bg-card: #1e1e22;
-  --color-bg-dropdown: #222226;
+  --color-bg-base: #f6f7f9;
+  --color-bg-surface: #ffffff;
+  --color-bg-elevated: #f9fafb;
+  --color-bg-card: #ffffff;
+  --color-bg-dropdown: #ffffff;
 
   /* Text */
-  --color-content: #f0f0f0;
-  --color-content-secondary: #bbb;
-  --color-content-muted: #888;
-  --color-content-dim: #555;
-  --color-content-ghost: #444;
-  --color-content-dimmed: #333;
+  --color-content: #1f2937;
+  --color-content-secondary: #4b5563;
+  --color-content-muted: #6b7280;
+  --color-content-dim: #9ca3af;
+  --color-content-ghost: #cbd5e1;
+  --color-content-dimmed: #e5e7eb;
 
   /* Borders */
-  --color-border: rgba(255, 255, 255, 0.05);
-  --color-border-card: rgba(255, 255, 255, 0.04);
-  --color-border-hover: rgba(255, 255, 255, 0.08);
-  --color-border-active: rgba(255, 255, 255, 0.12);
+  --color-border: #e5e7eb;
+  --color-border-card: #e5e7eb;
+  --color-border-hover: #d1d5db;
+  --color-border-active: #bfdbfe;
 
   /* Project colors */
   --color-project-red: #ef4444;
   --color-project-green: #34d399;
   --color-project-amber: #fbbf24;
-  --color-project-blue: #60a5fa;
+  --color-project-blue: #1e5eff;
   --color-project-purple: #a78bfa;
 
   /* Functional / Status */
   --color-status-success: #34d399;
   --color-status-warning: #fbbf24;
   --color-status-error: #ef4444;
-  --color-status-info: #60a5fa;
+  --color-status-info: #1e5eff;
   --color-agent: #fbbf24;
 
   /* Legacy compat — referenced in views not yet migrated */
-  --color-bg-hover: #222226;
-  --color-accent: #ef4444;
-  --color-accent-hover: #dc2626;
-  --color-accent-muted: rgba(239, 68, 68, 0.3);
-  --color-content-inverse: #0c0c0f;
-  --color-border-accent: rgba(239, 68, 68, 0.3);
+  --color-bg-hover: #eef2ff;
+  --color-accent: #1e5eff;
+  --color-accent-hover: #1747c7;
+  --color-accent-muted: rgba(30, 94, 255, 0.16);
+  --color-content-inverse: #ffffff;
+  --color-border-accent: rgba(30, 94, 255, 0.28);
 
   /* Font */
   --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
@@ -63,7 +63,7 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   html, body {
@@ -75,8 +75,8 @@
 
   /* Selection styling */
   ::selection {
-    background: #fbbf24;
-    color: #161619;
+    background: #dbeafe;
+    color: #1f2937;
   }
 
   /* Scrollbar styling */
@@ -88,11 +88,11 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.08);
+    background: #cbd5e1;
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.14);
+    background: #94a3b8;
   }
 }
 
@@ -127,7 +127,7 @@
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #fbbf24;
+  background: #1e5eff;
   animation: dotBounce 1s ease infinite;
 }
 

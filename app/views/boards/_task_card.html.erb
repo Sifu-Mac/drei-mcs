@@ -3,9 +3,9 @@
 <% board_color = task.board.color || "red" %>
 <li id="task_<%= task.id %>"
     class="group transition-all duration-150 <%= 'opacity-50' if is_done %>"
-    style="position:relative;padding:12px 14px;background:rgba(255,255,255,0.035);border-radius:10px;border:1px solid rgba(255,255,255,0.05)"
-    onmouseenter="this.style.borderColor='rgba(255,255,255,0.08)'"
-    onmouseleave="this.style.borderColor='rgba(255,255,255,0.05)'"
+    style="position:relative;padding:12px 14px;background:#ffffff;border-radius:10px;border:1px solid #e5e7eb;box-shadow:0 1px 2px rgba(15,23,42,0.04)"
+    onmouseenter="this.style.borderColor='#bfdbfe';this.style.boxShadow='0 8px 24px rgba(15,23,42,0.08)'"
+    onmouseleave="this.style.borderColor='#e5e7eb';this.style.boxShadow='0 1px 2px rgba(15,23,42,0.04)'"
     <% if has_current_user %>
       data-controller="dropdown delete-confirm"
       data-action="contextmenu->dropdown#openAtCursor"
@@ -17,10 +17,10 @@
 
   <div class="task-drag-handle"
        title="Drag card"
-       style="display:flex;align-items:center;justify-content:center;width:100%;height:18px;margin:-4px 0 8px;cursor:grab;color:#666;border-radius:8px"
-       onmouseenter="this.style.color='#999'"
-       onmouseleave="this.style.color='#666'">
-    <div style="width:36px;height:4px;border-radius:999px;background:rgba(255,255,255,0.10)"></div>
+       style="display:flex;align-items:center;justify-content:center;width:100%;height:18px;margin:-4px 0 8px;cursor:grab;color:#9ca3af;border-radius:8px"
+       onmouseenter="this.style.color='#6b7280'"
+       onmouseleave="this.style.color='#9ca3af'">
+    <div style="width:36px;height:4px;border-radius:999px;background:#e5e7eb"></div>
   </div>
 
   <%# Context Menu (right-click) - only rendered when current_user is available (not during broadcasts) %>
@@ -136,7 +136,7 @@
 
   <%= link_to board_task_path(task.board, task), class: "block select-none", data: { turbo_frame: "task_panel" } do %>
     <%# Task Title %>
-    <div style="font-size:13px;font-weight:600;color:<%= is_done ? '#555' : '#ddd' %>;line-height:1.35;<%= 'margin-bottom:7px' if has_metadata %>">
+    <div style="font-size:13px;font-weight:600;color:<%= is_done ? '#9ca3af' : '#1f2937' %>;line-height:1.35;<%= 'margin-bottom:7px' if has_metadata %>">
       <%= task.name %>
     </div>
 
@@ -152,8 +152,8 @@
         <% end %>
         <% if subtask_total > 0 %>
           <div style="display:flex;align-items:center;gap:4px">
-            <span style="font-size:10px;font-weight:500;color:#444">☐ <%= subtask_done %>/<%= subtask_total %></span>
-            <div style="width:32px;height:3px;border-radius:2px;background:rgba(255,255,255,0.06);overflow:hidden">
+            <span style="font-size:10px;font-weight:500;color:#6b7280">☐ <%= subtask_done %>/<%= subtask_total %></span>
+            <div style="width:32px;height:3px;border-radius:2px;background:#e5e7eb;overflow:hidden">
               <div style="height:100%;border-radius:2px;width:<%= subtask_total > 0 ? (subtask_done.to_f / subtask_total * 100).round : 0 %>%;opacity:0.7" class="bg-<%= board_color %>-500"></div>
             </div>
           </div>
