@@ -168,8 +168,11 @@ module Api
       # Toggles task between done and inbox status
       def complete
         set_task_activity_info(@task)
-        new_status = @task.status == "done" ? "inbox" : "done"
-        @task.update!(status: new_status)
+        completed = @task.completed? || @task.completed_at.present?
+        new_status = completed ? "inbox" : "done"
+        update_attrs = { status: new_status }
+        update_attrs[:completed_at] = nil if completed
+        @task.update!(update_attrs)
         render json: task_json(@task)
       end
 
