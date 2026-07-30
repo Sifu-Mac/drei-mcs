@@ -8,9 +8,9 @@ Stand: 2026-07-30
 - VPS-Projektpfad: `/docker/drei-review`
 - Live-URL: `https://drei.digitalbackup.cloud`
 - Aktueller Branch: `main`
-- Repository-Stand vor dieser Handoff-Aktualisierung: `3a8fdb6 Document browser QA findings`
-- Deployter Code-Commit: `bf05416 Merge task panel board UI fix`
-- Feature-Commits: `b6d2287 Fix board UI interactions`, `73a11d5 Fix task panel status label`
+- Repository-Stand vor dieser Handoff-Aktualisierung: `e8fab25 Merge PWA icon fix`
+- Deployter Code-Commit: `e8fab25 Merge PWA icon fix`
+- Aktuelle QA-Fix-Commits: `2a94ffe Fix production QA issues`, `642bdda Fix PWA icon links`
 - VPS-Git-Status nach Deployment: `main...origin/main`, nur `backup-postgres.sh` ist unversioniert und unberuehrt.
 
 ## Laufende Container und Services
@@ -53,6 +53,13 @@ Test-Stack:
 - Spaltenlayout ist grosszuegiger: Desktop-Spaltenbreite `320px`, Spaltenabstand `16px`, Karten-Innenabstand ca. `16px`, Kartenabstand `12px`, Spaltentitel `18px`, Kartentitel `15.5px`.
 - Spaltenbearbeitung ist im Dropdown standardmaessig geschlossen; Formular erscheint erst nach Auswahl von `Spalte umbenennen` oder `Spaltenart aendern`.
 - Sichtbare Board-/Task-/Kommentar-/Navigations-Texte wurden auf Deutsch umgestellt.
+- Portalisierte Spaltenmenues behalten ihre Aktions-/Edit-Ziele; `Spalte umbenennen` und `Spaltenart aendern` oeffnen wieder das Formular.
+- Kampagnen- und Board-Settings-Modals nutzen eine gemeinsame Stimulus-Steuerung mit Escape-, Backdrop- und Fokusbehandlung.
+- API-Tokens sind standardmaessig maskiert und koennen bewusst angezeigt, verborgen, kopiert oder neu erzeugt werden.
+- Kartenduplizierung bleibt per Turbo Stream im Board, fuegt die Kopie sofort ein, aktualisiert den Zaehler und oeffnet das Task-Panel; das HTML-Fallback leitet zum Board.
+- Leere Inline-Kartentitel zeigen eine deutsche Validierungsrueckmeldung und behalten den Fokus.
+- Settings-, Profil-, Admin-, Benutzer- und Invite-Oberflaechen wurden konsistent deutsch lokalisiert.
+- Das PWA-Manifest referenziert die vorhandenen Icons; der Browser-404 fuer `/icon.png` ist behoben.
 
 ## Wichtige technische Entscheidungen
 
@@ -93,17 +100,18 @@ Production-Migrationsstatus:
 
 Letzte vollstaendige Suite im isolierten Test-Stack:
 - Befehl: `docker compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from test test`
-- Ergebnis nach Board-UI-Fix mit neu gebautem Test-Image: `102 runs, 347 assertions, 0 failures, 0 errors, 0 skips`
+- Ergebnis nach allen QA- und PWA-Fixes mit neu gebautem Test-Image: `109 runs, 417 assertions, 0 failures, 0 errors, 0 skips`
 
-Fokussierte Board-UI-/Task-Tests:
-- `test/controllers/boards_controller_test.rb test/controllers/boards_tasks_controller_test.rb`: `10 runs, 42 assertions, 0 failures, 0 errors, 0 skips`
-- Task-Panel-Regressionslauf: `4 runs, 18 assertions, 0 failures, 0 errors, 0 skips`
+Fokussierte QA-Regressionslaeufe:
+- Board-, Task-, Profil- und Admin-Lokalisierungstests: `23 runs, 151 assertions, 0 failures, 0 errors, 0 skips`
+- PWA-Manifest: `2 runs, 8 assertions, 0 failures, 0 errors, 0 skips`
+- RuboCop fuer alle geaenderten Ruby-Dateien: keine Verstoesse.
 
 Production-Smoke:
 - `docker compose --env-file .env.production ps`: `db` healthy, `web` running.
 - `/up`: `200`.
 - Public Root: `200`.
-- Admin-HTTP-Smoke: Boardseite `200`, Task-Panel per `Turbo-Frame: task_panel` `200`, Kartencontroller vorhanden, Portal-Menues vorhanden, Karten-/Spaltenaktionen fuer Admin sichtbar, `md:w-[320px]` und Drei-Zeilen-Clamp im HTML vorhanden.
+- Echter Chromium/Selenium-Smoke: alle 21 Pruefpunkte bestanden, einschliesslich Kartenduplizierung, Modal-/Dropdown-Bedienung, Token-Maskierung, Lokalisierung, Responsive-Verhalten und fehlerfreier Browserkonsole.
 - Oeffentliche Registrierung: kein sichtbarer Registrierungsmarker im Public-Smoke.
 - Produktionsdaten: 1 interner Benutzer, 0 Client-Mitgliedschaften.
 - Client-UI konnte ohne Datenanlage nicht manuell eingeloggt werden. Server-Blockierung fuer Clients ist testabgedeckt.
@@ -111,7 +119,7 @@ Production-Smoke:
 
 ## Letzter Browser-QA-Stand
 
-Umfassender Browser-QA-Lauf gegen `https://drei.digitalbackup.cloud` am 2026-07-30 mit isoliertem Headless-Chromium/Selenium-Fallback, weil `Browser Use` in der Sitzung nicht als Tool verfuegbar war. Fuer mutierende Flows wurde nach ausdruecklicher Freigabe ein temporaerer Admin-/Owner-Benutzer verwendet. Der Benutzer, seine Sessions, API-Tokens und beide erzeugten `CODEX-QA-*`-Karten wurden danach geloescht; die Bereinigung wurde mit 0 verbleibenden QA-Benutzern und 0 QA-Karten verifiziert.
+Umfassender Browser-QA-Lauf und Wiederholung nach Deployment gegen `https://drei.digitalbackup.cloud` am 2026-07-30 mit isoliertem Headless-Chromium/Selenium-Fallback, weil `Browser Use` in der Sitzung nicht als Tool verfuegbar war. Fuer mutierende Flows wurde nach ausdruecklicher Freigabe ein temporaerer Admin-/Owner-Benutzer verwendet. Der Benutzer, seine Sessions, API-Tokens und alle erzeugten `CODEX-QA-*`-Karten wurden danach geloescht; die Bereinigung wurde mit 0 verbleibenden QA-Benutzern und 0 QA-Karten verifiziert. Das temporaere Browser-Image und der Test-Stack wurden ebenfalls entfernt.
 
 Geprueft:
 - Public Login, fehlende oeffentliche Registrierung, Passwort-Reset-Link und Login-Redirect.
@@ -121,23 +129,27 @@ Geprueft:
 - Responsive Viewports `1280x800`, `1024x768`, `768x1024`, `390x844` und `360x800`.
 - Sichtbarkeit des API-Tokens, Sprachkonsistenz und Browserkonsole.
 
-Bestanden:
+Nach den Fixes bestanden:
 - Login, alle geprueften internen Links und Direktseiten funktionieren ohne sichtbaren HTTP-/Routing-/Application-Fehler.
 - Ganze Kartenflaeche oeffnet das Task-Panel; `Karte bearbeiten` oeffnet die Kopie ebenfalls im Modal.
-- Kartenkopie funktioniert technisch: Klick auf `Karte duplizieren` erzeugte genau eine Kopie, leitete auf deren Task-URL und die Kopie war nach Board-Reload sichtbar.
-- Backdrop-Klick schliesst das `Neue Kampagne`-Modal im automatisierten Lauf.
+- Kartenkopie bleibt auf dem Board, erscheint ohne Reload und oeffnet direkt das Task-Panel der Kopie.
+- Kampagnenmodal schliesst per Escape und Backdrop.
+- Portalisierte Spaltenbearbeitung oeffnet sichtbar im Dropdown.
+- API-Token ist initial maskiert und nur nach expliziter Aktion sichtbar.
+- Leere Inline-Karteneingabe zeigt eine sichtbare Fehlermeldung.
+- Settings, Admin, Benutzer und Einladungen sind konsistent deutsch.
 - Archivseite zeigt den korrekten Leerzustand.
-- Kein Body-Level-Horizontaloverflow in allen fuenf Viewports.
+- Kein Body-Level-Horizontaloverflow in den final geprueften Viewports `1280x800`, `768x1024`, `390x844` und `360x800`.
 - Keine Browser-Konsolenfehler im Lauf.
 
-Gefundene Bugs:
-- P1: `Spalte umbenennen` oeffnet im portalierten Spaltenmenue kein sichtbares Bearbeitungsformular. Fix: Command-Handling im `dropdown_controller` am portalierten `document.body`-Menue binden; `editPanel`/`actionList` vor dem Repositionieren toggeln und mit einem Browser-Systemtest absichern.
-- P1: `Neue Kampagne` schliesst nicht per Escape und kann Eingaben hinter dem Modal blockieren. Fix: Inline-JavaScript durch den bestehenden Modal-Stimulus-Controller ersetzen, `keydown.esc` am Modal-Root registrieren, Fokus beim Oeffnen setzen und beim Schliessen zurueckgeben.
-- P1: Settings zeigt den API-Token vollstaendig sichtbar an. Fix: Token standardmaessig maskieren, eine explizite Anzeigen/Verbergen-Aktion anbieten, Copy weiterhin mit dem echten Wert speisen und Regeneration bestaetigen.
-- P1/P2 UX: Kartenkopie ist technisch erfolgreich, wirkt aber defekt, weil der POST direkt auf `/boards/:board_id/tasks/:copy_id` navigiert und keine eindeutige Erfolgsdarstellung im Board liefert. Fix: `duplicate` als Turbo-Stream beantworten, die neue Karte in die richtige Spalte einfuegen, Spaltenzaehler aktualisieren, Flash anzeigen und optional das neue Task-Panel oeffnen; HTML-Fallback zur Boardseite statt zur isolierten Task-URL umleiten.
-- P2: Admin-, User- und Invite-Seiten sind teilweise Englisch (`Welcome`, `Total Users`, `Create user`, `Invite user`, `Send invite`, `Back to Dashboard`). Fix: alle sichtbaren Texte deutsch lokalisieren.
-- P2: Settings/Profile-Agent-Prompt enthaelt gemischte Sprache (`Profile`, `Email Address`, `Copy token`, `Regenerate token`, englische Prompt-Abschnitte). Fix: UI-Texte vollstaendig deutsch lokalisieren und den technischen Prompt entweder konsistent deutsch verfassen oder klar als englisches Integrations-Template kennzeichnen.
-- P2: Leere Inline-Karteneingabe bleibt offen, zeigt aber keine sichtbare Validierungsrueckmeldung. Fix: Button bei leerem/Whitespace-Titel deaktivieren oder inline `Bitte einen Kartentitel eingeben` anzeigen und Fokus im Feld belassen.
+Behobene Befunde:
+- P1: Portalisierte Spaltenbearbeitung war nicht sichtbar.
+- P1: Kampagnenmodal schloss nicht per Escape.
+- P1: API-Token war standardmaessig im Klartext sichtbar.
+- P1/P2: Kartenkopie navigierte aus dem Board und wirkte dadurch defekt.
+- P2: Admin-, Settings-, Profil- und Invite-Texte waren teilweise Englisch.
+- P2: Leere Inline-Karteneingabe hatte keine sichtbare Rueckmeldung.
+- P2: Das PWA-Manifest verursachte wiederholte `/icon.png`-404 in der Browserkonsole.
 
 ## Offene Fehler
 
@@ -149,19 +161,16 @@ Gefundene Bugs:
 
 ## Offene Aufgaben nach Prioritaet
 
-1. QA-P1-Bugs beheben: Spaltenmenue-Editaktion, `Neue Kampagne`-Modal Escape/Backdrop, sichtbares API-Token maskieren.
-2. QA-P2-Lokalisierung beheben: Admin-/Invite-Texte, Agent-Prompt und Production-Beispielkarten ins Deutsche bringen.
-3. Einen echten Client-Testzugang ueber den Invite-Flow anlegen und die Client-Ansicht manuell pruefen.
-4. SMTP/Postmark sauber konfigurieren und mit echten ENV-Werten testen, ohne Secrets zu dokumentieren.
-5. Invite-Mailversand nach SMTP-Konfiguration mit nicht-produktiver Testadresse pruefen.
-6. Backup-Strategie fuer `/docker/drei-review` dokumentieren und verifizieren.
-7. Dynamische Board-Spalten in einem echten Admin-Browser-Flow pruefen: Spalte erstellen, umbenennen, verschieben, leere Spalte loeschen.
-8. Browser-Smoke fuer Drag-and-drop und Dropdown-Flipping mit Maus/Trackpad gegen Production nachholen.
-9. Lokale unversionierte Dubletten-Dateien pruefen und bereinigen, falls sie nicht gebraucht werden.
+1. Einen echten Client-Testzugang ueber den Invite-Flow anlegen und die Client-Ansicht manuell pruefen.
+2. SMTP/Postmark sauber konfigurieren und mit echten ENV-Werten testen, ohne Secrets zu dokumentieren.
+3. Invite-Mailversand nach SMTP-Konfiguration mit nicht-produktiver Testadresse pruefen.
+4. Backup-Strategie fuer `/docker/drei-review` dokumentieren und verifizieren.
+5. Dynamische Board-Spalten in einem echten Admin-Browser-Flow pruefen: Spalte erstellen, verschieben und leere Spalte loeschen; Umbenennen ist bereits browsergeprueft.
+6. Browser-Smoke fuer echtes Drag-and-drop und Dropdown-Flipping mit Maus/Trackpad gegen Production nachholen.
 
 ## Naechster konkreter Arbeitsschritt
 
-QA-P1-Bugs aus dem letzten Browser-QA-Lauf beheben; danach Browser-Smoke fuer Kartenklick, Menueoeffnung, Drag-and-drop und Dropdown-Flipping wiederholen.
+Einen temporaeren Client ausschliesslich ueber den Invite-Flow anlegen, dessen eingeschraenkte Production-Ansicht browserbasiert pruefen und anschliessend vollstaendig entfernen.
 
 ## Wichtige Dateien und Pfade
 
