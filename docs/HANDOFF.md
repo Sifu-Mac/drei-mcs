@@ -44,7 +44,7 @@ Verifikation auf dem vollstaendigen Integrationsstand:
 - Brakeman: `0 errors`, `0 security warnings`.
 - `bundler-audit` mit Advisory-DB-Commit `99b6a95`: keine Schwachstellen.
 - Importmap-Audit: keine verwundbaren Pakete.
-- Echter From-scratch-Lauf per `db:migrate:reset`: alle `61` Repository-Migrationen `up`, keine `NO FILE`-Eintraege.
+- Echter From-scratch-Lauf per `db:migrate:reset`: alle `61` Repository-Migrationen erfolgreich und `up`. Unmittelbar nach dem Reset kann Rails zusaetzlich den internen `schema_migrations`-Wert `0` als `000 NO FILE` anzeigen; er gehoert zu keiner Repository-Migrationsdatei, blockiert den Lauf nicht und war nach dem anschliessenden Test-Prepare nicht mehr vorhanden.
 - Separat benanntes Production-Pruefimage inklusive Asset-Precompile: erfolgreich und ohne Docker-Secret-Warnung gebaut; nicht deployt und danach entfernt.
 - Isolierter Restore des vorhandenen Dumps: Import erfolgreich, aktuelle Migrationen erfolgreich, `36` Tabellen, `61` Repository-Migrationen, `8/8` Kerntabellen; temporaere Container, Images, Netzwerke und Volumes entfernt.
 - Diff-/Secret-Pruefung: keine versehentlich aufgenommenen Secret-, Dump- oder ENV-Dateien.
