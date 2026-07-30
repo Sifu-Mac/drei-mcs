@@ -131,7 +131,6 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
     source = board_columns(:one_backlog)
     target = board_columns(:one_active)
     moved = tasks(:one)
-    original_position = moved.position
 
     patch update_task_status_board_path(board), params: {
       task_id: moved.id,
@@ -142,7 +141,7 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :unprocessable_entity
     assert_equal source, moved.reload.board_column
-    assert_equal original_position, moved.position
+    assert_nil moved.position
     assert_equal "inbox", moved.status
     assert_equal "Ungültige oder veraltete Kartenreihenfolge.", response.parsed_body["error"]
   end
