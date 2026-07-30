@@ -1,20 +1,14 @@
 <% content_for :title, "#{@board.name} - #{app_name}" %>
 <% @board_page = true %>
-
-<%# Subscribe to real-time updates for this board %>
 <%= turbo_stream_from "board_#{@board.id}" %>
 
 <div class="h-full flex flex-col" data-controller="board">
-  <%# Unified Navbar %>
   <%= render "shared/navbar" %>
-
-  <%# Board modals (new board, settings) %>
   <%= render "boards/header" %>
 
-  <%# Tag filter indicator %>
   <% if @current_tag.present? %>
     <div class="flex items-center gap-2 px-6 py-2 bg-bg-surface border-b border-border">
-      <span class="text-xs text-content-muted">Filtered by:</span>
+      <span class="text-xs text-content-muted">Gefiltert nach:</span>
       <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-bg-elevated text-content">
         <%= @current_tag %>
         <%= link_to board_path(@board), class: "ml-1 hover:text-status-error" do %>
@@ -30,44 +24,37 @@
     <%= render "boards/sidebar" %>
 
     <div class="flex-1 min-w-0 flex flex-col overflow-hidden">
-      <%# Mobile status navigation %>
       <div class="md:hidden px-4 pt-3 pb-2 bg-bg-surface border-b border-border">
         <div class="flex gap-2 overflow-x-auto no-scrollbar">
-          <% Task.statuses.keys.each do |status| %>
+          <% @board_columns.each do |column| %>
             <button type="button"
                     data-action="click->board#scrollToColumn"
-                    data-board-status-param="<%= status %>"
+                    data-board-column-id-param="<%= column.id %>"
                     data-board-target="columnTab"
                     class="shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors border border-border bg-bg-elevated text-content-muted"
                     style="scroll-snap-align:start">
-              <span class="rounded-full" style="width:6px;height:6px;background:<%= Task::STATUS_COLORS[status] %>"></span>
-              <span><%= Task::STATUS_LABELS[status] %></span>
-              <span class="text-[10px] text-content-muted"><%= @columns[status.to_sym].count %></span>
+              <span class="rounded-full" style="width:6px;height:6px;background:<%= Task::STATUS_COLORS[Task.legacy_status_for_kind(column.kind)] %>"></span>
+              <span><%= column.name %></span>
+              <span class="text-[10px] text-content-muted"><%= @columns[column].count %></span>
             </button>
           <% end %>
         </div>
       </div>
 
-      <%# Kanban Columns - scrollable page, variable height columns %>
       <div class="flex-1 bg-bg-base overflow-y-auto overflow-x-hidden md:overflow-auto">
         <div data-board-target="columnsViewport"
              data-action="scroll->board#handleColumnsScroll"
              class="h-full overflow-x-auto overflow-y-visible snap-x snap-mandatory md:overflow-x-auto md:overflow-y-hidden">
           <div class="flex gap-3 items-start min-h-full md:min-w-max" style="padding:12px 16px 16px">
-          <% Task.statuses.keys.each do |status| %>
-            <%= render "boards/column", status: status, tasks: @columns[status.to_sym] %>
-          <% end %>
+            <% @board_columns.each do |column| %>
+              <%= render "boards/column", column: column, tasks: @columns[column] %>
+            <% end %>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <%# Task Panel Container - loaded via Turbo Frame %>
   <%= turbo_frame_tag "task_panel" %>
-
-
-  <%# New Task Modal %>
   <%= turbo_frame_tag "new_task_modal" %>
-
 </div>

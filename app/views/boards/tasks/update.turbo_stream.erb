@@ -1,43 +1,22 @@
-<% if @task.saved_change_to_status? %>
-  <%# Status changed - move card to new column %>
-  <% old_status = @task.status_before_last_save %>
-  <% new_status = @task.status %>
-
-  <%# Remove from old column %>
+<% if @task.saved_change_to_board_column_id? %>
+  <% old_column_id = @task.board_column_id_before_last_save %>
+  <% new_column_id = @task.board_column_id %>
   <%= turbo_stream.remove "task_#{@task.id}" %>
-
-  <%# Add to new column %>
-  <%= turbo_stream.prepend "column-#{new_status}" do %>
+  <%= turbo_stream.prepend "column-#{new_column_id}" do %>
     <%= render "boards/task_card", task: @task %>
   <% end %>
-
-  <%# Update old column count %>
-  <% old_count = @board.tasks.where(status: old_status).count %>
-  <%= turbo_stream.replace "column-#{old_status}-count" do %>
-    <span id="column-<%= old_status %>-count" class="ml-auto text-xs text-content-secondary bg-bg-elevated px-1.5 py-0.5 rounded"><%= old_count %></span>
-  <% end %>
-
-  <%# Update new column count %>
-  <% new_count = @board.tasks.where(status: new_status).count %>
-  <%= turbo_stream.replace "column-#{new_status}-count" do %>
-    <span id="column-<%= new_status %>-count" class="ml-auto text-xs text-content-secondary bg-bg-elevated px-1.5 py-0.5 rounded"><%= new_count %></span>
-  <% end %>
-
-  <%# Update header counts if applicable %>
-  <% if %w[inbox in_progress].include?(old_status) %>
-    <%= turbo_stream.update "header-#{old_status}-count", old_count.to_s %>
-  <% end %>
-  <% if %w[inbox in_progress].include?(new_status) %>
-    <%= turbo_stream.update "header-#{new_status}-count", new_count.to_s %>
+  <% [old_column_id, new_column_id].uniq.each do |column_id| %>
+    <% column_count = @board.tasks.where(board_column_id: column_id).count %>
+    <%= turbo_stream.replace "column-#{column_id}-count" do %>
+      <span id="column-<%= column_id %>-count" class="ml-auto text-xs text-content-secondary bg-bg-elevated px-1.5 py-0.5 rounded"><%= column_count %></span>
+    <% end %>
   <% end %>
 <% else %>
-  <%# Status didn't change - just update the card in place %>
   <%= turbo_stream.replace "task_#{@task.id}" do %>
     <%= render "boards/task_card", task: @task %>
   <% end %>
 <% end %>
 
-<%# Update the activity section in the panel %>
 <%= turbo_stream.replace "task-activities-#{@task.id}" do %>
   <%= render "shared/task_activities", task: @task %>
 <% end %>

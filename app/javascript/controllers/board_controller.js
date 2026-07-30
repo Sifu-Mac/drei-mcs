@@ -42,12 +42,12 @@ export default class extends Controller {
   }
 
   scrollToColumn(event) {
-    const { status } = event.params
-    const column = this.columnTargets.find((target) => target.dataset.status === status)
+    const columnId = String(event.params.columnId)
+    const column = this.columnTargets.find((target) => target.dataset.columnId === columnId)
     if (!column) return
 
     column.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" })
-    this.setActiveTab(status)
+    this.setActiveTab(columnId)
   }
 
   handleColumnsScroll() {
@@ -61,7 +61,7 @@ export default class extends Controller {
     const viewportRect = this.columnsViewportTarget.getBoundingClientRect()
     const viewportCenter = viewportRect.left + viewportRect.width / 2
 
-    let activeStatus = null
+    let activeColumnId = null
     let bestDistance = Infinity
 
     this.columnTargets.forEach((column) => {
@@ -71,16 +71,16 @@ export default class extends Controller {
 
       if (distance < bestDistance) {
         bestDistance = distance
-        activeStatus = column.dataset.status
+        activeColumnId = column.dataset.columnId
       }
     })
 
-    if (activeStatus) this.setActiveTab(activeStatus)
+    if (activeColumnId) this.setActiveTab(activeColumnId)
   }
 
-  setActiveTab(status) {
+  setActiveTab(columnId) {
     this.columnTabTargets.forEach((tab) => {
-      const active = tab.dataset.boardStatusParam === status
+      const active = tab.dataset.boardColumnIdParam === columnId
       tab.classList.toggle("bg-accent/10", active)
       tab.classList.toggle("text-accent", active)
       tab.classList.toggle("border-accent/30", active)

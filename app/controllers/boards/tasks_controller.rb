@@ -1,6 +1,7 @@
 class Boards::TasksController < ApplicationController
   before_action :set_board
-  before_action :set_task, only: [:show, :edit, :update, :destroy, :assign, :unassign]
+  before_action :set_task, only: [:show, :edit, :update, :destroy, :assign, :unassign, :duplicate, :archive, :restore]
+  before_action :require_internal_workspace_member, except: [:show, :archived]
 
   def show
     @api_token = current_user.api_token
@@ -9,14 +10,13 @@ class Boards::TasksController < ApplicationController
   end
 
   def new
-    @task = @board.tasks.new(user: current_user)
+    @task = @board.tasks.new(user: current_user, board_column_id: params[:board_column_id] || @board.board_columns.ordered.first&.id)
     render layout: false
   end
 
   def create
     @task = @board.tasks.new(task_params)
     @task.user = current_user
-    @task.status ||= :inbox
     @task.activity_source = "web"
 
     if @task.save
@@ -48,8 +48,32 @@ class Boards::TasksController < ApplicationController
     end
   end
 
+  def duplicate
+    copy = @task.duplicate_for!(user: current_user)
+    redirect_to board_task_path(@board, copy), notice: "Karte wurde dupliziert."
+  end
+
+  def archive
+    @task.activity_source = "web"
+    @task.archive!
+    respond_to do |format|
+      format.turbo_stream { render :destroy }
+      format.html { redirect_to board_path(@board), notice: "Karte wurde archiviert." }
+    end
+  end
+
+  def restore
+    @task.restore!
+    redirect_to archived_board_tasks_path(@board), notice: "Karte wurde wiederhergestellt."
+  end
+
+  def archived
+    require_internal_workspace_member
+    @tasks = @board.tasks.unscoped.where(board_id: @board.id).where.not(archived_at: nil).includes(:board_column).order(archived_at: :desc)
+  end
+
   def destroy
-    @status = @task.status
+    @board_column = @task.board_column
     @task.activity_source = "web"
     @task.destroy
     respond_to do |format|
@@ -93,12 +117,11 @@ class Boards::TasksController < ApplicationController
   end
 
   def set_task
-    @task = @board.tasks.includes(:activities, comments: :user).find(params[:id])
+    @task = @board.tasks.unscoped.where(board_id: @board.id).includes(:activities, comments: :user).find(params[:id])
   end
 
   def task_params
-    permitted = params.require(:task).permit(:name, :title, :description, :priority, :status, :owner, :blocked, :due_date, :completed, :agent_hint, :cover_image, tags: [])
-    # Allow 'title' as alias for 'name'
+    permitted = params.require(:task).permit(:name, :title, :description, :priority, :status, :owner, :blocked, :due_date, :completed, :agent_hint, :cover_image, :board_column_id, :color, tags: [])
     permitted[:name] = permitted.delete(:title) if permitted[:title].present? && permitted[:name].blank?
     permitted
   end

@@ -8,7 +8,7 @@ export default class extends Controller {
   connect() {
     this.boundHandleKeydown = this.handleKeydown.bind(this)
     this.autoSaveTimeout = null
-    this.isAssigned = this.element.querySelector('[data-action="click->task-modal#toggleAgent"]')?.textContent?.includes('Assigned') || false
+    this.isAssigned = this.element.querySelector('[data-action="click->task-modal#toggleAgent"]')?.textContent?.includes('Zugewiesen') || false
 
     // Auto-open the modal when it's loaded
     setTimeout(() => {
@@ -147,7 +147,7 @@ export default class extends Controller {
     btn.style.background = cfg.bg
     btn.style.border = `1px solid ${cfg.border}`
     if (this.hasPriorityLabelTarget) {
-      this.priorityLabelTarget.textContent = next === "none" ? "None" : next.charAt(0).toUpperCase() + next.slice(1)
+      this.priorityLabelTarget.textContent = next === "none" ? "Keine" : next
     }
 
     // Rebuild dots
@@ -168,7 +168,7 @@ export default class extends Controller {
       const label = document.createElement("span")
       label.dataset.taskModalTarget = "priorityLabel"
       label.style.cssText = "font-size:12px;font-weight:700;color:#374151;line-height:1"
-      label.textContent = next === "none" ? "None" : next.charAt(0).toUpperCase() + next.slice(1)
+      label.textContent = next === "none" ? "Keine" : next
       btn.appendChild(label)
     }
 
@@ -180,6 +180,7 @@ export default class extends Controller {
   changeStatus(event) {
     const btn = event.currentTarget
     const newStatus = btn.dataset.status
+    const columnId = btn.dataset.columnId
     const label = btn.dataset.statusLabel
     const dotColor = btn.dataset.statusDot
 
@@ -195,7 +196,7 @@ export default class extends Controller {
     // Send PATCH via fetch
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
     const formData = new FormData()
-    formData.append('task[status]', newStatus)
+    if (columnId) { formData.append('task[board_column_id]', columnId) } else { formData.append('task[status]', newStatus) }
 
     fetch(this.updateUrlValue, {
       method: 'PATCH',
@@ -304,13 +305,13 @@ export default class extends Controller {
     if (!this.hasSaveStatusTarget) return
 
     const states = {
-      pending: { text: 'Unsaved changes', color: '#fbbf24' },
-      saving: { text: 'Saving…', color: '#60a5fa' },
-      saved: { text: 'Saved', color: '#34d399' },
-      error: { text: 'Save failed', color: '#ef4444' }
+      pending: { text: 'Ungespeicherte Änderungen', color: '#fbbf24' },
+      saving: { text: 'Speichern...', color: '#60a5fa' },
+      saved: { text: 'Gespeichert', color: '#34d399' },
+      error: { text: 'Speichern fehlgeschlagen', color: '#ef4444' }
     }
 
-    const cfg = states[state] || { text: 'Auto-save active', color: '#666' }
+    const cfg = states[state] || { text: 'Auto-Speichern aktiv', color: '#666' }
     this.saveStatusTarget.textContent = cfg.text
     this.saveStatusTarget.style.color = cfg.color
 
@@ -318,7 +319,7 @@ export default class extends Controller {
       clearTimeout(this.saveStateTimer)
       this.saveStateTimer = setTimeout(() => {
         if (this.hasSaveStatusTarget) {
-          this.saveStatusTarget.textContent = 'Auto-save active'
+          this.saveStatusTarget.textContent = 'Auto-Speichern aktiv'
           this.saveStatusTarget.style.color = '#666'
         }
       }, 1500)

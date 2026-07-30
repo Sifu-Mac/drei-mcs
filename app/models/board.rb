@@ -2,13 +2,17 @@ class Board < ApplicationRecord
   belongs_to :user
   belongs_to :workspace
   belongs_to :campaign
+  has_many :board_columns, dependent: :destroy
   has_many :tasks, dependent: :destroy
+
+  attr_accessor :column_template
 
   validates :name, presence: true
   validates :position, presence: true
 
   before_validation :ensure_campaign, on: :create
   before_create :set_position
+  after_create :create_template_columns
 
   default_scope { where(archived_at: nil).order(position: :asc) }
   scope :active, -> { where(archived_at: nil) }
@@ -26,26 +30,30 @@ class Board < ApplicationRecord
       campaign: campaign,
       name: "Erste Schritte",
       icon: "🚀",
-      color: "blue"
+      color: "blue",
+      column_template: "standard_review"
     )
+
+    active_column = board.column_for_legacy_status("ready")
+    backlog_column = board.column_for_legacy_status("inbox")
 
     tasks = [
       {
         name: "Willkommen bei DREI Asset Review",
         description: "Dies ist das gemeinsame Arbeitsboard für Kampagnen, Assets und Reviews. Verschiebe Karten durch den Workflow und halte Verantwortlichkeiten klar fest.",
-        status: "ready",
+        board_column: active_column,
         position: 0
       },
       {
         name: "Agent verbinden",
-        description: "Öffne Einstellungen, kopiere den Integrations-Prompt und füge ihn in deiner Agent-Konfiguration ein.",
-        status: "inbox",
+        description: "Öffne Einstellungen, kopiere den Integrations-Prompt und füge ihn in der Agent-Konfiguration ein.",
+        board_column: backlog_column,
         position: 0
       },
       {
         name: "Erste Karte zuweisen",
         description: "Erstelle eine Karte, setze den Owner und weise sie zu, wenn ein Agent daran arbeiten soll.",
-        status: "inbox",
+        board_column: backlog_column,
         position: 1
       }
     ]
@@ -69,20 +77,35 @@ class Board < ApplicationRecord
     update!(archived_at: nil)
   end
 
+  def column_for_legacy_status(status)
+    kind = Task.legacy_status_to_column_kind(status)
+    board_columns.ordered.find_by(kind: BoardColumn.kinds.fetch(kind)) || board_columns.ordered.first
+  end
+
   def duplicate_to!(campaign:, user: self.user)
     Board.transaction do
-      copy = campaign.workspace.boards.create!(
+      copy = campaign.workspace.boards.new(
         user: user,
         campaign: campaign,
         name: "#{name} Kopie",
         icon: icon,
         color: color
       )
+      copy.column_template = "skip"
+      copy.save!
 
-      tasks.reorder(:position, :created_at).find_each do |task|
+      column_map = {}
+      board_columns.ordered.each do |column|
+        copied_column = copy.board_columns.create!(name: column.name, kind: column.kind, position: column.position)
+        column_map[column.id] = copied_column
+      end
+
+      tasks.unscoped.where(board_id: id, archived_at: nil).reorder(:position, :created_at).find_each do |task|
         new_task = task.dup
         new_task.board = copy
+        new_task.board_column = column_map.fetch(task.board_column_id)
         new_task.user = task.user || user
+        new_task.archived_at = nil
         new_task.activity_source = "web"
         new_task.save!
         new_task.activities.delete_all
@@ -110,5 +133,13 @@ class Board < ApplicationRecord
     end
 
     self.position = (scope.maximum(:position) || 0) + 1
+  end
+
+  def create_template_columns
+    return if column_template == "skip" || board_columns.exists?
+
+    BoardColumn.template_for(column_template).each_with_index do |(column_name, column_kind), index|
+      board_columns.create!(name: column_name, kind: column_kind, position: index + 1)
+    end
   end
 end

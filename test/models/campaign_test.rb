@@ -30,6 +30,7 @@ class CampaignTest < ActiveSupport::TestCase
     assert_equal source.boards.count, copy.boards.count
     copied_board = copy.boards.first
     assert_not_includes source_board_ids, copied_board.id
+    assert_equal source.boards.first.board_columns.count, copied_board.board_columns.count
     assert_equal source.boards.first.tasks.count, copied_board.tasks.count
     assert_equal copied_board.id, copied_board.tasks.first.board_id
     assert_empty copied_board.tasks.first.comments

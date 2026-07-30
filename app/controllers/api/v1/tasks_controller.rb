@@ -2,85 +2,72 @@ module Api
   module V1
     class TasksController < BaseController
       before_action :set_task, only: [ :show, :update, :destroy, :complete, :claim, :unclaim, :assign, :unassign ]
+      before_action :require_internal_workspace_member, only: [ :create, :update, :destroy, :complete, :claim, :unclaim, :assign, :unassign ]
 
-      # GET /api/v1/tasks/next - get next task for agent to work on
-      # Returns highest priority unclaimed task in "ready" status
-      # Returns 204 No Content if no tasks available or user has auto_mode disabled
       def next
-        # Check if user has agent auto mode enabled
         unless current_user.agent_auto_mode?
           head :no_content
           return
         end
 
         @task = current_user.current_workspace_tasks
-          .where(status: :ready, blocked: false, agent_claimed_at: nil)
+          .joins(:board_column)
+          .where(board_columns: { kind: BoardColumn.kinds[:active] }, blocked: false, agent_claimed_at: nil)
           .reorder(priority: :desc, position: :asc)
           .first
 
-        if @task
-          render json: task_json(@task)
-        else
-          head :no_content
-        end
+        @task ? render(json: task_json(@task)) : head(:no_content)
       end
 
-      # GET /api/v1/tasks/pending_attention - tasks needing agent attention
-      # Returns tasks that are in "in_progress" and were claimed by agent
       def pending_attention
         unless current_user.agent_auto_mode?
           render json: []
           return
         end
 
-        # Tasks in progress that agent claimed
         @tasks = current_user.current_workspace_tasks
-          .where(status: :in_progress)
+          .joins(:board_column)
+          .where(board_columns: { kind: BoardColumn.kinds[:active] })
           .where.not(agent_claimed_at: nil)
 
         render json: @tasks.map { |task| task_json(task) }
       end
 
-      # PATCH /api/v1/tasks/:id/claim - agent claims a task
       def claim
         set_task_activity_info(@task)
-        @task.update!(agent_claimed_at: Time.current, status: :in_progress)
+        active_column = @task.board.board_columns.find_by(kind: BoardColumn.kinds[:active]) || @task.board.board_columns.ordered.first
+        @task.update!(agent_claimed_at: Time.current, board_column: active_column)
         render json: task_json(@task)
       end
 
-      # PATCH /api/v1/tasks/:id/unclaim - agent releases a task
       def unclaim
         set_task_activity_info(@task)
         @task.update!(agent_claimed_at: nil)
         render json: task_json(@task)
       end
 
-      # PATCH /api/v1/tasks/:id/assign - assign task to agent
       def assign
         set_task_activity_info(@task)
         @task.update!(assigned_to_agent: true, assigned_at: Time.current)
         render json: task_json(@task)
       end
 
-      # PATCH /api/v1/tasks/:id/unassign - unassign task from agent
       def unassign
         set_task_activity_info(@task)
         @task.update!(assigned_to_agent: false, assigned_at: nil)
         render json: task_json(@task)
       end
 
-      # GET /api/v1/tasks - all tasks for current user
       def index
         @tasks = current_user.current_workspace_tasks
 
-        # Filter by board
-        if params[:board_id].present?
-          @tasks = @tasks.where(board_id: params[:board_id])
-        end
+        @tasks = @tasks.where(board_id: params[:board_id]) if params[:board_id].present?
 
-        # Apply filters
-        if params[:status].present? && Task.statuses.key?(params[:status])
-          @tasks = @tasks.where(status: params[:status])
+        if params[:board_column_id].present?
+          @tasks = @tasks.where(board_column_id: params[:board_column_id])
+        elsif params[:status].present? && Task.statuses.key?(params[:status])
+          kind = Task.legacy_status_to_column_kind(params[:status])
+          @tasks = @tasks.joins(:board_column).where(board_columns: { kind: BoardColumn.kinds.fetch(kind) })
         end
 
         if params[:blocked].present?
@@ -88,42 +75,32 @@ module Api
           @tasks = @tasks.where(blocked: blocked)
         end
 
-        if params[:tag].present?
-          @tasks = @tasks.where("? = ANY(tags)", params[:tag])
-        end
+        @tasks = @tasks.where("? = ANY(tags)", params[:tag]) if params[:tag].present?
 
         if params[:completed].present?
           completed = ActiveModel::Type::Boolean.new.cast(params[:completed])
           @tasks = @tasks.where(completed: completed)
         end
 
-        if params[:priority].present? && Task.priorities.key?(params[:priority])
-          @tasks = @tasks.where(priority: params[:priority])
-        end
+        @tasks = @tasks.where(priority: params[:priority]) if params[:priority].present? && Task.priorities.key?(params[:priority])
+        @tasks = @tasks.where(owner: params[:owner]) if params[:owner].present? && Task.owners.key?(params[:owner])
+        @tasks = @tasks.where(color: params[:color]) if params[:color].present? && Task::COLOR_VALUES.include?(params[:color])
 
-        if params[:owner].present? && Task.owners.key?(params[:owner])
-          @tasks = @tasks.where(owner: params[:owner])
-        end
-
-        # Filter by agent assignment
         if params[:assigned].present?
           assigned = ActiveModel::Type::Boolean.new.cast(params[:assigned])
           @tasks = @tasks.where(assigned_to_agent: assigned)
         end
 
-        # Order by assigned_at for assigned tasks, otherwise by status then position
-        if params[:assigned].present? && ActiveModel::Type::Boolean.new.cast(params[:assigned])
-          @tasks = @tasks.reorder(assigned_at: :asc)
+        @tasks = if params[:assigned].present? && ActiveModel::Type::Boolean.new.cast(params[:assigned])
+          @tasks.reorder(assigned_at: :asc)
         else
-          @tasks = @tasks.reorder(status: :asc, position: :asc)
+          @tasks.reorder(board_column_id: :asc, position: :asc)
         end
 
         render json: @tasks.map { |task| task_json(task) }
       end
 
-      # POST /api/v1/tasks
       def create
-        # Assign to specified board or default to user's first board
         board_id = params.dig(:task, :board_id) || params[:board_id]
         board = if board_id.present?
           current_user.current_workspace_boards.find(board_id)
@@ -143,12 +120,10 @@ module Api
         end
       end
 
-      # GET /api/v1/tasks/:id
       def show
         render json: task_json(@task)
       end
 
-      # PATCH /api/v1/tasks/:id
       def update
         set_task_activity_info(@task)
         if @task.update(task_params)
@@ -158,21 +133,16 @@ module Api
         end
       end
 
-      # DELETE /api/v1/tasks/:id
       def destroy
         @task.destroy!
         head :no_content
       end
 
-      # PATCH /api/v1/tasks/:id/complete
-      # Toggles task between done and inbox status
       def complete
         set_task_activity_info(@task)
-        completed = @task.completed? || @task.completed_at.present?
-        new_status = completed ? "inbox" : "done"
-        update_attrs = { status: new_status }
-        update_attrs[:completed_at] = nil if completed
-        @task.update!(update_attrs)
+        target_kind = @task.completed? ? :backlog : :done
+        column = @task.board.board_columns.find_by(kind: BoardColumn.kinds.fetch(target_kind)) || @task.board.board_columns.ordered.first
+        @task.update!(board_column: column)
         render json: task_json(@task)
       end
 
@@ -190,7 +160,7 @@ module Api
       end
 
       def task_params
-        params.require(:task).permit(:name, :description, :priority, :due_date, :status, :owner, :blocked, :board_id, tags: [])
+        params.require(:task).permit(:name, :description, :priority, :due_date, :status, :owner, :blocked, :board_id, :board_column_id, :color, tags: [])
       end
 
       def task_json(task)
@@ -213,6 +183,11 @@ module Api
           assigned_at: task.assigned_at&.iso8601,
           agent_claimed_at: task.agent_claimed_at&.iso8601,
           board_id: task.board_id,
+          board_column_id: task.board_column_id,
+          board_column_name: task.board_column&.name,
+          board_column_kind: task.board_column&.kind,
+          color: task.color,
+          archived_at: task.archived_at&.iso8601,
           workspace_id: task.board.workspace_id,
           url: "#{app_url}/boards/#{task.board_id}/tasks/#{task.id}",
           created_at: task.created_at.iso8601,

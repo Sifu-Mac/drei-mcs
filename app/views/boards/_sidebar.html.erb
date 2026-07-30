@@ -70,6 +70,7 @@
                 <%= form.hidden_field :campaign_id, value: campaign.id %>
                 <%= form.text_field :name, required: true, placeholder: "Boardname", class: "w-full rounded-lg border border-border bg-bg-card px-2 py-1.5 text-xs text-content placeholder-content-muted focus:outline-none focus:ring-2 focus:ring-accent" %>
                 <%= form.hidden_field :icon, value: "📋" %>
+                <%= form.select :column_template, [["Standard Review", "standard_review"], ["Einfach", "simple"]], {}, class: "w-full rounded-lg border border-border bg-bg-card px-2 py-1.5 text-xs text-content focus:outline-none focus:ring-2 focus:ring-accent" %>
                 <%= form.submit "Erstellen", class: "w-full rounded-lg bg-accent px-2 py-1.5 text-xs font-semibold text-content-inverse hover:bg-accent-hover cursor-pointer" %>
               <% end %>
             </details>

@@ -54,10 +54,20 @@ Rails.application.routes.draw do
       patch :archive
       patch :restore
     end
+    resources :board_columns, only: [:create, :update, :destroy] do
+      member do
+        patch :move_left
+        patch :move_right
+      end
+    end
     resources :tasks, only: [ :show, :new, :create, :edit, :update, :destroy ], controller: "boards/tasks" do
+      get :archived, on: :collection
       member do
         patch :assign
         patch :unassign
+        post :duplicate
+        patch :archive
+        patch :restore
       end
       resources :subtasks, only: [ :create, :update, :destroy ], controller: "boards/subtasks"
       resources :comments, only: [ :create ], controller: "boards/comments"

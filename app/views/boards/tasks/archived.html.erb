@@ -1,0 +1,31 @@
+<% content_for :title, "Archivierte Karten - #{@board.name}" %>
+
+<div class="min-h-screen bg-bg px-6 py-8">
+  <div class="mx-auto max-w-4xl">
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-content">Archivierte Karten</h1>
+        <p class="mt-1 text-sm text-content-muted">Archivierte Karten bleiben erhalten und können wiederhergestellt werden.</p>
+      </div>
+      <%= link_to "Zurück zum Board", board_path(@board), class: "rounded-lg border border-border bg-bg-card px-3 py-2 text-sm font-semibold text-content-secondary hover:bg-bg-hover" %>
+    </div>
+
+    <% if @tasks.any? %>
+      <div class="space-y-3">
+        <% @tasks.each do |task| %>
+          <div class="rounded-xl border border-border bg-bg-card p-4 shadow-sm">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <div class="font-semibold text-content"><%= task.name %></div>
+                <div class="text-sm text-content-muted"><%= task.board_column&.name %></div>
+              </div>
+              <%= button_to "Wiederherstellen", restore_board_task_path(@board, task), method: :patch, class: "rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-content-inverse hover:bg-accent-hover cursor-pointer" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="rounded-xl border border-border bg-bg-card p-8 text-center text-sm text-content-muted">Keine archivierten Karten vorhanden.</div>
+    <% end %>
+  </div>
+</div>

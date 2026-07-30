@@ -1,6 +1,7 @@
 class Boards::SubtasksController < ApplicationController
   before_action :set_board
   before_action :set_task
+  before_action :require_internal_workspace_member
   before_action :set_subtask, only: [ :update, :destroy ]
 
   def create
