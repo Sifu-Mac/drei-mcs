@@ -13,6 +13,7 @@ module Admin
     def create
       email = params.dig(:invite, :email).to_s.strip.downcase
       @new_invite = Invite.new(invite_params)
+      @new_invite.role = params.dig(:invite, :role) if params.dig(:invite, :role).present?
       @new_invite.invited_by = current_user
 
       if User.exists?(email_address: email)
@@ -37,7 +38,7 @@ module Admin
     private
 
     def invite_params
-      params.require(:invite).permit(:email, :role)
+      params.require(:invite).permit(:email)
     end
   end
 end

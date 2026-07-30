@@ -86,7 +86,7 @@ Rails.application.configure do
     IPAddr.new("127.0.0.1"),
     IPAddr.new("::1")
   ]
-  
+
   # Skip DNS rebinding protection for the default health check endpoint.
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 end
