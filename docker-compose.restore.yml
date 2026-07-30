@@ -13,5 +13,19 @@ services:
     volumes:
       - restore-postgres:/var/lib/postgresql/data
 
+  restore-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+      restore-db:
+        condition: service_healthy
+    environment:
+      RAILS_ENV: production
+      SECRET_KEY_BASE: restore-isolated-dummy-secret-key-base
+      DATABASE_URL: postgresql://drei_review:drei_restore_ephemeral_only@restore-db:5432/drei_restore
+      DB_POOL: 5
+    command: ["bin/rails", "db:migrate"]
+
 volumes:
   restore-postgres:

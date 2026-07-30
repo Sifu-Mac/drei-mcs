@@ -15,8 +15,10 @@ production database, containers, network, or volumes.
 
 `bin/verify_postgres_backup` enforces an isolated Compose project name beginning
 with `drei-restore-`. Its PostgreSQL service uses a project-scoped temporary
-volume and fixed, non-production credentials. An exit trap removes the container,
-network, and volume on success, failure, or interruption.
+volume and fixed, non-production credentials. Its one-shot Rails service receives
+only the isolated database URL and dummy application credentials; it does not
+load `.env.production`. An exit trap removes the containers, network, volume,
+and locally built restore image on success, failure, or interruption.
 
 ## Prerequisites
 
@@ -45,9 +47,10 @@ The verifier:
 2. creates a uniquely named `drei-restore-*` Compose project;
 3. starts PostgreSQL 16 with a new project-scoped volume;
 4. restores with `psql` and `ON_ERROR_STOP=1`;
-5. reports only aggregate checks: public table count, migration count, presence
+5. runs the current branch's Rails migrations against only `restore-db`;
+6. reports only aggregate checks: public table count, migration count, presence
    of required tables, and row counts for campaigns, boards, columns, and tasks;
-6. removes the isolated container, network, and volume.
+7. removes the isolated containers, network, volume, and local restore image.
 
 It intentionally suppresses SQL output during import. Do not add queries that
 print user records, credentials, tokens, comments, filenames, or other content.
@@ -58,10 +61,12 @@ A backup passes when:
 
 - gzip validation succeeds;
 - the SQL import exits successfully without ignored errors;
+- current Rails migrations complete successfully against the isolated database;
 - all eight required structural tables are present;
 - `schema_migrations` can be queried;
 - aggregate queries for campaigns, boards, board columns, and tasks succeed;
 - no `drei-restore-*` container, network, or volume remains afterward;
+- no locally built `drei-restore-*` image remains afterward;
 - the production `db` and `web` services remain in their previous state.
 
 The aggregate row counts are diagnostics, not a guarantee of application-level

@@ -18,7 +18,8 @@ compose_file="$project_dir/docker-compose.restore.yml"
 restore_project="drei-restore-$(date -u +%Y%m%d%H%M%S)-$$"
 
 cleanup() {
-  docker compose --project-name "$restore_project" --file "$compose_file" down --volumes --remove-orphans >/dev/null 2>&1 || true
+  docker compose --project-name "$restore_project" --file "$compose_file" down \
+    --volumes --remove-orphans --rmi local >/dev/null 2>&1 || true
 }
 trap cleanup EXIT INT TERM
 
@@ -28,6 +29,9 @@ docker compose --project-name "$restore_project" --file "$compose_file" up --det
 gzip --decompress --stdout "$backup_path" |
   docker compose --project-name "$restore_project" --file "$compose_file" exec --no-TTY restore-db \
     psql --set ON_ERROR_STOP=1 --username drei_review --dbname drei_restore >/dev/null
+
+docker compose --project-name "$restore_project" --file "$compose_file" run --rm --no-deps restore-app \
+  bin/rails db:migrate
 
 restore_checks=$(docker compose --project-name "$restore_project" --file "$compose_file" exec --no-TTY restore-db \
   psql --set ON_ERROR_STOP=1 --username drei_review --dbname drei_restore --tuples-only --no-align <<'SQL'
