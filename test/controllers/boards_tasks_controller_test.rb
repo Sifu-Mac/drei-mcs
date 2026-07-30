@@ -110,4 +110,33 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_no_match "Spaltenaktionen", response.body
     assert_no_match "Spalte umbenennen", response.body
   end
+
+  test "client task panel is read only but keeps comments" do
+    sign_in_as users(:client)
+    task = tasks(:one)
+    task.subtasks.create!(title: "Nur lesen")
+
+    get board_task_path(boards(:one), task), headers: { "Turbo-Frame" => "task_panel" }
+
+    assert_response :success
+    assert_includes response.body, task.name
+    assert_includes response.body, "Nur lesen"
+    assert_includes response.body, "Kommentar"
+    assert_includes response.body, board_task_comments_path(boards(:one), task)
+    assert_not_includes response.body, "data-task-modal-update-url-value"
+    assert_not_includes response.body, "data-task-modal-assign-url-value"
+    assert_not_includes response.body, "data-task-modal-unassign-url-value"
+    assert_not_includes response.body, "data-task-modal-delete-url-value"
+    assert_not_includes response.body, 'name="task[name]"'
+    assert_not_includes response.body, 'name="task[cover_image]"'
+    assert_not_includes response.body, 'name="task[board_column_id]"'
+    assert_not_includes response.body, 'name="task[priority]"'
+    assert_not_includes response.body, 'name="task[color]"'
+    assert_not_includes response.body, 'name="task[owner]"'
+    assert_not_includes response.body, board_task_subtask_path(boards(:one), task, task.subtasks.first)
+    assert_not_includes response.body, "click-&gt;task-modal#toggleAgent"
+    assert_not_includes response.body, "click-&gt;task-modal#deleteTask"
+    assert_not_includes response.body, "Auto-Speichern aktiv"
+    assert_not_includes response.body, "Activity"
+  end
 end

@@ -1,4 +1,6 @@
 class AgentController < ApplicationController
+  before_action :require_internal_workspace_member
+
   def chat
     response = case params[:message_type]
     when "focus"
