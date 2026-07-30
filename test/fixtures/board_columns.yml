@@ -1,0 +1,41 @@
+one_backlog:
+  board: one
+  name: Eingang
+  kind: backlog
+  position: 1
+
+one_active:
+  board: one
+  name: In Bearbeitung
+  kind: active
+  position: 2
+
+one_review:
+  board: one
+  name: Kunden-Review
+  kind: review
+  position: 3
+
+one_blocked:
+  board: one
+  name: Änderungen angefordert
+  kind: blocked
+  position: 4
+
+one_done:
+  board: one
+  name: Freigegeben
+  kind: done
+  position: 5
+
+two_backlog:
+  board: two
+  name: Eingang
+  kind: backlog
+  position: 1
+
+two_active:
+  board: two
+  name: In Bearbeitung
+  kind: active
+  position: 2

@@ -4,14 +4,18 @@ one:
   name: Test Task One
   user: one
   board: one
+  board_column: one_backlog
   status: inbox
   priority: none
   completed: false
+  color: none
 
 two:
   name: Test Task Two
   user: two
   board: two
+  board_column: two_active
   status: in_progress
   priority: high
   completed: false
+  color: none

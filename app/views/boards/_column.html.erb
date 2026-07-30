@@ -1,63 +1,72 @@
-<div id="board-column-<%= status %>"
+<div id="board-column-<%= column.id %>"
      class="w-[calc(100vw-32px)] shrink-0 snap-start md:w-[220px] lg:w-[240px] xl:w-[250px] md:flex-none flex flex-col h-auto md:h-full overflow-visible md:overflow-hidden"
      data-controller="inline-add"
      data-board-target="column"
-     data-inline-add-status-value="<%= status %>"
+     data-inline-add-column-id-value="<%= column.id %>"
      data-inline-add-url-value="<%= board_tasks_path(@board) %>"
-     data-status="<%= status %>">
-  <%# Column Header %>
+     data-column-id="<%= column.id %>">
   <div class="flex items-center gap-2" style="padding:6px 8px 10px">
-    <div class="rounded-full" style="width:7px;height:7px;background:<%= Task::STATUS_COLORS[status] %>"></div>
-    <span style="font-size:13px;font-weight:700;color:#374151"><%= Task::STATUS_LABELS[status] %></span>
-    <span id="column-<%= status %>-count" style="font-size:11px;font-weight:600;color:#6b7280;background:#eef2ff;padding:0 7px;border-radius:5px;line-height:20px"><%= tasks.count %></span>
+    <div class="rounded-full" style="width:7px;height:7px;background:<%= Task::STATUS_COLORS[Task.legacy_status_for_kind(column.kind)] %>"></div>
+    <span class="min-w-0 flex-1 truncate" style="font-size:13px;font-weight:700;color:#374151"><%= column.name %></span>
+    <span id="column-<%= column.id %>-count" style="font-size:11px;font-weight:600;color:#6b7280;background:#eef2ff;padding:0 7px;border-radius:5px;line-height:20px"><%= tasks.count %></span>
+
+    <% if internal_workspace_member? %>
+      <details class="relative">
+        <summary class="flex h-7 w-7 cursor-pointer list-none items-center justify-center rounded-lg text-content-muted hover:bg-bg-hover hover:text-content" aria-label="Spaltenaktionen">
+          <span class="text-lg leading-none">...</span>
+        </summary>
+        <div class="absolute right-0 top-8 z-50 w-64 rounded-xl border border-border bg-bg-card p-2 shadow-lg">
+          <%= form_with model: [@board, column], url: board_board_column_path(@board, column), method: :patch, class: "space-y-2" do |form| %>
+            <%= form.text_field :name, required: true, aria: { label: "Spalte umbenennen" }, class: "w-full rounded-lg border border-border bg-bg-card px-2 py-1.5 text-xs text-content focus:outline-none focus:ring-2 focus:ring-accent" %>
+            <%= form.select :kind, BoardColumn.kinds.keys.map { |kind| [BoardColumn::KIND_LABELS[kind], kind] }, {}, class: "w-full rounded-lg border border-border bg-bg-card px-2 py-1.5 text-xs text-content focus:outline-none focus:ring-2 focus:ring-accent" %>
+            <%= form.submit "Speichern", class: "w-full rounded-lg bg-accent px-2 py-1.5 text-xs font-semibold text-content-inverse hover:bg-accent-hover cursor-pointer" %>
+          <% end %>
+          <div class="my-2 h-px bg-border"></div>
+          <div class="grid grid-cols-2 gap-2">
+            <%= button_to "Links", move_left_board_board_column_path(@board, column), method: :patch, class: "rounded-lg px-2 py-1.5 text-xs font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer" %>
+            <%= button_to "Rechts", move_right_board_board_column_path(@board, column), method: :patch, class: "rounded-lg px-2 py-1.5 text-xs font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer" %>
+          </div>
+          <%= button_to "Spalte löschen", board_board_column_path(@board, column), method: :delete, data: { turbo_confirm: "Spalte löschen?" }, class: "mt-2 w-full rounded-lg px-2 py-1.5 text-left text-xs font-semibold text-status-error hover:bg-red-50 cursor-pointer" %>
+        </div>
+      </details>
+    <% end %>
   </div>
 
-  <%# Tasks List %>
-  <ul id="column-<%= status %>"
+  <ul id="column-<%= column.id %>"
       class="flex-1 flex flex-col gap-[5px] min-h-[2rem] overflow-visible md:overflow-y-hidden md:hover:overflow-y-auto transition-all duration-[120ms] list-none m-0"
       style="border-radius:12px;padding:6px;background:#eef1f6;border:1px solid #e5e7eb"
       data-controller="sortable"
       data-sortable-group-value="board"
-      data-sortable-status-value="<%= status %>"
+      data-sortable-column-id-value="<%= column.id %>"
       data-sortable-url-value="<%= update_task_status_board_path(@board) %>">
     <% tasks.each do |task| %>
       <%= render "boards/task_card", task: task %>
     <% end %>
   </ul>
 
-  <%# Inline Add Card Form (hidden by default) %>
-  <div data-inline-add-target="form" class="hidden px-1.5 py-1.5">
-    <div class="bg-bg-elevated rounded-lg border border-border p-2">
-      <textarea data-inline-add-target="input"
-                data-action="keydown->inline-add#handleKeydown"
-                placeholder="Titel der Karte eingeben..."
-                rows="3"
-                class="w-full bg-transparent text-sm text-content placeholder-content-muted resize-none focus:outline-none"></textarea>
-      <div class="flex items-center gap-2 mt-2">
-        <button type="button"
-                data-action="click->inline-add#submit"
-                class="px-3 py-1.5 text-xs font-semibold rounded bg-accent text-content-inverse hover:bg-accent-hover transition-colors cursor-pointer">
-          Karte hinzufügen
-        </button>
-        <button type="button"
-                data-action="click->inline-add#cancel"
-                class="p-1.5 text-content-muted hover:text-content transition-colors cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-          </svg>
-        </button>
+  <% if internal_workspace_member? %>
+    <div data-inline-add-target="form" class="hidden px-1.5 py-1.5">
+      <div class="bg-bg-elevated rounded-lg border border-border p-2">
+        <textarea data-inline-add-target="input"
+                  data-action="keydown->inline-add#handleKeydown"
+                  placeholder="Titel der Karte eingeben..."
+                  rows="3"
+                  class="w-full bg-transparent text-sm text-content placeholder-content-muted resize-none focus:outline-none"></textarea>
+        <div class="flex items-center gap-2 mt-2">
+          <button type="button" data-action="click->inline-add#submit" class="px-3 py-1.5 text-xs font-semibold rounded bg-accent text-content-inverse hover:bg-accent-hover transition-colors cursor-pointer">Karte hinzufügen</button>
+          <button type="button" data-action="click->inline-add#cancel" class="p-1.5 text-content-muted hover:text-content transition-colors cursor-pointer">✕</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <%# Add Card Button %>
-  <div data-inline-add-target="button" class="px-1.5 py-1">
-    <button type="button"
-            data-action="click->inline-add#show"
-            class="w-full flex items-center gap-2 rounded-lg cursor-pointer border-none bg-transparent transition-colors hover:text-accent"
-            style="padding:8px 4px;font-size:13px;font-weight:600;color:#6b7280">
-      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M14 8H2M8 2V14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-      Karte hinzufügen
-    </button>
-  </div>
+    <div data-inline-add-target="button" class="px-1.5 py-1">
+      <button type="button"
+              data-action="click->inline-add#show"
+              class="w-full flex items-center gap-2 rounded-lg cursor-pointer border-none bg-transparent transition-colors hover:text-accent"
+              style="padding:8px 4px;font-size:13px;font-weight:600;color:#6b7280">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M14 8H2M8 2V14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Karte hinzufügen
+      </button>
+    </div>
+  <% end %>
 </div>

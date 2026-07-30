@@ -43,6 +43,16 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to board_path(Board.order(:created_at).last)
   end
 
+  test "duplicate board copies columns and keeps copied cards in copied columns" do
+    sign_in_as users(:admin)
+
+    post duplicate_board_path(boards(:one))
+    copy = Board.order(:created_at).last
+
+    assert_equal boards(:one).board_columns.count, copy.board_columns.count
+    assert_equal copy.board_columns.first.id, copy.tasks.first.board_column_id
+  end
+
   test "client can see board but cannot mutate board structure" do
     sign_in_as users(:client)
 

@@ -1,6 +1,6 @@
 <%# Task edit modal for kanban board %>
 <%
-  status_labels = Task::STATUS_LABELS
+  board_columns = @board.board_columns.ordered
   status_dot_colors = Task::STATUS_COLORS
   owner_labels = Task::OWNER_LABELS
   priority_levels = [
@@ -45,9 +45,9 @@
       <%= form_with model: task, url: board_task_path(@board, task), method: :patch, id: dom_id(task, :edit), class: "flex flex-col gap-5", data: { task_modal_target: "form" }, html: { multipart: true } do |form| %>
         <%= form.hidden_field :priority, value: task.priority, data: { task_modal_target: "priorityField" } %>
 
-        <!-- Cover image -->
+        <!-- Coverbild -->
         <div class="space-y-2">
-          <div class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#5f5f67]">Cover image</div>
+          <div class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#5f5f67]">Coverbild</div>
           <% if task.cover_image.attached? %>
             <div style="border-radius:16px;overflow:hidden;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)">
               <%= image_tag task.cover_image, alt: "", style: "display:block;width:100%;height:auto;max-height:380px;object-fit:contain" %>
@@ -68,18 +68,18 @@
 
         <!-- Title -->
         <div class="space-y-2">
-          <div class="text-[11px] font-semibold uppercase tracking-[0.08em] text-content-muted">Task</div>
+          <div class="text-[11px] font-semibold uppercase tracking-[0.08em] text-content-muted">Karte</div>
           <%= form.text_field :name,
-              placeholder: "Task title",
+              placeholder: "Kartentitel",
               class: "w-full bg-transparent border-0 outline-none p-0 text-xl md:text-[20px] font-extrabold leading-tight text-content",
               data: { task_modal_target: "nameField", action: "input->task-modal#scheduleAutoSpeichern" } %>
         </div>
 
         <!-- Notes -->
         <div class="space-y-2">
-          <div class="text-[11px] font-semibold uppercase tracking-[0.08em] text-content-muted">Notes</div>
+          <div class="text-[11px] font-semibold uppercase tracking-[0.08em] text-content-muted">Notizen</div>
           <%= form.text_area :description,
-              placeholder: "Add notes...",
+              placeholder: "Notizen hinzufügen...",
               class: "w-full min-h-[140px] md:min-h-[120px] p-3.5 rounded-xl border border-border bg-bg-elevated text-[14px] text-content-secondary resize-y outline-none leading-6 placeholder:text-content-muted focus:ring-2 focus:ring-accent",
               data: { task_modal_target: "descriptionField", action: "input->task-modal#scheduleAutoSpeichern" } %>
         </div>
@@ -93,33 +93,28 @@
         <div class="text-[13px] font-bold text-content mb-4">Details</div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
 
-        <!-- Status row -->
+        <!-- Spalten row -->
         <div class="space-y-2" data-controller="dropdown">
-          <span class="text-xs font-medium text-content-muted">Status</span>
+          <span class="text-xs font-medium text-content-muted">Spalte</span>
           <div class="relative w-full md:w-auto">
             <button type="button" data-action="click->dropdown#toggle" data-dropdown-target="button" aria-expanded="false"
                     class="w-full md:w-auto min-h-11 flex items-center justify-between gap-2 px-3 py-2 rounded-lg cursor-pointer bg-bg-surface border border-border transition-all text-left hover:bg-bg-hover">
-              <div data-task-modal-target="statusDot" style="width:6px;height:6px;border-radius:50%;background:<%= status_dot_colors[task.status] %>"></div>
-              <span data-task-modal-target="statusLabel" class="text-xs font-semibold text-[#ccc] flex-1"><%= status_labels[task.status] %></span>
+              <div data-task-modal-target="statusDot" style="width:6px;height:6px;border-radius:50%;background:<%= Task::STATUS_COLORS[Task.legacy_status_for_kind(task.board_column.kind)] %>"></div>
+              <span data-task-modal-target="statusLabel" class="text-xs font-semibold text-content-secondary flex-1"><%= task.board_column.name %></span>
               <svg width="10" height="10" viewBox="0 0 16 16" fill="none" style="opacity:0.3">
                 <path d="M4 6L8 10L12 6" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
-            <div data-dropdown-target="menu" class="hidden absolute top-[calc(100%+4px)] right-0 w-full md:w-[180px] p-1 rounded-[10px] bg-bg-dropdown border border-border shadow-[0_12px_40px_rgba(15,23,42,0.12)] z-10">
-              <% status_labels.each do |status_key, status_label| %>
+            <div data-dropdown-target="menu" class="hidden absolute top-[calc(100%+4px)] right-0 w-full md:w-[220px] p-1 rounded-[10px] bg-bg-dropdown border border-border shadow-[0_12px_40px_rgba(15,23,42,0.12)] z-10">
+              <% board_columns.each do |column| %>
                 <button type="button"
                         data-action="click->task-modal#changeStatus"
-                        data-status="<%= status_key %>"
-                        data-status-label="<%= status_label %>"
-                        data-status-dot="<%= status_dot_colors[status_key] %>"
-                        style="display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border-radius:7px;background:<%= task.status == status_key ? '#eaf1ff' : 'transparent' %>;border:none;cursor:pointer;transition:background 0.1s;text-align:left"
-                        onmouseenter="if(!this.dataset.active)this.style.background='#eef2ff'"
-                        onmouseleave="if(!this.dataset.active)this.style.background='transparent'">
-                  <div style="width:7px;height:7px;border-radius:50%;background:<%= status_dot_colors[status_key] %>"></div>
-                  <span style="font-size:12px;font-weight:600;color:<%= task.status == status_key ? '#1e5eff' : '#4b5563' %>;flex:1"><%= status_label %></span>
-                  <% if task.status == status_key %>
-                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.5 12L13 4" stroke="<%= status_dot_colors[status_key] %>" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  <% end %>
+                        data-column-id="<%= column.id %>"
+                        data-status-label="<%= column.name %>"
+                        data-status-dot="<%= Task::STATUS_COLORS[Task.legacy_status_for_kind(column.kind)] %>"
+                        style="display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border-radius:7px;background:<%= task.board_column_id == column.id ? '#eaf1ff' : 'transparent' %>;border:none;cursor:pointer;transition:background 0.1s;text-align:left">
+                  <div style="width:7px;height:7px;border-radius:50%;background:<%= Task::STATUS_COLORS[Task.legacy_status_for_kind(column.kind)] %>"></div>
+                  <span style="font-size:12px;font-weight:600;color:<%= task.board_column_id == column.id ? '#1e5eff' : '#4b5563' %>;flex:1"><%= column.name %></span>
                 </button>
               <% end %>
             </div>
@@ -140,7 +135,7 @@
         <div class="space-y-2">
           <span class="text-xs font-medium text-content-muted">Priorität</span>
           <button type="button"
-                  data-action="click->task-modal#cyclePriorität"
+                  data-action="click->task-modal#cyclePriority"
                   data-task-modal-target="priorityButton"
                   data-priority-value="<%= task.priority %>"
                   class="w-full md:w-[100px] h-11 md:h-[30px] rounded-lg md:rounded-[7px] cursor-pointer flex items-center justify-center gap-2 transition-all"
@@ -152,8 +147,19 @@
                 <div style="width:5px;height:5px;border-radius:50%;background:<%= current_p[:color] %>"></div>
               <% end %>
             <% end %>
-            <span data-task-modal-target="priorityLabel" style="font-size:12px;font-weight:700;color:#374151;line-height:1"><%= task.priority == "none" ? "None" : task.priority.titleize %></span>
+            <span data-task-modal-target="priorityLabel" style="font-size:12px;font-weight:700;color:#374151;line-height:1"><%= task.priority == "none" ? "Keine" : task.priority.titleize %></span>
           </button>
+        </div>
+
+        <!-- Farbe row -->
+        <div class="space-y-2">
+          <span class="text-xs font-medium text-content-muted">Farbe</span>
+          <%= select_tag "task[color]",
+              options_for_select(Task::COLOR_LABELS.map { |key, label| [label, key] }, task.color),
+              form: dom_id(task, :edit),
+              id: nil,
+              class: "w-full h-11 px-3 rounded-lg bg-bg-surface border border-border text-content text-sm font-semibold outline-none focus:ring-2 focus:ring-accent",
+              data: { action: "change->task-modal#scheduleAutoSave" } %>
         </div>
 
         <!-- Owner row -->
@@ -207,7 +213,7 @@
           <span style="font-size:16px">🤖</span>
           <div>
             <div style="font-size:12px;font-weight:600;color:<%= agent_done ? '#34d399' : '#fbbf24' %>">
-              <%= agent_done ? 'Agent finished — needs review' : 'Agent is working on this' %>
+              <%= agent_done ? 'Agent fertig - Prüfung erforderlich' : 'Agent arbeitet daran' %>
             </div>
             <div style="font-size:11px;font-weight:500;color:#6b7280;margin-top:2px">
               <%= agent_done ? 'Änderungen prüfen, bevor die Karte erledigt wird' : 'Später erneut auf Updates prüfen' %>
@@ -250,12 +256,12 @@
         </div>
       <% end %>
 
-      <!-- Agent Suggestion Hint -->
+      <!-- Agent Hinweis Hint -->
       <% if task.agent_hint.present? %>
         <div style="padding:12px 14px;border-radius:10px;background:rgba(251,191,36,0.04);border:1px solid rgba(251,191,36,0.08);display:flex;align-items:flex-start;gap:9px">
           <span style="font-size:14px;margin-top:1px">💡</span>
           <div>
-            <div style="font-size:12px;font-weight:600;color:#fbbf24;margin-bottom:2px">Suggestion</div>
+            <div style="font-size:12px;font-weight:600;color:#fbbf24;margin-bottom:2px">Hinweis</div>
             <div style="font-size:12px;font-weight:500;color:#4b5563;line-height:1.4"><%= task.agent_hint %></div>
           </div>
         </div>

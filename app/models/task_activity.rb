@@ -5,7 +5,7 @@ class TaskActivity < ApplicationRecord
   validates :action, presence: true
 
   ACTIONS = %w[created updated moved].freeze
-  TRACKED_FIELDS = %w[name due_date owner].freeze
+  TRACKED_FIELDS = %w[name due_date owner color].freeze
 
   scope :recent, -> { order(created_at: :desc) }
 
@@ -28,8 +28,24 @@ class TaskActivity < ApplicationRecord
       user: Current.user,
       action: "moved",
       field_name: "status",
-      old_value: old_status,
-      new_value: new_status,
+      old_value: format_status(old_status),
+      new_value: format_status(new_status),
+      source: source,
+      actor_type: source == "api" ? "agent" : "user",
+      actor_name: actor_name,
+      actor_emoji: actor_emoji,
+      note: note
+    )
+  end
+
+  def self.record_column_change(task, old_column_name:, new_column_name:, source: "web", actor_name: nil, actor_emoji: nil, note: nil)
+    create!(
+      task: task,
+      user: Current.user,
+      action: "moved",
+      field_name: "board_column",
+      old_value: old_column_name,
+      new_value: new_column_name,
       source: source,
       actor_type: source == "api" ? "agent" : "user",
       actor_name: actor_name,
@@ -75,8 +91,8 @@ class TaskActivity < ApplicationRecord
   private
 
   def describe_move
-    from_label = format_status(old_value)
-    to_label = format_status(new_value)
+    from_label = old_value
+    to_label = new_value
     "Moved from #{from_label} to #{to_label}"
   end
 
@@ -91,7 +107,7 @@ class TaskActivity < ApplicationRecord
     end
   end
 
-  def format_status(status)
+  def self.format_status(status)
     case status
     when "inbox" then "Inbox"
     when "planned" then "Geplant"
@@ -112,6 +128,8 @@ class TaskActivity < ApplicationRecord
       Task.priorities.key(value)&.humanize || value.to_s
     when "owner"
       Task::OWNER_LABELS[Task.owners.key(value)] || value.to_s.titleize
+    when "color"
+      Task::COLOR_LABELS[value.to_s] || value.to_s
     when "due_date"
       value.is_a?(Date) ? value.strftime("%b %d, %Y") : value.to_s
     else

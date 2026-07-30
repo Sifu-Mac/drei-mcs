@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_130100) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_160100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -61,6 +61,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_130100) do
     t.bigint "user_id", null: false
     t.index ["user_id", "month"], name: "index_api_usage_records_on_user_id_and_month", unique: true
     t.index ["user_id"], name: "index_api_usage_records_on_user_id"
+  end
+
+  create_table "board_columns", force: :cascade do |t|
+    t.bigint "board_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "kind", default: 0, null: false
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["board_id", "kind"], name: "index_board_columns_on_board_id_and_kind"
+    t.index ["board_id", "position"], name: "index_board_columns_on_board_id_and_position", unique: true
+    t.index ["board_id"], name: "index_board_columns_on_board_id"
   end
 
   create_table "boards", force: :cascade do |t|
@@ -353,10 +365,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_130100) do
   create_table "tasks", force: :cascade do |t|
     t.datetime "agent_claimed_at"
     t.text "agent_hint"
+    t.datetime "archived_at"
     t.datetime "assigned_at"
     t.boolean "assigned_to_agent", default: false, null: false
     t.boolean "blocked", default: false, null: false
+    t.bigint "board_column_id", null: false
     t.bigint "board_id", null: false
+    t.string "color", default: "none", null: false
     t.boolean "completed", default: false, null: false
     t.datetime "completed_at"
     t.integer "confidence", default: 0, null: false
@@ -377,9 +392,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_130100) do
     t.bigint "task_list_id"
     t.datetime "updated_at", null: false
     t.integer "user_id"
+    t.index ["archived_at"], name: "index_tasks_on_archived_at"
     t.index ["assigned_to_agent"], name: "index_tasks_on_assigned_to_agent"
     t.index ["blocked"], name: "index_tasks_on_blocked"
+    t.index ["board_column_id"], name: "index_tasks_on_board_column_id"
     t.index ["board_id"], name: "index_tasks_on_board_id"
+    t.index ["color"], name: "index_tasks_on_color"
     t.index ["owner"], name: "index_tasks_on_owner"
     t.index ["position"], name: "index_tasks_on_position"
     t.index ["project_id"], name: "index_tasks_on_project_id"
@@ -443,6 +461,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_130100) do
   add_foreign_key "projects", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "board_columns", "boards"
   add_foreign_key "boards", "campaigns"
   add_foreign_key "campaigns", "workspaces"
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
@@ -461,6 +480,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_130100) do
   add_foreign_key "task_lists", "users"
   add_foreign_key "task_tags", "tags"
   add_foreign_key "task_tags", "tasks"
+  add_foreign_key "tasks", "board_columns"
   add_foreign_key "tasks", "boards"
   add_foreign_key "tasks", "projects"
   add_foreign_key "tasks", "task_lists"

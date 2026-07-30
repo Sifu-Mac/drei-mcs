@@ -5,7 +5,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["form", "button", "input"]
   static values = {
-    status: String,
+    columnId: String,
     url: String
   }
 
@@ -65,7 +65,7 @@ export default class extends Controller {
         body: JSON.stringify({
           task: {
             title: title,
-            status: this.statusValue
+            board_column_id: this.columnIdValue
           }
         })
       })

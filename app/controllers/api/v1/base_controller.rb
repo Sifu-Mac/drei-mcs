@@ -11,6 +11,20 @@ module Api
 
       private
 
+      def current_workspace_membership
+        return nil unless current_user&.current_workspace
+
+        @current_workspace_membership ||= current_user.workspace_memberships.find_by(workspace: current_user.current_workspace)
+      end
+
+      def internal_workspace_member?
+        current_user&.admin? || current_workspace_membership&.owner? || current_workspace_membership&.member?
+      end
+
+      def require_internal_workspace_member
+        render json: { error: "Not found" }, status: :not_found unless internal_workspace_member?
+      end
+
       def not_found
         render json: { error: "Not found" }, status: :not_found
       end
