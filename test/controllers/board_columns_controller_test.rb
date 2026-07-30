@@ -13,11 +13,36 @@ class BoardColumnsControllerTest < ActionDispatch::IntegrationTest
 
   test "internal user renames and changes kind" do
     sign_in_as users(:admin)
+    task = tasks(:one)
 
-    patch board_board_column_path(boards(:one), board_columns(:one_review)), params: { board_column: { name: "Prüfung intern", kind: "review" } }
+    patch board_board_column_path(boards(:one), board_columns(:one_backlog)), params: { board_column: { name: "Prüfung intern", kind: "done" } }
 
     assert_redirected_to board_path(boards(:one))
-    assert_equal "Prüfung intern", board_columns(:one_review).reload.name
+    column = board_columns(:one_backlog).reload
+    assert_equal "Prüfung intern", column.name
+    assert column.kind_done?
+    task.reload
+    assert_equal "done", task.status
+    assert task.completed
+    assert task.completed_at.present?
+  end
+
+  test "failed task synchronization rolls back column update" do
+    sign_in_as users(:admin)
+    column = board_columns(:one_backlog)
+    task = tasks(:one)
+    task.update_column(:name, nil)
+
+    patch board_board_column_path(boards(:one), column), params: { board_column: { name: "Should roll back", kind: "done" } }
+
+    assert_redirected_to board_path(boards(:one))
+    assert_match "Kartenstatus konnte nicht synchronisiert werden", flash[:alert]
+    column.reload
+    assert_equal "Eingang", column.name
+    assert column.kind_backlog?
+    task.reload
+    assert_equal "inbox", task.status
+    assert_not task.completed
   end
 
   test "empty column can be deleted" do
