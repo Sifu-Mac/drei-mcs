@@ -56,6 +56,37 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, 'id="task_panel"'
     assert_includes response.body, tasks(:one).board_column.name
+    assert_equal 4, response.body.scan(/(?:input|change)-&gt;task-modal#scheduleAutoSave/).size
+    assert_includes response.body, "click->task-modal#cyclePriority"
+    assert_not_includes response.body, "scheduleAutoSpeichern"
+    assert_includes response.body, 'role="status"'
+    assert_includes response.body, "Auto-Speichern aktiv"
+  end
+
+  test "auto-save update persists all editable task panel fields" do
+    sign_in_as users(:admin)
+    task = tasks(:one)
+
+    patch board_task_path(boards(:one), task),
+          params: {
+            task: {
+              name: "Auto-Save Titel",
+              description: "Auto-Save Beschreibung",
+              priority: "high",
+              owner: "codex",
+              color: "purple"
+            }
+          },
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    assert_response :success
+    assert_equal "text/vnd.turbo-stream.html", response.media_type
+    task.reload
+    assert_equal "Auto-Save Titel", task.name
+    assert_equal "Auto-Save Beschreibung", task.description
+    assert_equal "high", task.priority
+    assert_equal "codex", task.owner
+    assert_equal "purple", task.color
   end
 
   test "client cannot mutate card" do
