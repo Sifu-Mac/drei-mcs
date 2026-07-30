@@ -16,6 +16,25 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_empty copy.comments
     assert_empty copy.activities
     assert_not copy.cover_image.attached?
+    assert_redirected_to board_path(boards(:one))
+  end
+
+  test "internal user duplicates card with turbo stream board update" do
+    sign_in_as users(:admin)
+    task = tasks(:one)
+
+    assert_difference "Task.count", 1 do
+      post duplicate_board_task_path(boards(:one), task),
+           headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+
+    copy = Task.unscoped.order(:created_at).last
+    assert_response :success
+    assert_equal "text/vnd.turbo-stream.html", response.media_type
+    assert_includes response.body, "column-#{copy.board_column_id}"
+    assert_includes response.body, "task_#{copy.id}"
+    assert_includes response.body, 'target="task_panel"'
+    assert_includes response.body, "#{task.name} Kopie"
   end
 
   test "internal user archives and restores card" do

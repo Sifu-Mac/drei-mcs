@@ -12,7 +12,7 @@ export default class extends Controller {
       
       if (this.hasLabelTarget) {
         const originalText = this.labelTarget.textContent
-        this.labelTarget.textContent = "Copied!"
+        this.labelTarget.textContent = "Kopiert!"
         
         setTimeout(() => {
           this.labelTarget.textContent = originalText
@@ -22,10 +22,10 @@ export default class extends Controller {
       console.error("Failed to copy:", err)
       
       if (this.hasLabelTarget) {
-        this.labelTarget.textContent = "Failed"
+        this.labelTarget.textContent = "Fehlgeschlagen"
         
         setTimeout(() => {
-          this.labelTarget.textContent = "Copy"
+          this.labelTarget.textContent = "Kopieren"
         }, 2000)
       }
     }

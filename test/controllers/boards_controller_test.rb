@@ -62,15 +62,20 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, 'data-controller="task-card"'
-    assert_includes response.body, "data-task-card-url-value="#{board_task_path(boards(:one), tasks(:one))}""
+    assert_includes response.body, %(data-task-card-url-value="#{board_task_path(boards(:one), tasks(:one))}")
     assert_includes response.body, 'data-dropdown-portal-value="true"'
     assert_includes response.body, 'data-dropdown-target="editPanel" class="hidden'
-    assert_includes response.body, 'md:w-[320px]'
-    assert_includes response.body, 'gap-3 overflow-x-hidden overflow-y-auto'
-    assert_includes response.body, 'padding:16px'
-    assert_includes response.body, 'font-size:15.5px'
-    assert_includes response.body, '-webkit-line-clamp:3'
-    assert_includes response.body, "title="#{ERB::Util.html_escape(long_name)}""
+    assert_includes response.body, 'data-modal-manager-target="modal"'
+    assert_includes response.body, 'data-modal-manager-id-param="new-campaign-modal"'
+    assert_includes response.body, 'data-action="click->modal-manager#close"'
+    assert_includes response.body, 'data-inline-add-target="error"'
+    assert_includes response.body, "Bitte einen Kartentitel eingeben."
+    assert_includes response.body, "md:w-[320px]"
+    assert_includes response.body, "gap-3 overflow-x-hidden overflow-y-auto"
+    assert_includes response.body, "padding:16px"
+    assert_includes response.body, "font-size:15.5px"
+    assert_includes response.body, "-webkit-line-clamp:3"
+    assert_includes response.body, %(title="#{ERB::Util.html_escape(long_name)}")
   end
 
   test "client can see board but cannot mutate board structure" do

@@ -1,57 +1,57 @@
-<% content_for :title, "Admin Dashboard - #{app_name}" %>
-<% content_for :nav_center, "Admin Dashboard" %>
+<% content_for :title, "Admin-Übersicht - #{app_name}" %>
+<% content_for :nav_center, "Admin-Übersicht" %>
 
 <% dashboard_content = capture do %>
 <section id="admin-dashboard" class="max-w-lg mx-auto space-y-6">
-  <!-- Welcome message -->
+  <!-- Begrüßung -->
   <div class="bg-bg-surface border border-border p-5 rounded-lg shadow-sm">
     <h1 class="text-xl font-semibold text-content mb-2">
-      Welcome, <%= current_user.email_address %>
+      Willkommen, <%= current_user.email_address %>
     </h1>
     <p class="text-sm text-content-secondary">
-      Admin dashboard for <%= app_name %>
+      Administration für <%= app_name %>
     </p>
   </div>
 
-  <!-- Stats grid -->
+  <!-- Kennzahlen -->
   <div class="grid grid-cols-2 gap-4">
-    <!-- Total Users -->
+    <!-- Benutzer insgesamt -->
     <%= link_to admin_users_path, class: "block bg-bg-surface border border-border p-5 rounded-lg hover:bg-bg-hover transition-colors shadow-sm" do %>
       <div class="text-3xl font-bold text-content mb-2">
         <%= @total_users %>
       </div>
       <div class="text-sm text-content-secondary">
-        Total Users
+        Benutzer insgesamt
       </div>
     <% end %>
 
-    <!-- Total Tasks -->
+    <!-- Karten insgesamt -->
     <div class="bg-bg-surface border border-border p-5 rounded-lg hover:bg-bg-hover transition-colors shadow-sm">
       <div class="text-3xl font-bold text-content mb-2">
         <%= @total_tasks %>
       </div>
       <div class="text-sm text-content-secondary">
-        Total Tasks
+        Karten insgesamt
       </div>
     </div>
 
-    <!-- Recent Signups -->
+    <!-- Neue Benutzer -->
     <div class="bg-bg-surface border border-border p-5 rounded-lg hover:bg-bg-hover transition-colors col-span-2 shadow-sm">
       <div class="text-3xl font-bold text-content mb-2">
         <%= @recent_signups %>
       </div>
       <div class="text-sm text-content-secondary">
-        Signups (7 days)
+        Neue Benutzer (7 Tage)
       </div>
     </div>
 
-    <!-- Pending Invites -->
+    <!-- Offene Einladungen -->
     <%= link_to admin_invites_path, class: "block bg-bg-surface border border-border p-5 rounded-lg hover:bg-bg-hover transition-colors col-span-2 shadow-sm" do %>
       <div class="text-3xl font-bold text-content mb-2">
         <%= @pending_invites %>
       </div>
       <div class="text-sm text-content-secondary">
-        Pending Invites
+        Offene Einladungen
       </div>
     <% end %>
   </div>
@@ -59,7 +59,7 @@
 <% end %>
 
 <% if turbo_frame_request? %>
-  <%= render "admin/shared/overlay", title: "Admin Dashboard" do %>
+  <%= render "admin/shared/overlay", title: "Admin-Übersicht" do %>
     <%= dashboard_content %>
   <% end %>
 <% else %>

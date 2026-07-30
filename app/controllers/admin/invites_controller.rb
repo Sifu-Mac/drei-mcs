@@ -16,12 +16,12 @@ module Admin
       @new_invite.invited_by = current_user
 
       if User.exists?(email_address: email)
-        @new_invite.errors.add(:email, "already has an account")
+        @new_invite.errors.add(:email, "gehört bereits zu einem Konto")
       elsif Invite.pending.exists?(email: email)
-        @new_invite.errors.add(:email, "already has a pending invite")
+        @new_invite.errors.add(:email, "hat bereits eine offene Einladung")
       elsif @new_invite.save
         InviteMailer.invitation(@new_invite).deliver_later
-        redirect_to admin_invites_path, notice: "Invite sent to #{@new_invite.email}." and return
+        redirect_to admin_invites_path, notice: "Einladung an #{@new_invite.email} wurde versendet." and return
       end
 
       @invites = Invite.includes(:invited_by).order(created_at: :desc)
@@ -31,7 +31,7 @@ module Admin
     def destroy
       invite = Invite.find(params[:id])
       invite.update!(revoked_at: Time.current) if invite.usable?
-      redirect_to admin_invites_path, notice: "Invite revoked."
+      redirect_to admin_invites_path, notice: "Einladung wurde widerrufen."
     end
 
     private

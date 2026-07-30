@@ -30,8 +30,9 @@
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
-  <body data-controller="turbo-progress">
-    <!-- Global Navbar -->
+  <body data-controller="turbo-progress modal-manager"
+        data-action="keydown@window->modal-manager#closeOnEscape">
+    <!-- Globale Navigation -->
     <%= render "shared/navbar" %>
     <main class="container max-w-6xl mx-auto text-content-secondary font-normal text-sm pt-24 px-4">
       <%= yield %>

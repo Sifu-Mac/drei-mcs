@@ -50,7 +50,8 @@
           <div class="h-px bg-border my-1"></div>
           <%# Neue Kampagne %>
           <button type="button"
-                  onclick="document.getElementById('new-campaign-modal').classList.remove('hidden')"
+                  data-action="click->modal-manager#open"
+                  data-modal-manager-id-param="new-campaign-modal"
                   class="flex items-center gap-2.5 w-full px-2.5 py-[9px] rounded-lg hover:bg-bg-hover transition-colors cursor-pointer">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="ml-1">
               <path d="M8 3V13M3 8H13" stroke="#1e5eff" stroke-width="1.5" stroke-linecap="round"/>
@@ -137,7 +138,8 @@
           <% end %>
           <% if @board %>
             <button type="button"
-                    onclick="document.getElementById('board-settings-modal').classList.remove('hidden')"
+                    data-action="click->modal-manager#open"
+                    data-modal-manager-id-param="board-settings-modal"
                     class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] font-medium text-content-secondary hover:bg-bg-hover transition-colors cursor-pointer">
               <svg width="15" height="15" viewBox="0 0 16 16" fill="none" class="opacity-35">
                 <path d="M3 3H13V6H3V3ZM3 8H13V13H3V8Z" stroke="#6b7280" stroke-width="1.5" stroke-linejoin="round"/>

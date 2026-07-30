@@ -1,17 +1,17 @@
-<% content_for :title, "Invites - Admin - #{app_name}" %>
-<% content_for :nav_center, "Invites - Admin" %>
+<% content_for :title, "Einladungen - Admin - #{app_name}" %>
+<% content_for :nav_center, "Einladungen" %>
 
 <% invites_content = capture do %>
 <section id="admin-invites" class="space-y-6">
-  <!-- Header with back link -->
+  <!-- Zurück-Link -->
   <div class="flex items-center gap-3">
     <%= link_to admin_root_path, class: "text-stone-600 dark:text-purple-100 hover:text-stone-900 dark:hover:text-stone-100 transition-colors" do %>
-      ← Back to Dashboard
+      ← Zurück zur Admin-Übersicht
     <% end %>
   </div>
 
   <div class="bg-stone-100 dark:bg-white/10 rounded-md p-5 space-y-4">
-    <h2 class="text-sm font-semibold text-stone-900 dark:text-stone-100">Invite user</h2>
+    <h2 class="text-sm font-semibold text-stone-900 dark:text-stone-100">Benutzer einladen</h2>
 
     <%= form_with model: @new_invite, url: admin_invites_path, class: "space-y-4" do |form| %>
       <% if @new_invite.errors.any? %>
@@ -22,32 +22,32 @@
 
       <div class="grid gap-4 md:grid-cols-2">
         <div>
-          <label class="block text-xs font-semibold text-stone-700 dark:text-purple-100 mb-1.5">Email</label>
+          <label class="block text-xs font-semibold text-stone-700 dark:text-purple-100 mb-1.5">E-Mail</label>
           <%= form.email_field :email, required: true, class: "w-full rounded-md px-3 py-2 text-sm bg-white dark:bg-white/5 border border-stone-300 dark:border-white/10 text-stone-900 dark:text-stone-100" %>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-stone-700 dark:text-purple-100 mb-1.5">Role</label>
-          <%= form.select :role, [["Internal", "internal"], ["Client", "client"]], {}, class: "w-full rounded-md px-3 py-2 text-sm bg-white dark:bg-white/5 border border-stone-300 dark:border-white/10 text-stone-900 dark:text-stone-100" %>
+          <label class="block text-xs font-semibold text-stone-700 dark:text-purple-100 mb-1.5">Rolle</label>
+          <%= form.select :role, [["Intern", "internal"], ["Client", "client"]], {}, class: "w-full rounded-md px-3 py-2 text-sm bg-white dark:bg-white/5 border border-stone-300 dark:border-white/10 text-stone-900 dark:text-stone-100" %>
         </div>
       </div>
 
       <div>
-        <%= form.submit "Send invite", class: "px-4 py-2 rounded-md text-xs font-semibold bg-stone-900 text-white dark:bg-white dark:text-stone-900 cursor-pointer" %>
+        <%= form.submit "Einladung senden", class: "px-4 py-2 rounded-md text-xs font-semibold bg-stone-900 text-white dark:bg-white dark:text-stone-900 cursor-pointer" %>
       </div>
     <% end %>
   </div>
 
-  <!-- Invites table -->
+  <!-- Einladungstabelle -->
   <div class="bg-stone-100 dark:bg-white/10 rounded-md overflow-hidden">
     <div class="overflow-x-auto">
       <table class="w-full">
         <thead class="bg-stone-200 dark:bg-white/20">
           <tr>
-            <th class="px-5 py-3 text-left text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Email</th>
-            <th class="px-5 py-3 text-center text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Role</th>
+            <th class="px-5 py-3 text-left text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">E-Mail</th>
+            <th class="px-5 py-3 text-center text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Rolle</th>
             <th class="px-5 py-3 text-center text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Status</th>
-            <th class="px-5 py-3 text-left text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Invited by</th>
-            <th class="px-5 py-3 text-left text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Created</th>
+            <th class="px-5 py-3 text-left text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Eingeladen von</th>
+            <th class="px-5 py-3 text-left text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100">Erstellt</th>
             <th class="px-5 py-3 text-left text-xs font-semibold tracking-tight text-stone-900 dark:text-stone-100"></th>
           </tr>
         </thead>
@@ -56,7 +56,7 @@
             <tr class="hover:bg-stone-200 dark:hover:bg-white/20 transition-colors">
               <td class="px-5 py-4 text-sm text-stone-900 dark:text-stone-100"><%= invite.email %></td>
               <td class="px-5 py-4 text-sm text-center text-stone-900 dark:text-stone-100 font-semibold">
-                <%= invite.internal? ? "Internal" : "Client" %>
+                <%= invite.internal? ? "Intern" : "Client" %>
               </td>
               <td class="px-5 py-4 text-sm text-center">
                 <span class="px-2 py-0.5 rounded text-xs font-semibold
@@ -66,7 +66,7 @@
                       when "revoked" then "bg-red-500/12 text-red-400"
                       else "bg-stone-500/12 text-stone-400"
                       end %>">
-                  <%= invite.status.capitalize %>
+                  <%= { "pending" => "Offen", "accepted" => "Angenommen", "revoked" => "Widerrufen" }.fetch(invite.status, invite.status.humanize) %>
                 </span>
               </td>
               <td class="px-5 py-4 text-sm text-stone-600 dark:text-purple-100"><%= invite.invited_by.email_address %></td>
@@ -75,7 +75,7 @@
               </td>
               <td class="px-5 py-4 text-sm text-right">
                 <% if invite.usable? %>
-                  <%= button_to "Revoke",
+                  <%= button_to "Widerrufen",
                       admin_invite_path(invite),
                       method: :delete,
                       data: { turbo_confirm: "Einladung wirklich widerrufen?" },
@@ -89,15 +89,15 @@
     </div>
   </div>
 
-  <!-- Summary footer -->
+  <!-- Zusammenfassung -->
   <div class="text-sm text-stone-600 dark:text-purple-100 text-center">
-    Total: <%= pluralize(@invites.count, 'invite') %>
+    Insgesamt: <%= @invites.count %> <%= @invites.count == 1 ? "Einladung" : "Einladungen" %>
   </div>
 </section>
 <% end %>
 
 <% if turbo_frame_request? %>
-  <%= render "admin/shared/overlay", title: "Admin Invites" do %>
+  <%= render "admin/shared/overlay", title: "Einladungen" do %>
     <%= invites_content %>
   <% end %>
 <% else %>
