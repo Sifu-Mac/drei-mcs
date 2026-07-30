@@ -16,7 +16,7 @@ Stand: 2026-07-30
 ## QA-Sanierungsstand (noch nicht gemergt oder deployt)
 
 - Integrationsbranch: `codex/qa-remediation-integration`
-- Aktueller Integrationsstand: `fa53dd3 Avoid persistent build dummy secret`
+- Vollstaendig getesteter Integrationsstand vor dieser Dokumentationsaktualisierung: `c16e3d4 Disable board drag and drop while filtered`
 - `main`, `origin/main` und der deployte Production-Stand wurden nicht veraendert.
 - Der Integrationsbranch wartet auf das unabhaengige Re-Review und ausdrueckliche Go des Threads `QA & Review`.
 - Vor diesem Go darf nichts nach `main` gemergt oder deployt werden.
@@ -28,6 +28,7 @@ Auf dem Integrationsbranch umgesetzt:
 - Aenderungen von `BoardColumn.kind` synchronisieren enthaltene Tasks atomar inklusive archivierter Karten.
 - Client-Task-Panel als echte Read-only-/Kommentaransicht umgesetzt; zusaetzliche Agent- und API-Mutationsluecken geschlossen.
 - Drag-and-drop atomar gemacht und um DOM-/Zaehler-Rollback, Race-Schutz und sichtbare Fehlerbehandlung ergaenzt.
+- Drag-and-drop ist bei aktivem Tag-Filter bewusst deaktiviert; UI und Server verhindern damit unvollstaendige Reihenfolgen aus einer gefilterten Teilmenge.
 - Bild-Uploads pruefen echte Dateiinhalte, MIME-Uebereinstimmung, Groesse, Defekte und Kommentar-Bildanzahl; ungueltige neue Blobs werden bereinigt.
 - Brakeman-Mass-Assignment-Befunde beseitigt und OAuth-Invite-only-Abdeckung erweitert.
 - Test-Compose ueber projektabhaengige Namen und Volumes vollstaendig von Production und parallelen Testlaeufen getrennt.
@@ -37,15 +38,15 @@ Auf dem Integrationsbranch umgesetzt:
 
 Verifikation auf dem vollstaendigen Integrationsstand:
 - Frisch gebautes Testimage: erfolgreich.
-- Rails- und JavaScript-Systemtests: `143 runs, 698 assertions, 0 failures, 0 errors, 0 skips`.
-- JavaScript-Systemtests separat: `3 runs, 20 assertions, 0 failures, 0 errors, 0 skips`.
+- Vollstaendige Rails-Suite: `144 runs, 702 assertions, 0 failures, 0 errors, 0 skips`.
+- JavaScript-Systemtests separat: `5 runs, 27 assertions, 0 failures, 0 errors, 0 skips`.
 - RuboCop: `167 files inspected, no offenses`.
 - Brakeman: `0 errors`, `0 security warnings`.
 - `bundler-audit` mit Advisory-DB-Commit `99b6a95`: keine Schwachstellen.
 - Importmap-Audit: keine verwundbaren Pakete.
-- From-scratch-Migration: alle `62` Migrationen `up`, keine `NO FILE`-Eintraege.
+- Echter From-scratch-Lauf per `db:migrate:reset`: alle `61` Repository-Migrationen `up`, keine `NO FILE`-Eintraege.
 - Separat benanntes Production-Pruefimage inklusive Asset-Precompile: erfolgreich und ohne Docker-Secret-Warnung gebaut; nicht deployt und danach entfernt.
-- Isolierter Restore des vorhandenen Dumps: Import erfolgreich, aktuelle Migrationen erfolgreich, `36` Tabellen, `62` Migrationen, `8/8` Kerntabellen; temporaere Container, Images, Netzwerke und Volumes entfernt.
+- Isolierter Restore des vorhandenen Dumps: Import erfolgreich, aktuelle Migrationen erfolgreich, `36` Tabellen, `61` Repository-Migrationen, `8/8` Kerntabellen; temporaere Container, Images, Netzwerke und Volumes entfernt.
 - Diff-/Secret-Pruefung: keine versehentlich aufgenommenen Secret-, Dump- oder ENV-Dateien.
 - Production nach allen isolierten Pruefungen: `db` healthy, `web` running, `/up` liefert `200`.
 
@@ -136,9 +137,10 @@ Production-Migrationsstatus:
 
 Letzte vollstaendige Suite im isolierten Test-Stack:
 - Befehl: `docker compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from test test`
-- Ergebnis nach allen QA- und PWA-Fixes mit neu gebautem Test-Image: `109 runs, 417 assertions, 0 failures, 0 errors, 0 skips`
+- Ergebnis nach allen QA-Fixes mit frisch und ohne Cache gebautem Test-Image: `144 runs, 702 assertions, 0 failures, 0 errors, 0 skips`
 
 Fokussierte QA-Regressionslaeufe:
+- Selenium-Systemtests fuer Auto-Save, Client-Berechtigungen sowie gefiltertes und ungefiltertes Drag-and-drop: `5 runs, 27 assertions, 0 failures, 0 errors, 0 skips`
 - Board-, Task-, Profil- und Admin-Lokalisierungstests: `23 runs, 151 assertions, 0 failures, 0 errors, 0 skips`
 - PWA-Manifest: `2 runs, 8 assertions, 0 failures, 0 errors, 0 skips`
 - RuboCop fuer alle geaenderten Ruby-Dateien: keine Verstoesse.
@@ -231,7 +233,7 @@ Kampagnen, Boards, Spalten und Karten:
 
 Qualitaet:
 - Isolierte Docker-Testumgebung eingerichtet.
-- Vollstaendige Rails-Test-Suite lauffaehig; letzter Stand: `109 runs, 417 assertions, 0 failures, 0 errors, 0 skips`.
+- Vollstaendige Rails-Test-Suite lauffaehig; letzter Stand auf dem noch nicht gemergten QA-Integrationsbranch: `144 runs, 702 assertions, 0 failures, 0 errors, 0 skips`.
 - Production-QA mit echtem Headless Chromium abgeschlossen; alle 21 finalen Pruefpunkte bestanden.
 
 ## 2. Aktuell offen
