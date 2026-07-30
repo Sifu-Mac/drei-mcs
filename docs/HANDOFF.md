@@ -8,8 +8,8 @@ Stand: 2026-07-30
 - VPS-Projektpfad: `/docker/drei-review`
 - Live-URL: `https://drei.digitalbackup.cloud`
 - Aktueller Branch: `main`
-- Deployter Code-Commit: `b7cd849 Merge dynamic board columns`
-- Feature-Commit: `b174e67 Add dynamic board columns`
+- Deployter Code-Commit: `bf05416 Merge task panel board UI fix`
+- Feature-Commits: `b6d2287 Fix board UI interactions`, `73a11d5 Fix task panel status label`
 - VPS-Git-Status nach Deployment: `main...origin/main`, nur `backup-postgres.sh` ist unversioniert und unberuehrt.
 
 ## Laufende Container und Services
@@ -47,6 +47,9 @@ Test-Stack:
 - Karten koennen archiviert und aus einer Archivansicht wiederhergestellt werden.
 - Kartenfarbe ist als dezenter visueller Akzent verfuegbar.
 - Kanban-Karten sind kompakt, zeigen keine Coverbild-Vorschau und begrenzen Titel auf drei Zeilen; Coverbilder bleiben in Detailansichten erhalten.
+- Board-UI-Interaktionen repariert: ganze Kartenflaeche oeffnet das Task-Panel, Drag-and-drop loest keinen Kartenklick aus, Karten- und Spaltenmenues werden per portaled/fixed Dropdown angezeigt und nicht mehr von Spalten-Overflow abgeschnitten.
+- Spaltenlayout ist grosszuegiger: Desktop-Spaltenbreite `320px`, Spaltenabstand `16px`, Karten-Innenabstand ca. `16px`, Kartenabstand `12px`, Spaltentitel `18px`, Kartentitel `15.5px`.
+- Spaltenbearbeitung ist im Dropdown standardmaessig geschlossen; Formular erscheint erst nach Auswahl von `Spalte umbenennen` oder `Spaltenart aendern`.
 - Sichtbare Board-/Task-/Kommentar-/Navigations-Texte wurden auf Deutsch umgestellt.
 
 ## Wichtige technische Entscheidungen
@@ -63,6 +66,8 @@ Test-Stack:
 - `Task.status` bleibt als Legacy-Spiegel fuer API-Kompatibilitaet erhalten und wird aus `BoardColumn.kind` synchronisiert.
 - API-Status-Parameter werden weiterhin akzeptiert und auf passende `BoardColumn.kind`-Spalten gemappt.
 - Stabile Datenbank-IDs sind DOM-/Route-/Turbo-Basis; Namen werden nicht als technische IDs genutzt.
+- Dropdowns in scrollbaren Board-Containern nutzen den bestehenden Stimulus-`dropdown_controller` mit Portal in `document.body`, fixed Positionierung, Viewport-Clamping und Upward-Flip bei wenig Platz nach unten.
+- Ursache der nicht klickbaren Karten: Die Karte hatte nur einen kleinen Titellink; Drag-/Menuelemente und `overflow-hidden`-Container erzeugten eine fragile Klickflaeche. Zusaetzlich blockierte ein undefiniertes `status_labels` im Task-Panel den direkten Turbo-Frame-Aufruf mit 500.
 - Production-Deployment erfolgt ausschliesslich im Stack `/docker/drei-review`.
 
 ## Migrationen
@@ -86,15 +91,17 @@ Production-Migrationsstatus:
 
 Letzte vollstaendige Suite im isolierten Test-Stack:
 - Befehl: `docker compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from test test`
-- Ergebnis: `100 runs, 315 assertions, 0 failures, 0 errors, 0 skips`
+- Ergebnis nach Board-UI-Fix mit neu gebautem Test-Image: `102 runs, 347 assertions, 0 failures, 0 errors, 0 skips`
 
-Fokussierte dynamische Spalten-/Task-Tests:
-- Ergebnis vor Merge: `28 runs, 118 assertions, 0 failures, 0 errors, 0 skips`
+Fokussierte Board-UI-/Task-Tests:
+- `test/controllers/boards_controller_test.rb test/controllers/boards_tasks_controller_test.rb`: `10 runs, 42 assertions, 0 failures, 0 errors, 0 skips`
+- Task-Panel-Regressionslauf: `4 runs, 18 assertions, 0 failures, 0 errors, 0 skips`
 
 Production-Smoke:
 - `docker compose --env-file .env.production ps`: `db` healthy, `web` running.
 - `/up`: `200`.
 - Public Root: `200`.
+- Admin-HTTP-Smoke: Boardseite `200`, Task-Panel per `Turbo-Frame: task_panel` `200`, Kartencontroller vorhanden, Portal-Menues vorhanden, Karten-/Spaltenaktionen fuer Admin sichtbar, `md:w-[320px]` und Drei-Zeilen-Clamp im HTML vorhanden.
 - Oeffentliche Registrierung: kein sichtbarer Registrierungsmarker im Public-Smoke.
 - Produktionsdaten: 1 interner Benutzer, 0 Client-Mitgliedschaften.
 - Client-UI konnte ohne Datenanlage nicht manuell eingeloggt werden. Server-Blockierung fuer Clients ist testabgedeckt.
@@ -104,7 +111,8 @@ Production-Smoke:
 - Keine offenen Testfehler bekannt.
 - SMTP-Werte sind weiterhin nicht gesetzt; Compose gibt entsprechende Warnungen aus.
 - Kein Production-Client-Benutzer vorhanden, daher keine manuelle Client-Smoke-Pruefung ohne Datenanlage.
-- Der erste kombinierte Deployment-Befehl wurde nach Build/Start mit Exit-Code 137 beendet; Web-Container, Migrationen und `/up` wurden danach erfolgreich separat verifiziert.
+- Direkt nach dem finalen Container-Recreate lieferte `/up` einmal kurz `502`; nach Puma-Start lieferte `/up` wieder `200`.
+- Kein echter Browser-Drag-and-drop-Smoke wurde gegen Production automatisiert; serverseitige/HTML-Vertraege und Task-Panel-Aufruf sind geprueft.
 
 ## Offene Aufgaben nach Prioritaet
 
@@ -113,11 +121,12 @@ Production-Smoke:
 3. Invite-Mailversand nach SMTP-Konfiguration mit nicht-produktiver Testadresse pruefen.
 4. Backup-Strategie fuer `/docker/drei-review` dokumentieren und verifizieren.
 5. Dynamische Board-Spalten in einem echten Admin-Browser-Flow pruefen: Spalte erstellen, umbenennen, verschieben, leere Spalte loeschen.
-6. Lokale unversionierte Dubletten-Dateien pruefen und bereinigen, falls sie nicht gebraucht werden.
+6. Browser-Smoke fuer Drag-and-drop und Dropdown-Flipping mit Maus/Trackpad gegen Production nachholen.
+7. Lokale unversionierte Dubletten-Dateien pruefen und bereinigen, falls sie nicht gebraucht werden.
 
 ## Naechster konkreter Arbeitsschritt
 
-Client-Testzugang per Invite-Flow erstellen und die Client-Ansicht fuer Lesen/Kommentieren sowie blockierte Struktur- und Kartenaktionen manuell validieren.
+Browser-Smoke fuer Kartenklick, Menueoeffnung, Drag-and-drop und Dropdown-Flipping mit einem internen Testnutzer durchfuehren; danach Client-Testzugang per Invite-Flow erstellen und Client-Ansicht validieren.
 
 ## Wichtige Dateien und Pfade
 
@@ -135,6 +144,8 @@ Client-Testzugang per Invite-Flow erstellen und die Client-Ansicht fuer Lesen/Ko
 - `app/views/boards/_sidebar.html.erb`: linke Kampagnen-/Board-Navigation.
 - `app/views/boards/_column.html.erb`: dynamische Spaltenansicht und Spaltenaktionen.
 - `app/views/boards/tasks/_task_card.html.erb`: kompakte Karte mit Farbakzent und internem Menue.
+- `app/javascript/controllers/dropdown_controller.js`: portaled/fixed Dropdowns fuer Board-Menues.
+- `app/javascript/controllers/task_card_controller.js`: ganze Kartenflaeche oeffnet Task-Panel und ignoriert Menues/Drag/Formulare.
 - `Dockerfile`: Production-Image.
 - `Dockerfile.test`: Test-Image mit Development-/Test-Gems.
 - `docker-compose.yml`: Production-Stack.
