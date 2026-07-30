@@ -41,11 +41,11 @@
         </div>
       </div>
 
-      <div class="flex-1 bg-bg-base overflow-y-auto overflow-x-hidden md:overflow-auto">
+      <div class="flex-1 min-h-0 bg-bg-base overflow-hidden">
         <div data-board-target="columnsViewport"
              data-action="scroll->board#handleColumnsScroll"
-             class="h-full overflow-x-auto overflow-y-visible snap-x snap-mandatory md:overflow-x-auto md:overflow-y-hidden">
-          <div class="flex gap-3 items-start min-h-full md:min-w-max" style="padding:12px 16px 16px">
+             class="h-full overflow-x-auto overflow-y-hidden snap-x snap-mandatory overscroll-contain">
+          <div class="flex h-full items-stretch gap-4 md:min-w-max" style="padding:18px 20px 22px">
             <% @board_columns.each do |column| %>
               <%= render "boards/column", column: column, tasks: @columns[column] %>
             <% end %>
