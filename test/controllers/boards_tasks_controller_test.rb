@@ -39,12 +39,15 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "client board view hides card menu" do
+  test "client board view hides internal card and column menus" do
     sign_in_as users(:client)
 
     get board_path(boards(:one))
 
     assert_response :success
     assert_no_match "Karte duplizieren", response.body
+    assert_no_match "Kartenaktionen", response.body
+    assert_no_match "Spaltenaktionen", response.body
+    assert_no_match "Spalte umbenennen", response.body
   end
 end

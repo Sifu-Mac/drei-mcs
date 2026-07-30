@@ -1,72 +1,95 @@
 <div id="board-column-<%= column.id %>"
-     class="w-[calc(100vw-32px)] shrink-0 snap-start md:w-[220px] lg:w-[240px] xl:w-[250px] md:flex-none flex flex-col h-auto md:h-full overflow-visible md:overflow-hidden"
+     class="w-[calc(100vw-32px)] shrink-0 snap-start md:w-[320px] md:flex-none flex flex-col h-auto md:h-full overflow-visible"
      data-controller="inline-add"
      data-board-target="column"
      data-inline-add-column-id-value="<%= column.id %>"
      data-inline-add-url-value="<%= board_tasks_path(@board) %>"
      data-column-id="<%= column.id %>">
-  <div class="flex items-center gap-2" style="padding:6px 8px 10px">
-    <div class="rounded-full" style="width:7px;height:7px;background:<%= Task::STATUS_COLORS[Task.legacy_status_for_kind(column.kind)] %>"></div>
-    <span class="min-w-0 flex-1 truncate" style="font-size:13px;font-weight:700;color:#374151"><%= column.name %></span>
-    <span id="column-<%= column.id %>-count" style="font-size:11px;font-weight:600;color:#6b7280;background:#eef2ff;padding:0 7px;border-radius:5px;line-height:20px"><%= tasks.count %></span>
+  <div class="flex min-h-14 items-center gap-3 rounded-t-2xl border border-border bg-bg-surface px-4 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+    <div class="shrink-0 rounded-full" style="width:8px;height:8px;background:<%= Task::STATUS_COLORS[Task.legacy_status_for_kind(column.kind)] %>"></div>
+    <div class="min-w-0 flex-1">
+      <div class="truncate" title="<%= column.name %>" style="font-size:18px;font-weight:750;line-height:1.25;color:#1f2937"><%= column.name %></div>
+    </div>
+    <span id="column-<%= column.id %>-count" class="shrink-0" style="font-size:12px;font-weight:700;color:#4b5563;background:#eaf1ff;padding:0 8px;border-radius:7px;line-height:24px"><%= tasks.count %></span>
 
     <% if internal_workspace_member? %>
-      <details class="relative">
-        <summary class="flex h-7 w-7 cursor-pointer list-none items-center justify-center rounded-lg text-content-muted hover:bg-bg-hover hover:text-content" aria-label="Spaltenaktionen">
-          <span class="text-lg leading-none">...</span>
-        </summary>
-        <div class="absolute right-0 top-8 z-50 w-64 rounded-xl border border-border bg-bg-card p-2 shadow-lg">
-          <%= form_with model: [@board, column], url: board_board_column_path(@board, column), method: :patch, class: "space-y-2" do |form| %>
-            <%= form.text_field :name, required: true, aria: { label: "Spalte umbenennen" }, class: "w-full rounded-lg border border-border bg-bg-card px-2 py-1.5 text-xs text-content focus:outline-none focus:ring-2 focus:ring-accent" %>
-            <%= form.select :kind, BoardColumn.kinds.keys.map { |kind| [BoardColumn::KIND_LABELS[kind], kind] }, {}, class: "w-full rounded-lg border border-border bg-bg-card px-2 py-1.5 text-xs text-content focus:outline-none focus:ring-2 focus:ring-accent" %>
-            <%= form.submit "Speichern", class: "w-full rounded-lg bg-accent px-2 py-1.5 text-xs font-semibold text-content-inverse hover:bg-accent-hover cursor-pointer" %>
-          <% end %>
-          <div class="my-2 h-px bg-border"></div>
-          <div class="grid grid-cols-2 gap-2">
-            <%= button_to "Links", move_left_board_board_column_path(@board, column), method: :patch, class: "rounded-lg px-2 py-1.5 text-xs font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer" %>
-            <%= button_to "Rechts", move_right_board_board_column_path(@board, column), method: :patch, class: "rounded-lg px-2 py-1.5 text-xs font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer" %>
+      <div class="relative shrink-0" data-controller="dropdown" data-dropdown-portal-value="true">
+        <button type="button"
+                data-dropdown-target="button"
+                data-action="click->dropdown#toggle"
+                aria-expanded="false"
+                aria-label="Spaltenaktionen"
+                class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border border-transparent text-content-muted transition-colors hover:border-border hover:bg-bg-hover hover:text-content">
+          <span class="text-xl leading-none" aria-hidden="true">...</span>
+        </button>
+        <div data-dropdown-target="menu"
+             class="hidden z-[220] w-[280px] rounded-xl border border-border bg-bg-card p-2 shadow-[0_18px_45px_rgba(15,23,42,0.16)]">
+          <div data-dropdown-target="actionList" class="space-y-1">
+            <button type="button" data-dropdown-command="edit" data-dropdown-keep-open="true" class="w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer">Spalte umbenennen</button>
+            <button type="button" data-dropdown-command="edit" data-dropdown-keep-open="true" class="w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer">Spaltenart ändern</button>
+            <div class="my-1 h-px bg-border"></div>
+            <div class="grid grid-cols-2 gap-2">
+              <%= button_to "Nach links", move_left_board_board_column_path(@board, column), method: :patch, class: "w-full rounded-lg px-3 py-2 text-sm font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer" %>
+              <%= button_to "Nach rechts", move_right_board_board_column_path(@board, column), method: :patch, class: "w-full rounded-lg px-3 py-2 text-sm font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer" %>
+            </div>
+            <%= button_to "Spalte löschen", board_board_column_path(@board, column), method: :delete, data: { turbo_confirm: "Spalte löschen?" }, class: "mt-1 w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold text-status-error hover:bg-red-50 cursor-pointer" %>
           </div>
-          <%= button_to "Spalte löschen", board_board_column_path(@board, column), method: :delete, data: { turbo_confirm: "Spalte löschen?" }, class: "mt-2 w-full rounded-lg px-2 py-1.5 text-left text-xs font-semibold text-status-error hover:bg-red-50 cursor-pointer" %>
+
+          <div data-dropdown-target="editPanel" class="hidden space-y-3">
+            <button type="button" data-dropdown-command="actions" data-dropdown-keep-open="true" class="text-xs font-semibold text-content-muted hover:text-content cursor-pointer">← Zurück</button>
+            <%= form_with model: [@board, column], url: board_board_column_path(@board, column), method: :patch, class: "space-y-3" do |form| %>
+              <div>
+                <label class="mb-1.5 block text-xs font-semibold text-content-muted">Spaltenname</label>
+                <%= form.text_field :name, required: true, aria: { label: "Spalte umbenennen" }, class: "w-full rounded-lg border border-border bg-bg-card px-3 py-2 text-sm text-content focus:outline-none focus:ring-2 focus:ring-accent" %>
+              </div>
+              <div>
+                <label class="mb-1.5 block text-xs font-semibold text-content-muted">Spaltenart</label>
+                <%= form.select :kind, BoardColumn.kinds.keys.map { |kind| [BoardColumn::KIND_LABELS[kind], kind] }, {}, class: "w-full rounded-lg border border-border bg-bg-card px-3 py-2 text-sm text-content focus:outline-none focus:ring-2 focus:ring-accent" %>
+              </div>
+              <%= form.submit "Speichern", class: "w-full rounded-lg bg-accent px-3 py-2 text-sm font-bold text-content-inverse hover:bg-accent-hover cursor-pointer" %>
+            <% end %>
+          </div>
         </div>
-      </details>
+      </div>
     <% end %>
   </div>
 
-  <ul id="column-<%= column.id %>"
-      class="flex-1 flex flex-col gap-[5px] min-h-[2rem] overflow-visible md:overflow-y-hidden md:hover:overflow-y-auto transition-all duration-[120ms] list-none m-0"
-      style="border-radius:12px;padding:6px;background:#eef1f6;border:1px solid #e5e7eb"
-      data-controller="sortable"
-      data-sortable-group-value="board"
-      data-sortable-column-id-value="<%= column.id %>"
-      data-sortable-url-value="<%= update_task_status_board_path(@board) %>">
-    <% tasks.each do |task| %>
-      <%= render "boards/task_card", task: task %>
-    <% end %>
-  </ul>
+  <div class="flex min-h-0 flex-1 flex-col rounded-b-2xl border-x border-b border-border bg-[#eef1f6] px-3 pb-3 pt-3 shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
+    <ul id="column-<%= column.id %>"
+        class="flex min-h-[2rem] flex-1 flex-col gap-3 overflow-x-hidden overflow-y-auto list-none m-0 pr-1"
+        data-controller="sortable"
+        data-sortable-group-value="board"
+        data-sortable-column-id-value="<%= column.id %>"
+        data-sortable-url-value="<%= update_task_status_board_path(@board) %>">
+      <% tasks.each do |task| %>
+        <%= render "boards/task_card", task: task %>
+      <% end %>
+    </ul>
 
-  <% if internal_workspace_member? %>
-    <div data-inline-add-target="form" class="hidden px-1.5 py-1.5">
-      <div class="bg-bg-elevated rounded-lg border border-border p-2">
-        <textarea data-inline-add-target="input"
-                  data-action="keydown->inline-add#handleKeydown"
-                  placeholder="Titel der Karte eingeben..."
-                  rows="3"
-                  class="w-full bg-transparent text-sm text-content placeholder-content-muted resize-none focus:outline-none"></textarea>
-        <div class="flex items-center gap-2 mt-2">
-          <button type="button" data-action="click->inline-add#submit" class="px-3 py-1.5 text-xs font-semibold rounded bg-accent text-content-inverse hover:bg-accent-hover transition-colors cursor-pointer">Karte hinzufügen</button>
-          <button type="button" data-action="click->inline-add#cancel" class="p-1.5 text-content-muted hover:text-content transition-colors cursor-pointer">✕</button>
+    <% if internal_workspace_member? %>
+      <div data-inline-add-target="form" class="hidden pt-3">
+        <div class="rounded-xl border border-border bg-bg-card p-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+          <textarea data-inline-add-target="input"
+                    data-action="keydown->inline-add#handleKeydown"
+                    placeholder="Titel der Karte eingeben..."
+                    rows="3"
+                    class="w-full resize-none bg-transparent text-sm text-content placeholder-content-muted focus:outline-none"></textarea>
+          <div class="mt-3 flex items-center gap-2">
+            <button type="button" data-action="click->inline-add#submit" class="rounded-lg bg-accent px-3 py-2 text-sm font-bold text-content-inverse transition-colors hover:bg-accent-hover cursor-pointer">Karte hinzufügen</button>
+            <button type="button" data-action="click->inline-add#cancel" class="rounded-lg px-2 py-2 text-content-muted hover:bg-bg-hover hover:text-content transition-colors cursor-pointer">✕</button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div data-inline-add-target="button" class="px-1.5 py-1">
-      <button type="button"
-              data-action="click->inline-add#show"
-              class="w-full flex items-center gap-2 rounded-lg cursor-pointer border-none bg-transparent transition-colors hover:text-accent"
-              style="padding:8px 4px;font-size:13px;font-weight:600;color:#6b7280">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M14 8H2M8 2V14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        Karte hinzufügen
-      </button>
-    </div>
-  <% end %>
+      <div data-inline-add-target="button" class="pt-3">
+        <button type="button"
+                data-action="click->inline-add#show"
+                class="w-full flex items-center justify-center gap-2 rounded-xl cursor-pointer border border-dashed border-border bg-bg-surface transition-colors hover:border-border-active hover:bg-bg-hover hover:text-accent"
+                style="padding:11px 10px;font-size:14px;font-weight:700;color:#4b5563">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14 8H2M8 2V14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          Karte hinzufügen
+        </button>
+      </div>
+    <% end %>
+  </div>
 </div>
