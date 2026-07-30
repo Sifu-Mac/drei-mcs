@@ -106,6 +106,37 @@ Production-Smoke:
 - Produktionsdaten: 1 interner Benutzer, 0 Client-Mitgliedschaften.
 - Client-UI konnte ohne Datenanlage nicht manuell eingeloggt werden. Server-Blockierung fuer Clients ist testabgedeckt.
 
+
+## Letzter Browser-QA-Stand
+
+Browser-QA gegen `https://drei.digitalbackup.cloud` wurde am 2026-07-30 mit Playwright-Fallback ausgefuehrt, weil der In-App-Browser in der lokalen Sitzung nicht verfuegbar war. Es wurden keine mutierenden Aktionen ausgefuehrt.
+
+Geprueft:
+- Login und Redirect auf Board.
+- Boardansicht, Karten, Spalten, Kartenmenue, Spaltenmenue, Task-Panel, Archivseite.
+- Links zu `/boards`, `/settings`, `/admin`, `/admin/invites` und Task-Detailrouten.
+- Responsive Desktop, Laptop, Tablet und Mobile.
+- Unauthentifizierter Zugriff auf `/boards`.
+
+Bestanden:
+- Login funktioniert.
+- `/boards`, `/settings`, `/admin`, `/admin/invites`, Task-Links und Archivseite liefern `200`.
+- Kartenflaeche oeffnet Task-Panel.
+- Kartenmenue oeffnet, ohne Task-Panel auszuloesen.
+- Kommentare im Task-Panel sichtbar.
+- Archivierte-Karten-Leerzustand vorhanden.
+- Responsive: Desktop/Laptop/Tablet mit `320px`-Spalten und internem horizontalem Board-Scroll; Mobile ohne Body-Level-Horizontaloverflow.
+- Keine Browser-Konsolefehler oder Page Errors im QA-Lauf.
+
+Gefundene Bugs:
+- P1: Spaltenmenue-Aktion `Spalte umbenennen` oeffnet das Bearbeitungsformular nicht. Fix: `dropdown_controller` fuer portaled Menues pruefen; Commands aus dem nach `document.body` verschobenen Menue muessen verlaesslich delegiert und danach neu positioniert werden.
+- P1: `Neue Kampagne`-Modal schliesst nicht per Escape und kann danach Board-Klicks blockieren. Fix: Modal auf Stimulus-Controller oder globalen `keydown.esc`-Handler umstellen, Root-Modal sicher verstecken und Fokus zurueckgeben.
+- P1: Backdrop-Klick beim `Neue Kampagne`-Modal schliesst nicht zuverlaessig. Fix: Backdrop-Click auf Root-Modal-Schliessen normalisieren und Klickabfang durch innere Layer verhindern.
+- P1: Settings zeigt API-Token vollstaendig sichtbar an. Fix: Token standardmaessig maskieren, explizite Anzeigen-Aktion ergaenzen, Copy beibehalten und Regenerate bestaetigen lassen.
+- P2: Admin- und Invite-Seiten sind teilweise Englisch (`Welcome`, `Admin dashboard`, `Invite user`, `Send invite`, `Back to Dashboard`). Fix: sichtbare Admin-/Invite-Texte deutsch lokalisieren.
+- P2: Settings/Profile-Agent-Prompt enthaelt gemischte Sprache. Fix: Prompt-Template vollstaendig deutsch lokalisieren oder bewusst als technischer englischer Prompt kennzeichnen.
+- P2: Production-Board enthaelt englische Beispielkarten (`Connect your agent`, `Assign your first task`, `Welcome to DREI Asset Review`). Fix: Default-/Demo-Karten deutsch lokalisieren oder aus Production entfernen.
+
 ## Offene Fehler
 
 - Keine offenen Testfehler bekannt.
@@ -116,17 +147,19 @@ Production-Smoke:
 
 ## Offene Aufgaben nach Prioritaet
 
-1. Einen echten Client-Testzugang ueber den Invite-Flow anlegen und die Client-Ansicht manuell pruefen.
-2. SMTP/Postmark sauber konfigurieren und mit echten ENV-Werten testen, ohne Secrets zu dokumentieren.
-3. Invite-Mailversand nach SMTP-Konfiguration mit nicht-produktiver Testadresse pruefen.
-4. Backup-Strategie fuer `/docker/drei-review` dokumentieren und verifizieren.
-5. Dynamische Board-Spalten in einem echten Admin-Browser-Flow pruefen: Spalte erstellen, umbenennen, verschieben, leere Spalte loeschen.
-6. Browser-Smoke fuer Drag-and-drop und Dropdown-Flipping mit Maus/Trackpad gegen Production nachholen.
-7. Lokale unversionierte Dubletten-Dateien pruefen und bereinigen, falls sie nicht gebraucht werden.
+1. QA-P1-Bugs beheben: Spaltenmenue-Editaktion, `Neue Kampagne`-Modal Escape/Backdrop, sichtbares API-Token maskieren.
+2. QA-P2-Lokalisierung beheben: Admin-/Invite-Texte, Agent-Prompt und Production-Beispielkarten ins Deutsche bringen.
+3. Einen echten Client-Testzugang ueber den Invite-Flow anlegen und die Client-Ansicht manuell pruefen.
+4. SMTP/Postmark sauber konfigurieren und mit echten ENV-Werten testen, ohne Secrets zu dokumentieren.
+5. Invite-Mailversand nach SMTP-Konfiguration mit nicht-produktiver Testadresse pruefen.
+6. Backup-Strategie fuer `/docker/drei-review` dokumentieren und verifizieren.
+7. Dynamische Board-Spalten in einem echten Admin-Browser-Flow pruefen: Spalte erstellen, umbenennen, verschieben, leere Spalte loeschen.
+8. Browser-Smoke fuer Drag-and-drop und Dropdown-Flipping mit Maus/Trackpad gegen Production nachholen.
+9. Lokale unversionierte Dubletten-Dateien pruefen und bereinigen, falls sie nicht gebraucht werden.
 
 ## Naechster konkreter Arbeitsschritt
 
-Browser-Smoke fuer Kartenklick, Menueoeffnung, Drag-and-drop und Dropdown-Flipping mit einem internen Testnutzer durchfuehren; danach Client-Testzugang per Invite-Flow erstellen und Client-Ansicht validieren.
+QA-P1-Bugs aus dem letzten Browser-QA-Lauf beheben; danach Browser-Smoke fuer Kartenklick, Menueoeffnung, Drag-and-drop und Dropdown-Flipping wiederholen.
 
 ## Wichtige Dateien und Pfade
 
