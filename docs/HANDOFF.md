@@ -8,10 +8,46 @@ Stand: 2026-07-30
 - VPS-Projektpfad: `/docker/drei-review`
 - Live-URL: `https://drei.digitalbackup.cloud`
 - Aktueller Branch: `main`
-- Repository-Stand vor dieser Handoff-Aktualisierung: `1847dae Add maintained project roadmap`
+- Aktueller `main`-/`origin/main`-Stand: `a3797b2 Document lead agent workflow`
 - Deployter Code-Commit: `e8fab25 Merge PWA icon fix`
 - Aktuelle QA-Fix-Commits: `2a94ffe Fix production QA issues`, `642bdda Fix PWA icon links`
 - VPS-Git-Status nach Deployment: `main...origin/main`, nur `backup-postgres.sh` ist unversioniert und unberuehrt.
+
+## QA-Sanierungsstand (noch nicht gemergt oder deployt)
+
+- Integrationsbranch: `codex/qa-remediation-integration`
+- Aktueller Integrationsstand: `fa53dd3 Avoid persistent build dummy secret`
+- `main`, `origin/main` und der deployte Production-Stand wurden nicht veraendert.
+- Der Integrationsbranch wartet auf das unabhaengige Re-Review und ausdrueckliche Go des Threads `QA & Review`.
+- Vor diesem Go darf nichts nach `main` gemergt oder deployt werden.
+
+Auf dem Integrationsbranch umgesetzt:
+- Verwundbare Ruby-Abhaengigkeiten aktualisiert; Rails/Active Storage `8.1.3.1`, Rack `3.2.6`, Puma `8.0.2`, Nokogiri `1.19.4`, OAuth2 `2.0.25`, JWT `3.2.0`, `action_text-trix` `2.1.19` sowie weitere Advisory-Fixes.
+- Alle bisherigen `bundler-audit`-Ausnahmen entfernt.
+- Task-Panel-Auto-Save fuer Titel, Beschreibung, Prioritaet, Owner und Farbe repariert; Saves werden serialisiert und Fehler sichtbar behandelt.
+- Aenderungen von `BoardColumn.kind` synchronisieren enthaltene Tasks atomar inklusive archivierter Karten.
+- Client-Task-Panel als echte Read-only-/Kommentaransicht umgesetzt; zusaetzliche Agent- und API-Mutationsluecken geschlossen.
+- Drag-and-drop atomar gemacht und um DOM-/Zaehler-Rollback, Race-Schutz und sichtbare Fehlerbehandlung ergaenzt.
+- Bild-Uploads pruefen echte Dateiinhalte, MIME-Uebereinstimmung, Groesse, Defekte und Kommentar-Bildanzahl; ungueltige neue Blobs werden bereinigt.
+- Brakeman-Mass-Assignment-Befunde beseitigt und OAuth-Invite-only-Abdeckung erweitert.
+- Test-Compose ueber projektabhaengige Namen und Volumes vollstaendig von Production und parallelen Testlaeufen getrennt.
+- Production-Single-DB-Migrationskonfiguration bereinigt; `primary` ist die einzige Quelle fuer Datenbanktasks.
+- Chromium/ChromeDriver und echte JavaScript-Systemtests fuer Auto-Save, Client-Panel/Kommentar und Drag-and-drop-Fehlerrollback hinzugefuegt.
+- Isoliertes PostgreSQL-Restore-Runbook, Restore-Compose und Verifikationsskript hinzugefuegt.
+
+Verifikation auf dem vollstaendigen Integrationsstand:
+- Frisch gebautes Testimage: erfolgreich.
+- Rails- und JavaScript-Systemtests: `143 runs, 698 assertions, 0 failures, 0 errors, 0 skips`.
+- JavaScript-Systemtests separat: `3 runs, 20 assertions, 0 failures, 0 errors, 0 skips`.
+- RuboCop: `167 files inspected, no offenses`.
+- Brakeman: `0 errors`, `0 security warnings`.
+- `bundler-audit` mit Advisory-DB-Commit `99b6a95`: keine Schwachstellen.
+- Importmap-Audit: keine verwundbaren Pakete.
+- From-scratch-Migration: alle `62` Migrationen `up`, keine `NO FILE`-Eintraege.
+- Separat benanntes Production-Pruefimage inklusive Asset-Precompile: erfolgreich und ohne Docker-Secret-Warnung gebaut; nicht deployt und danach entfernt.
+- Isolierter Restore des vorhandenen Dumps: Import erfolgreich, aktuelle Migrationen erfolgreich, `36` Tabellen, `62` Migrationen, `8/8` Kerntabellen; temporaere Container, Images, Netzwerke und Volumes entfernt.
+- Diff-/Secret-Pruefung: keine versehentlich aufgenommenen Secret-, Dump- oder ENV-Dateien.
+- Production nach allen isolierten Pruefungen: `db` healthy, `web` running, `/up` liefert `200`.
 
 ## Laufende Container und Services
 
