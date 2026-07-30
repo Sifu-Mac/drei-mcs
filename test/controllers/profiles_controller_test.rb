@@ -23,4 +23,27 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to settings_path
     assert_equal "Profil wurde gespeichert.", flash[:notice]
   end
+
+  test "profile accepts a valid avatar" do
+    user = users(:admin)
+    sign_in_as user
+
+    patch settings_path, params: { user: { avatar: uploaded_png(filename: "avatar.png") } }
+
+    assert_redirected_to settings_path
+    assert user.reload.avatar.attached?
+  end
+
+  test "profile rejects corrupt avatar and removes its blob" do
+    user = users(:admin)
+    sign_in_as user
+
+    assert_no_difference [ "ActiveStorage::Blob.count", "ActiveStorage::Attachment.count" ] do
+      patch settings_path,
+        params: { user: { avatar: uploaded_png(filename: "avatar.png", bytes: "not an image") } }
+    end
+
+    assert_response :unprocessable_entity
+    assert_not user.reload.avatar.attached?
+  end
 end

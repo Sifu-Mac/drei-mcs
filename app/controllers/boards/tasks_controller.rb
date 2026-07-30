@@ -1,4 +1,6 @@
 class Boards::TasksController < ApplicationController
+  include UploadCleanup
+
   before_action :set_board
   before_action :set_task, only: [:show, :edit, :update, :destroy, :assign, :unassign, :duplicate, :archive, :restore]
   before_action :require_internal_workspace_member, except: [:show, :archived]
@@ -37,6 +39,7 @@ class Boards::TasksController < ApplicationController
   end
 
   def update
+    previous_cover_blob_ids = attached_blob_ids(@task, :cover_image)
     @task.activity_source = "web"
     if @task.update(task_params)
       respond_to do |format|
@@ -44,7 +47,8 @@ class Boards::TasksController < ApplicationController
         format.html { redirect_to(request.referer.presence || board_task_path(@board, @task), notice: "Karte wurde aktualisiert.") }
       end
     else
-      render :edit, status: :unprocessable_entity, layout: false
+      purge_new_uploads(@task, :cover_image, previous_blob_ids: previous_cover_blob_ids)
+      render :show, status: :unprocessable_entity, layout: false
     end
   end
 

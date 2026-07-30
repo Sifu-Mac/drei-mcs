@@ -237,15 +237,7 @@ class Task < ApplicationRecord
   end
 
   def cover_image_is_supported
-    return unless cover_image.attached?
-
-    unless cover_image.blob.content_type.in?(MediaUploadValidator::ALLOWED_IMAGE_TYPES)
-      errors.add(:cover_image, "must be a JPEG, PNG, WebP, or GIF image")
-    end
-
-    if cover_image.blob.byte_size > MediaUploadValidator::MAX_IMAGE_SIZE
-      errors.add(:cover_image, "must be 5 MB or smaller")
-    end
+    MediaUploadValidator.validate_image(self, cover_image, attribute: :cover_image)
   end
 
   def broadcast_create

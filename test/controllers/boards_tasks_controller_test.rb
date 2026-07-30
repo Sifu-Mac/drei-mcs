@@ -139,4 +139,21 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "Auto-Speichern aktiv"
     assert_not_includes response.body, "Activity"
   end
+
+  test "invalid cover upload is rejected without retaining a blob" do
+    sign_in_as users(:admin)
+    task = tasks(:one)
+
+    assert_no_difference [ "ActiveStorage::Blob.count", "ActiveStorage::Attachment.count" ] do
+      patch board_task_path(boards(:one), task),
+        params: {
+          task: {
+            cover_image: uploaded_png(filename: "cover.png", bytes: "not an image")
+          }
+        }
+    end
+
+    assert_response :unprocessable_entity
+    assert_not task.reload.cover_image.attached?
+  end
 end

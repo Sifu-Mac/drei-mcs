@@ -102,6 +102,22 @@ class ClientPermissionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @client, TaskComment.order(:created_at).last.user
   end
 
+  test "client can upload valid comment images but cannot upload task covers or avatars" do
+    assert_difference [ "TaskComment.count", "ActiveStorage::Attachment.count" ], 1 do
+      post board_task_comments_path(@board, @task),
+        params: { task_comment: { body: "Bildfreigabe", images: [ uploaded_png ] } }
+    end
+    assert_redirected_to board_task_path(@board, @task)
+
+    patch board_task_path(@board, @task), params: { task: { cover_image: uploaded_png(filename: "cover.png") } }
+    assert_response :not_found
+    assert_not @task.reload.cover_image.attached?
+
+    patch settings_path, params: { user: { avatar: uploaded_png(filename: "avatar.png") } }
+    assert_response :not_found
+    assert_not @client.reload.avatar.attached?
+  end
+
   test "client cannot use internal agent web endpoint" do
     post agent_chat_path, params: { message_type: "focus" }
 

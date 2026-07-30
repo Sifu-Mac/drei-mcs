@@ -1,6 +1,4 @@
 require "test_helper"
-require "stringio"
-
 class TaskCommentTest < ActiveSupport::TestCase
   setup do
     @comment = task_comments(:one)
@@ -12,42 +10,44 @@ class TaskCommentTest < ActiveSupport::TestCase
   end
 
   test "comment accepts one image" do
-    attach_file(@comment.images, filename: "comment.png", content_type: "image/png")
+    attach_png(@comment.images, filename: "comment.png")
 
     assert @comment.valid?, @comment.errors.full_messages.join(", ")
     assert_equal 1, @comment.images.size
   end
 
-  test "comment accepts multiple images" do
-    attach_file(@comment.images, filename: "comment-1.jpg", content_type: "image/jpeg")
-    attach_file(@comment.images, filename: "comment-2.webp", content_type: "image/webp")
-    attach_file(@comment.images, filename: "comment-3.gif", content_type: "image/gif")
+  test "comment accepts multiple images within the limit" do
+    3.times { |index| attach_png(@comment.images, filename: "comment-#{index}.png") }
 
     assert @comment.valid?, @comment.errors.full_messages.join(", ")
     assert_equal 3, @comment.images.size
   end
 
   test "comment rejects invalid image type" do
-    attach_file(@comment.images, filename: "payload.svg", content_type: "image/svg+xml")
+    @comment.images.attach(io: StringIO.new("<svg />"), filename: "payload.svg", content_type: "image/svg+xml")
 
     assert_not @comment.valid?
-    assert @comment.errors[:images].any? { |message| message.include?("must be a JPEG, PNG, WebP, or GIF image") }
+    assert @comment.errors[:images].any? { |message| message.include?("must be a valid JPEG") }
   end
 
   test "comment rejects image over five megabytes" do
-    attach_file(@comment.images, filename: "large.png", content_type: "image/png", size: 5.megabytes + 1)
+    attach_png(@comment.images, filename: "large.png", bytes: png_bytes.ljust(5.megabytes + 1, "\0"))
 
     assert_not @comment.valid?
     assert @comment.errors[:images].any? { |message| message.include?("must be 5 MB or smaller") }
   end
 
-  private
+  test "comment rejects more than five images" do
+    6.times { |index| attach_png(@comment.images, filename: "comment-#{index}.png") }
 
-  def attach_file(attachments, filename:, content_type:, size: 128)
-    attachments.attach(
-      io: StringIO.new("a" * size),
-      filename: filename,
-      content_type: content_type
-    )
+    assert_not @comment.valid?
+    assert_includes @comment.errors[:images], "must contain no more than 5 images"
+  end
+
+  test "comment rejects MIME-spoofed images" do
+    attach_png(@comment.images, filename: "fake.jpg", content_type: "image/jpeg")
+
+    assert_not @comment.valid?
+    assert @comment.errors[:images].any? { |message| message.include?("does not match") }
   end
 end

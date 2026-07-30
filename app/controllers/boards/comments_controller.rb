@@ -1,4 +1,6 @@
 class Boards::CommentsController < ApplicationController
+  include UploadCleanup
+
   before_action :set_board
   before_action :set_task
 
@@ -12,6 +14,7 @@ class Boards::CommentsController < ApplicationController
         format.html { redirect_to board_task_path(@board, @task), notice: "Kommentar wurde hinzugefügt." }
       end
     else
+      purge_new_uploads(@comment, :images)
       respond_to do |format|
         format.turbo_stream { render :create, status: :unprocessable_entity }
         format.html { redirect_to board_task_path(@board, @task), alert: @comment.errors.full_messages.join(", ") }
