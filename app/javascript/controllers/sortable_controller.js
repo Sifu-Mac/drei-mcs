@@ -1,6 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 import Sortable from "sortablejs"
 
+let updatePending = false
+
 // Connects to data-controller="sortable"
 // Used for kanban board column drag-and-drop
 export default class extends Controller {
@@ -11,6 +13,7 @@ export default class extends Controller {
   }
 
   connect() {
+    this.element.sortableController = this
     const options = {
       animation: 150,
       ghostClass: "sortable-ghost",
@@ -44,10 +47,13 @@ export default class extends Controller {
     if (this.sortable) {
       this.sortable.destroy()
     }
+    delete this.element.sortableController
+    window.clearTimeout(this.errorTimeout)
   }
 
   // Dispatch event when drag starts (for delete zone visibility)
   handleStart(event) {
+    event.item.sortableSnapshot = this.captureBoardState()
     document.dispatchEvent(new CustomEvent("sortable:dragstart", { detail: { item: event.item } }))
   }
 
@@ -87,26 +93,12 @@ export default class extends Controller {
   async handleUpdate(event) {
     if (!this.hasUrlValue) return
 
-    // Get all task IDs in their new order
-    const taskIds = Array.from(this.element.querySelectorAll("[data-task-id]"))
-      .map(el => el.dataset.taskId)
-
-    try {
-      const response = await fetch(this.urlValue, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": this.csrfToken
-        },
-        body: JSON.stringify({ task_ids: taskIds, board_column_id: this.columnIdValue })
-      })
-
-      if (!response.ok) {
-        console.error("Failed to update task positions")
-      }
-    } catch (error) {
-      console.error("Error updating task positions:", error)
-    }
+    await this.persistMove(event, {
+      task_id: event.item.dataset.taskId,
+      task_ids: this.taskIds(this.element),
+      board_column_id: this.columnIdValue,
+      source_column_id: this.columnIdValue
+    })
   }
 
   // Handle task added from another column (board mode)
@@ -115,52 +107,122 @@ export default class extends Controller {
 
     const taskId = event.item.dataset.taskId
     const newColumnId = this.columnIdValue
-    const oldColumnId = event.from.dataset.sortableColumnIdValue || event.from.id.replace("column-", "")
+    const oldColumnId = this.columnIdFor(event.from)
 
     // Get all task IDs in their new order (including the newly added one)
-    const taskIds = Array.from(this.element.querySelectorAll("[data-task-id]"))
-      .map(el => el.dataset.taskId)
+    const taskIds = this.taskIds(this.element)
 
     // Update the task's data attributes
     event.item.dataset.taskColumnId = newColumnId
 
-    // Update column counters
-    this.updateColumnCount(oldColumnId, -1)
-    this.updateColumnCount(newColumnId, 1)
+    this.setColumnCount(oldColumnId, this.taskIds(event.from).length)
+    this.setColumnCount(newColumnId, taskIds.length)
+
+    await this.persistMove(event, {
+      task_id: taskId,
+      board_column_id: newColumnId,
+      source_column_id: oldColumnId,
+      task_ids: taskIds
+    })
+  }
+
+  get csrfToken() {
+    return document.querySelector("[name='csrf-token']")?.content || ""
+  }
+
+  async persistMove(event, payload) {
+    if (updatePending) {
+      this.restoreBoardState(event.item.sortableSnapshot)
+      this.showError("Die vorherige Verschiebung wird noch gespeichert.")
+      return
+    }
+
+    updatePending = true
+    this.setDraggingEnabled(false)
 
     try {
       const response = await fetch(this.urlValue, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
           "X-CSRF-Token": this.csrfToken
         },
-        body: JSON.stringify({ task_id: taskId, board_column_id: newColumnId, task_ids: taskIds })
+        body: JSON.stringify(payload)
       })
 
       if (!response.ok) {
-        console.error("Failed to update task status")
+        const body = await response.json().catch(() => ({}))
+        throw new Error(body.error || "Die Kartenposition konnte nicht gespeichert werden.")
       }
     } catch (error) {
-      console.error("Error updating task status:", error)
+      this.restoreBoardState(event.item.sortableSnapshot)
+      this.showError(error.message)
+      console.error("Error updating task positions:", error)
+    } finally {
+      delete event.item.sortableSnapshot
+      updatePending = false
+      this.setDraggingEnabled(true)
     }
   }
 
-  get csrfToken() {
-    return document.querySelector("[name='csrf-token']").content
+  captureBoardState() {
+    return Array.from(document.querySelectorAll('[data-controller~="sortable"][data-sortable-column-id-value]')).map(element => ({
+      element,
+      columnId: this.columnIdFor(element),
+      items: Array.from(element.querySelectorAll(":scope > [data-task-id]")),
+      count: document.getElementById(`column-${this.columnIdFor(element)}-count`)?.textContent
+    }))
   }
 
-  updateColumnCount(columnId, delta) {
+  restoreBoardState(snapshot) {
+    if (!snapshot) return
+
+    snapshot.forEach(column => {
+      column.items.forEach(item => {
+        column.element.appendChild(item)
+        item.dataset.taskColumnId = column.columnId
+      })
+      if (column.count !== undefined) {
+        this.setColumnCount(column.columnId, column.count)
+      }
+    })
+  }
+
+  setDraggingEnabled(enabled) {
+    document.querySelectorAll('[data-controller~="sortable"]').forEach(element => {
+      element.sortableController?.sortable?.option("disabled", !enabled)
+    })
+  }
+
+  taskIds(element) {
+    return Array.from(element.querySelectorAll(":scope > [data-task-id]"))
+      .map(item => item.dataset.taskId)
+  }
+
+  columnIdFor(element) {
+    return element.dataset.sortableColumnIdValue || element.id.replace("column-", "")
+  }
+
+  setColumnCount(columnId, value) {
     const countEl = document.getElementById(`column-${columnId}-count`)
     if (countEl) {
-      const currentCount = parseInt(countEl.textContent, 10) || 0
-      countEl.textContent = currentCount + delta
+      countEl.textContent = value
     }
-    // Update header stats count
-    const headerCountEl = null
-    if (headerCountEl) {
-      const currentCount = parseInt(headerCountEl.textContent, 10) || 0
-      headerCountEl.textContent = currentCount + delta
+  }
+
+  showError(message) {
+    let error = document.getElementById("board-drag-error")
+    if (!error) {
+      error = document.createElement("div")
+      error.id = "board-drag-error"
+      error.setAttribute("role", "alert")
+      error.className = "fixed right-4 top-4 z-[300] max-w-sm rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 shadow-lg"
+      document.body.appendChild(error)
     }
+
+    error.textContent = message || "Die Kartenposition konnte nicht gespeichert werden."
+    window.clearTimeout(this.errorTimeout)
+    this.errorTimeout = window.setTimeout(() => error.remove(), 5000)
   }
 }

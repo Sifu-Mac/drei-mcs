@@ -83,28 +83,45 @@ class BoardsController < ApplicationController
   end
 
   def update_task_status
-    column = if params[:board_column_id].present?
-      @board.board_columns.find(params[:board_column_id])
-    elsif params[:status].present?
-      @board.column_for_legacy_status(params[:status])
-    end
+    target_column = @board.board_columns.find(params[:board_column_id])
+    source_column = @board.board_columns.find(params[:source_column_id] || target_column.id)
+    ordered_ids = Array(params[:task_ids]).map(&:to_s)
+    moved_task = @board.tasks.find(params[:task_id])
 
-    if params[:task_ids].present?
-      params[:task_ids].each_with_index do |task_id, index|
-        task = @board.tasks.find(task_id)
-        updates = { position: index + 1 }
-        updates[:board_column_id] = column.id if column
-        task.update!(updates)
+    Task.transaction do
+      involved_tasks = @board.tasks.where(board_column_id: [source_column.id, target_column.id]).lock.to_a
+      current_source_id = involved_tasks.find { |task| task.id == moved_task.id }&.board_column_id
+      raise ActiveRecord::StaleObjectError.new(moved_task, "move") unless current_source_id == source_column.id
+
+      expected_ids = involved_tasks
+        .select { |task| task.board_column_id == target_column.id || task.id == moved_task.id }
+        .map { |task| task.id.to_s }
+
+      unless ordered_ids.uniq.length == ordered_ids.length && ordered_ids.sort == expected_ids.sort
+        raise ActionController::BadRequest, "Ungültige oder veraltete Kartenreihenfolge."
+      end
+
+      ordered_ids.each_with_index do |task_id, index|
+        task = involved_tasks.find { |candidate| candidate.id.to_s == task_id }
+        task.activity_source = "web"
+        task.update!(board_column: target_column, position: index + 1)
+      end
+
+      if source_column != target_column
+        involved_tasks
+          .select { |task| task.board_column_id == source_column.id && task.id != moved_task.id }
+          .sort_by(&:position)
+          .each_with_index { |task, index| task.update!(position: index + 1) }
       end
     end
 
-    if params[:task_id].present? && column
-      @task = @board.tasks.find(params[:task_id])
-      @task.activity_source = "web"
-      @task.update!(board_column: column)
-    end
-
     head :ok
+  rescue ActiveRecord::RecordInvalid => error
+    render json: { error: error.record.errors.full_messages.to_sentence }, status: :unprocessable_entity
+  rescue ActiveRecord::StaleObjectError
+    render json: { error: "Das Board wurde zwischenzeitlich geändert. Bitte erneut versuchen." }, status: :conflict
+  rescue ActionController::BadRequest => error
+    render json: { error: error.message }, status: :unprocessable_entity
   end
 
   private
