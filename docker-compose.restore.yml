@@ -1,0 +1,17 @@
+services:
+  restore-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: drei_restore
+      POSTGRES_USER: drei_review
+      POSTGRES_PASSWORD: drei_restore_ephemeral_only
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U drei_review -d drei_restore"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - restore-postgres:/var/lib/postgresql/data
+
+volumes:
+  restore-postgres:
