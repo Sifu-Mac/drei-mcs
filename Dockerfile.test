@@ -9,6 +9,8 @@ WORKDIR ${APP_HOME}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    chromium \
+    chromium-driver \
     curl \
     git \
     libpq-dev \
