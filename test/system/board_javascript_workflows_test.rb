@@ -71,4 +71,38 @@ class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
     assert_no_selector "#column-#{target_column.id} #task_#{task.id}"
     assert_equal source_column, task.reload.board_column
   end
+
+  test "active tag filter disables drag and drop and explains why" do
+    task = tasks(:one)
+    task.update!(tags: ["review"])
+    sign_in_through_browser(users(:one))
+
+    visit board_path(task.board, tag: "review")
+
+    assert_text "Karten können mit aktivem Filter nicht verschoben werden."
+    assert_selector "#task_#{task.id}"
+    assert page.evaluate_script(<<~JS)
+      (() => {
+        const column = document.getElementById("column-#{task.board_column_id}")
+        return column.dataset.sortableDisabledValue === "true" &&
+          column.sortableController.sortable.option("disabled") === true
+      })()
+    JS
+  end
+
+  test "unfiltered board keeps drag and drop enabled" do
+    task = tasks(:one)
+    sign_in_through_browser(users(:one))
+
+    visit board_path(task.board)
+
+    assert_selector "#task_#{task.id}"
+    assert page.evaluate_script(<<~JS)
+      (() => {
+        const column = document.getElementById("column-#{task.board_column_id}")
+        return column.dataset.sortableDisabledValue === "false" &&
+          column.sortableController.sortable.option("disabled") === false
+      })()
+    JS
+  end
 end

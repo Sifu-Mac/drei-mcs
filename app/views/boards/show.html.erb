@@ -7,7 +7,7 @@
   <%= render "boards/header" %>
 
   <% if @current_tag.present? %>
-    <div class="flex items-center gap-2 px-6 py-2 bg-bg-surface border-b border-border">
+    <div class="flex flex-wrap items-center gap-2 px-6 py-2 bg-bg-surface border-b border-border">
       <span class="text-xs text-content-muted">Gefiltert nach:</span>
       <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-bg-elevated text-content">
         <%= @current_tag %>
@@ -16,6 +16,9 @@
             <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
           </svg>
         <% end %>
+      </span>
+      <span class="text-xs text-content-muted" role="status">
+        Karten können mit aktivem Filter nicht verschoben werden. Entferne den Filter, um die Reihenfolge zu ändern.
       </span>
     </div>
   <% end %>

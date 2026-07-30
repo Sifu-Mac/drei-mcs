@@ -9,7 +9,8 @@ export default class extends Controller {
   static values = {
     group: String,
     columnId: String,
-    url: String
+    url: String,
+    disabled: Boolean
   }
 
   connect() {
@@ -27,6 +28,7 @@ export default class extends Controller {
       swapThreshold: 0.65,
       invertSwap: true,
       filter: '[style*="display: none"]',
+      disabled: this.disabledValue,
       onStart: this.handleStart.bind(this),
       onEnd: this.handleEnd.bind(this),
       onMove: this.move.bind(this),
@@ -91,7 +93,7 @@ export default class extends Controller {
 
   // Handle reordering within the same column
   async handleUpdate(event) {
-    if (!this.hasUrlValue) return
+    if (!this.hasUrlValue || this.disabledValue) return
 
     await this.persistMove(event, {
       task_id: event.item.dataset.taskId,
@@ -103,7 +105,7 @@ export default class extends Controller {
 
   // Handle task added from another column (board mode)
   async handleAdd(event) {
-    if (!this.hasUrlValue || !this.hasColumnIdValue) return
+    if (!this.hasUrlValue || !this.hasColumnIdValue || this.disabledValue) return
 
     const taskId = event.item.dataset.taskId
     const newColumnId = this.columnIdValue

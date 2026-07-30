@@ -83,6 +83,12 @@ class BoardsController < ApplicationController
   end
 
   def update_task_status
+    if params[:tag].present?
+      render json: { error: "Karten können in einer gefilterten Ansicht nicht verschoben werden. Filter entfernen und erneut versuchen." },
+        status: :unprocessable_entity
+      return
+    end
+
     target_column = @board.board_columns.find(params[:board_column_id])
     source_column = @board.board_columns.find(params[:source_column_id] || target_column.id)
     ordered_ids = Array(params[:task_ids]).map(&:to_s)

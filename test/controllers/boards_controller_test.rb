@@ -146,6 +146,29 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Ungültige oder veraltete Kartenreihenfolge.", response.parsed_body["error"]
   end
 
+  test "filtered board context rejects task moves before changing positions" do
+    sign_in_as users(:admin)
+    board = boards(:one)
+    moved = tasks(:one)
+    source = board_columns(:one_backlog)
+    target = board_columns(:one_active)
+
+    patch update_task_status_board_path(board, tag: "review"), params: {
+      task_id: moved.id,
+      source_column_id: source.id,
+      board_column_id: target.id,
+      task_ids: [moved.id]
+    }, as: :json
+
+    assert_response :unprocessable_entity
+    assert_equal source, moved.reload.board_column
+    assert_nil moved.position
+    assert_equal(
+      "Karten können in einer gefilterten Ansicht nicht verschoben werden. Filter entfernen und erneut versuchen.",
+      response.parsed_body["error"]
+    )
+  end
+
   test "stale source column rejects a competing move" do
     sign_in_as users(:admin)
     board = boards(:one)
