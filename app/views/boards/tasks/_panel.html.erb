@@ -31,7 +31,7 @@
     <!-- Header — status pill + close -->
     <div class="px-4 py-3 md:px-5 md:py-4 border-b border-border flex items-center justify-between gap-3 shrink-0">
       <div data-task-modal-target="statusPill" class="text-[11px] font-bold text-content-secondary bg-bg-elevated px-3 py-1 rounded-md border border-border">
-        <%= status_labels[task.status] %>
+        <%= task.board_column.name %>
       </div>
       <button type="button"
               data-action="click->task-modal#close"
