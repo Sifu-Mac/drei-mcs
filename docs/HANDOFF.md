@@ -8,7 +8,7 @@ Stand: 2026-07-30
 - VPS-Projektpfad: `/docker/drei-review`
 - Live-URL: `https://drei.digitalbackup.cloud`
 - Aktueller Branch: `main`
-- Repository-Stand vor dieser Handoff-Aktualisierung: `e8fab25 Merge PWA icon fix`
+- Repository-Stand vor dieser Handoff-Aktualisierung: `5b3afe0 Update QA fix handoff`
 - Deployter Code-Commit: `e8fab25 Merge PWA icon fix`
 - Aktuelle QA-Fix-Commits: `2a94ffe Fix production QA issues`, `642bdda Fix PWA icon links`
 - VPS-Git-Status nach Deployment: `main...origin/main`, nur `backup-postgres.sh` ist unversioniert und unberuehrt.
@@ -151,26 +151,154 @@ Behobene Befunde:
 - P2: Leere Inline-Karteneingabe hatte keine sichtbare Rueckmeldung.
 - P2: Das PWA-Manifest verursachte wiederholte `/icon.png`-404 in der Browserkonsole.
 
-## Offene Fehler
+# Roadmap
 
-- Keine offenen Testfehler bekannt.
-- SMTP-Werte sind weiterhin nicht gesetzt; Compose gibt entsprechende Warnungen aus.
-- Kein Production-Client-Benutzer vorhanden, daher keine manuelle Client-Smoke-Pruefung ohne Datenanlage.
-- Direkt nach dem finalen Container-Recreate lieferte `/up` einmal kurz `502`; nach Puma-Start lieferte `/up` wieder `200`.
-- Kein echter Browser-Drag-and-drop-Smoke wurde gegen Production automatisiert; serverseitige/HTML-Vertraege und Task-Panel-Aufruf sind geprueft.
+## 1. Abgeschlossen
 
-## Offene Aufgaben nach Prioritaet
+Repository, Betrieb und Arbeitsgrundlage:
+- Privates GitHub-Repository `Sifu-Mac/drei-mcs` erstellt und die urspruengliche Mission-Control-Codebasis unabhaengig geforkt.
+- Branding auf `DREI Asset Review` angepasst.
+- Isoliertes Single-Tenant-Deployment unter `/docker/drei-review` und Live-Domain `https://drei.digitalbackup.cloud` eingerichtet.
+- Eigener Docker-Stack `drei-review`, eigene PostgreSQL-Datenbank und persistentes Active-Storage-Volume eingerichtet.
+- HTTPS ueber das bestehende Traefik-Setup eingerichtet.
+- Automatische taegliche PostgreSQL-Backups per aktivem Systemd-Timer eingerichtet; letzter verifizierter Lauf am 2026-07-30 erfolgreich.
+- Aufbewahrung der letzten 14 lokalen Backups im Backup-Skript konfiguriert.
+- `AGENTS.md` und `docs/HANDOFF.md` als dauerhafte Arbeits- und Uebergabedokumentation eingerichtet.
+- SSH-Zugriff vom Mac zum VPS und Codex CLI auf dem VPS eingerichtet.
+- VPS per SSH mit GitHub verbunden; direkte Commits und Pushes vom VPS funktionieren.
 
-1. Einen echten Client-Testzugang ueber den Invite-Flow anlegen und die Client-Ansicht manuell pruefen.
-2. SMTP/Postmark sauber konfigurieren und mit echten ENV-Werten testen, ohne Secrets zu dokumentieren.
-3. Invite-Mailversand nach SMTP-Konfiguration mit nicht-produktiver Testadresse pruefen.
-4. Backup-Strategie fuer `/docker/drei-review` dokumentieren und verifizieren.
-5. Dynamische Board-Spalten in einem echten Admin-Browser-Flow pruefen: Spalte erstellen, verschieben und leere Spalte loeschen; Umbenennen ist bereits browsergeprueft.
-6. Browser-Smoke fuer echtes Drag-and-drop und Dropdown-Flipping mit Maus/Trackpad gegen Production nachholen.
+Authentifizierung und Rollen:
+- Invite-only Auth und Admin-Einladungsverwaltung umgesetzt; oeffentliche Registrierung entfernt.
+- Rolle `client` eingefuehrt; Client-Mutationen werden serverseitig blockiert.
+- Login und Passwort-Reset erhalten.
 
-## Naechster konkreter Arbeitsschritt
+Oberflaeche und Assets:
+- Helles DREI-UI mit blauem Akzent und deutsche sichtbare Benutzeroberflaeche umgesetzt.
+- Task-Coverbilder und mehrere Bild-Uploads in Kommentaren umgesetzt.
+- Board-UI grosszuegiger und lesbarer gestaltet; Karten vollstaendig klickbar gemacht.
+- Dropdowns und Popovers mit Portal-/Viewport-Positionierung repariert.
+- Task-Panel-Fehler behoben.
 
-Einen temporaeren Client ausschliesslich ueber den Invite-Flow anlegen, dessen eingeschraenkte Production-Ansicht browserbasiert pruefen und anschliessend vollstaendig entfernen.
+Kampagnen, Boards, Spalten und Karten:
+- Kampagnenmodell und Struktur `Kampagne -> Boards -> Karten` umgesetzt.
+- Bestehende Boards verlustfrei der Standardkampagne `Allgemein` zugeordnet.
+- Kampagnen koennen dupliziert, archiviert und wiederhergestellt werden.
+- Boards koennen dupliziert und archiviert werden.
+- Dynamische Board-Spalten mit den Arten `backlog`, `active`, `review`, `blocked` und `done` umgesetzt.
+- Spalten koennen hinzugefuegt, umbenannt, sortiert und leer geloescht werden.
+- Bestehende Tasks wurden verlustfrei auf dynamische Spalten migriert.
+- Karten sind per Drag-and-drop zwischen Spalten verschiebbar.
+- Drei-Punkte-Menue sowie Bearbeiten, Duplizieren, Archivieren und Loeschen fuer Karten umgesetzt.
+- Optionale Kartenfarben umgesetzt.
+- Bekannter Task-Completion-Bug und die beim Browser-QA gefundenen P1/P2-Fehler behoben.
+
+Qualitaet:
+- Isolierte Docker-Testumgebung eingerichtet.
+- Vollstaendige Rails-Test-Suite lauffaehig; letzter Stand: `109 runs, 417 assertions, 0 failures, 0 errors, 0 skips`.
+- Production-QA mit echtem Headless Chromium abgeschlossen; alle 21 finalen Pruefpunkte bestanden.
+
+## 2. Aktuell offen
+
+### SMTP und Postmark
+
+- Postmark-Account ist eingerichtet.
+- `digitalbackup.at` ist DKIM-verifiziert; der Return-Path ist verifiziert.
+- SMTP-Zugangsdaten sind noch nicht in `.env.production` hinterlegt; alle erwarteten SMTP-Variablen fehlen aktuell.
+- Action Mailer wurde noch nicht mit echtem Versand getestet.
+- Test-Einladung an eine eigene interne E-Mail-Adresse ist noch offen.
+- Keine echten DREI-Kunden einladen, bevor Testmail und Testeinladung erfolgreich waren.
+
+### Client-Test
+
+- Aktuell ist kein dauerhafter Production-Client-Benutzer vorhanden.
+- Client-Ansicht vollstaendig manuell im Browser testen.
+- Pruefen, dass Clients nur lesen und kommentieren koennen.
+- Pruefen, dass Kommentar-Bilduploads fuer Clients funktionieren.
+- Pruefen, dass keine internen Aktionen im HTML erscheinen.
+- Mutierende Requests muessen weiterhin serverseitig blockiert bleiben.
+
+### Browser-Smoke
+
+- Drag-and-drop im echten Browser manuell pruefen.
+- Karten- und Spaltenmenues am oberen und unteren Viewport-Rand sowie Dropdown-Flipping pruefen.
+- Laptop- und Tablet-Breite manuell pruefen.
+- Ein Board mit vielen Spalten und vielen Karten pruefen.
+
+### Backup und Restore
+
+- Der taegliche Backup-Timer ist aktiv; der letzte verifizierte Lauf war erfolgreich.
+- Zwei lokale Backup-Dateien waren am 2026-07-30 vorhanden; die konfigurierte Aufbewahrung behaelt maximal 14.
+- Einen projektspezifischen PostgreSQL-Restore-Ablauf dokumentieren und mit einem isolierten Test-Stack verifizieren. Dieser Punkt ist entgegen einer frueheren Annahme noch nicht abgeschlossen.
+- Automatisierte Offsite-Backups sind noch nicht eingerichtet.
+
+### Unversionierte Serverdateien
+
+- `backup-postgres.sh` bleibt bewusst unversioniert.
+- `.env.production` bleibt unversioniert.
+- Aktuell ist nur `backup-postgres.sh` im Git-Worktree unversioniert; `git stash list` ist leer.
+- Bei Bedarf spaeter pruefen, ob ausserhalb des aktuellen Git-Status bekannte lokale Dubletten bereinigt werden sollen.
+- Niemals Secrets, Datenbank-Dumps oder Backups in Git uebernehmen.
+
+## 3. Als Naechstes
+
+Empfohlene Reihenfolge:
+
+1. SMTP/Postmark produktiv konfigurieren.
+2. Testmail und Testeinladung an eine eigene interne Adresse senden.
+3. Temporaeren Client-Benutzer ueber den Invite-Flow anlegen.
+4. Vollstaendigen Admin- und Client-Smoke-Test durchfuehren.
+5. Temporaeren Test-Client anschliessend vollstaendig entfernen.
+6. UI-/UX-Fehler aus dem manuellen Test sammeln.
+7. Einen gebuendelten UI-/UX-Feinschliff umsetzen.
+8. Rollout-Checkliste fuer echte DREI-Nutzer durchfuehren.
+9. Erste echte interne Einladungen senden.
+10. Danach kontrolliert DREI-Kunden einladen.
+
+## 4. Spaeter geplant
+
+Folgende Erweiterungen sind spaeter oder optional:
+- Benachrichtigungen bei neuen Kommentaren; interne Nutzer benachrichtigen, den Autor selbst nicht.
+- Clients standardmaessig nicht als E-Mail-Empfaenger behandeln.
+- Granularere Board-, Kampagnen- oder Kartenfreigaben, falls nicht alle Inhalte sichtbar sein sollen.
+- Suche ueber Kampagnen, Boards und Karten.
+- Filter nach Kartenfarbe, Spalte, Kampagne und Statusart.
+- Aktivitaetsprotokoll weiter ausbauen.
+- Freigabe- und Korrekturschleifen expliziter abbilden.
+- CSV-Import einer Produktionsplanung und automatisches Erstellen von Kampagnen, Boards und Karten.
+- Optionale Asset-Metadaten wie Format, Kanal, Sujet und Funnel.
+- Dashboard mit offenen Reviews, blockierten Karten und Freigaben.
+- Automatisierte Offsite-Backups zusaetzlich zu lokalen VPS-Backups.
+- Monitoring und Fehlerbenachrichtigungen.
+- Wiederverwendbare Deployment-Vorlage und eigenes isoliertes Deployment je weiterem Kunden.
+
+## 5. Offene fachliche Entscheidungen
+
+- Sind innerhalb eines Kunden-Deployments immer alle Kampagnen und Boards fuer alle Clients sichtbar?
+- Werden spaeter feinere Board-, Kampagnen- oder Kartenfreigaben benoetigt?
+- Welche Kartenfarben sollen verbindlich welchen Asset-Typen entsprechen?
+- Soll es feste Asset-Typen zusaetzlich zur freien Kartenfarbe geben?
+- Welche Metadaten muessen aus zukuenftigen Produktionslisten uebernommen werden?
+- Wie soll der Freigabestatus fachlich benannt und ausgewertet werden?
+- Sollen archivierte Karten, Boards und Kampagnen zentral durchsuchbar sein?
+- Welche E-Mail-Benachrichtigungen sollen interne Benutzer und Clients erhalten?
+- Soll Postmark pro Kunden-Deployment einen eigenen Server oder Message Stream bekommen?
+- Welche Daten muessen bei Kampagnen- oder Board-Duplikaten zusaetzlich uebernommen werden?
+
+## 6. Arbeitsregeln fuer kommende Sessions
+
+- Jede neue Session beginnt mit dem vollstaendigen Lesen von `AGENTS.md` und `docs/HANDOFF.md`.
+- Vor groesseren Aenderungen zuerst einen Plan erstellen und die Freigabe abwarten.
+- Jede Funktion auf einem eigenen, sprechenden Branch entwickeln.
+- Keine parallelen Agenten an denselben Dateien oder stark gekoppelten Bereichen arbeiten lassen.
+- Vor Merge und Deployment die vollstaendige passende Testsuite ausfuehren.
+- Keine Secrets committen, ausgeben oder dokumentieren.
+- Die bestehende Mission-Control-Instanz niemals veraendern.
+- Nur Ressourcen unter `/docker/drei-review` bearbeiten.
+- Nach erfolgreichem Merge `main` zu GitHub pushen.
+- Danach das VPS-Deployment und den Production-Healthcheck durchfuehren; reine Dokumentationsaenderungen benoetigen keinen Rebuild.
+- Vor jedem Abschlussbericht `docs/HANDOFF.md` aktualisieren.
+- Erledigte Roadmap-Punkte aus offenen Bereichen entfernen und nach `Abgeschlossen` verschieben.
+- Das Handoff muss immer den tatsaechlichen Stand wiedergeben, nicht nur den geplanten Stand.
 
 ## Wichtige Dateien und Pfade
 
@@ -206,7 +334,10 @@ Einen temporaeren Client ausschliesslich ueber den Invite-Flow anlegen, dessen e
 
 ## Backup-Status
 
-- Auf dem VPS existiert unversioniert `backup-postgres.sh`; Inhalt und Einsatzstatus wurden nicht veraendert.
-- Kein verifizierter aktueller Backup-Lauf dokumentiert.
+- Auf dem VPS existiert bewusst unversioniert `backup-postgres.sh`; es wurde nicht veraendert.
+- `drei-review-backup.timer` ist aktiviert und wartet auf den naechsten taeglichen Lauf um `03:30 UTC`.
+- Der letzte verifizierte automatische Lauf am 2026-07-30 um `03:30 UTC` endete erfolgreich.
+- Das Skript behaelt die letzten 14 Backups; am 2026-07-30 waren zwei komprimierte Dumps vorhanden.
+- Ein projektspezifischer Restore-Ablauf ist noch zu dokumentieren und isoliert zu testen.
 - Bestehende Production-Daten wurden nicht exportiert.
 - Production-Daten wurden nur durch die notwendigen Kampagnen-/Board- und dynamische-Spalten-Migrationen veraendert.
