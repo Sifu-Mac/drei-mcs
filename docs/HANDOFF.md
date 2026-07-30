@@ -8,6 +8,7 @@ Stand: 2026-07-30
 - VPS-Projektpfad: `/docker/drei-review`
 - Live-URL: `https://drei.digitalbackup.cloud`
 - Aktueller Branch: `main`
+- Repository-Stand vor dieser Handoff-Aktualisierung: `3a8fdb6 Document browser QA findings`
 - Deployter Code-Commit: `bf05416 Merge task panel board UI fix`
 - Feature-Commits: `b6d2287 Fix board UI interactions`, `73a11d5 Fix task panel status label`
 - VPS-Git-Status nach Deployment: `main...origin/main`, nur `backup-postgres.sh` ist unversioniert und unberuehrt.
@@ -18,6 +19,7 @@ Production-Stack in `/docker/drei-review`:
 - `drei-review-db-1`: Service `db`, running, healthy
 - `drei-review-web-1`: Service `web`, running
 - Healthcheck: `https://drei.digitalbackup.cloud/up` liefert `200`
+- Zuletzt erneut verifiziert am 2026-07-30: `db` healthy, `web` running, Production-Healthcheck `200`.
 
 Test-Stack:
 - `docker-compose.test.yml` definiert `test-db` und `test`.
