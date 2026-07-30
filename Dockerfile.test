@@ -3,8 +3,7 @@ FROM ruby:3.3.1-slim
 ENV APP_HOME=/rails \
     BUNDLE_DEPLOYMENT=1 \
     BUNDLE_PATH=/usr/local/bundle \
-    RAILS_ENV=test \
-    SECRET_KEY_BASE_DUMMY=dummy
+    RAILS_ENV=test
 
 WORKDIR ${APP_HOME}
 
