@@ -1,9 +1,13 @@
 class MakeMaxAnAdmin < ActiveRecord::Migration[8.1]
+  class MigrationUser < ActiveRecord::Base
+    self.table_name = "users"
+  end
+
   def up
-    User.find_by(email_address: "max@mx.works")&.update(admin: true)
+    MigrationUser.where(email_address: "max@mx.works").update_all(admin: true)
   end
 
   def down
-    User.find_by(email_address: "max@mx.works")&.update(admin: false)
+    MigrationUser.where(email_address: "max@mx.works").update_all(admin: false)
   end
 end

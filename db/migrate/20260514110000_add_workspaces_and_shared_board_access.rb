@@ -1,17 +1,17 @@
 class AddWorkspacesAndSharedBoardAccess < ActiveRecord::Migration[8.1]
-  class MigrationUser < ApplicationRecord
+  class MigrationUser < ActiveRecord::Base
     self.table_name = "users"
   end
 
-  class MigrationBoard < ApplicationRecord
+  class MigrationBoard < ActiveRecord::Base
     self.table_name = "boards"
   end
 
-  class MigrationWorkspace < ApplicationRecord
+  class MigrationWorkspace < ActiveRecord::Base
     self.table_name = "workspaces"
   end
 
-  class MigrationWorkspaceMembership < ApplicationRecord
+  class MigrationWorkspaceMembership < ActiveRecord::Base
     self.table_name = "workspace_memberships"
   end
 
