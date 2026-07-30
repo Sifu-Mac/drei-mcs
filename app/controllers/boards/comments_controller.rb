@@ -9,7 +9,7 @@ class Boards::CommentsController < ApplicationController
     if @comment.save
       respond_to do |format|
         format.turbo_stream
-        format.html { redirect_to board_task_path(@board, @task), notice: "Comment added." }
+        format.html { redirect_to board_task_path(@board, @task), notice: "Kommentar wurde hinzugefügt." }
       end
     else
       respond_to do |format|

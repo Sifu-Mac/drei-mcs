@@ -15,3 +15,8 @@ admin:
   email_address: admin@example.com
   password_digest: <%= BCrypt::Password.create('password123') %>
   admin: true
+
+
+client:
+  email_address: client@example.com
+  password_digest: <%= BCrypt::Password.create('password123') %>

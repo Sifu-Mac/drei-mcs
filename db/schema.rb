@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_29_205705) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_130100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -64,6 +64,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_205705) do
   end
 
   create_table "boards", force: :cascade do |t|
+    t.datetime "archived_at"
+    t.bigint "campaign_id", null: false
     t.string "color", default: "gray"
     t.datetime "created_at", null: false
     t.string "icon", default: "📋"
@@ -72,10 +74,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_205705) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.bigint "workspace_id", null: false
+    t.index ["archived_at"], name: "index_boards_on_archived_at"
+    t.index ["campaign_id"], name: "index_boards_on_campaign_id"
     t.index ["user_id", "position"], name: "index_boards_on_user_id_and_position"
     t.index ["user_id"], name: "index_boards_on_user_id"
     t.index ["workspace_id", "position"], name: "index_boards_on_workspace_id_and_position"
     t.index ["workspace_id"], name: "index_boards_on_workspace_id"
+  end
+
+  create_table "campaigns", force: :cascade do |t|
+    t.datetime "archived_at"
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["archived_at"], name: "index_campaigns_on_archived_at"
+    t.index ["workspace_id", "position"], name: "index_campaigns_on_workspace_id_and_position"
+    t.index ["workspace_id"], name: "index_campaigns_on_workspace_id"
   end
 
   create_table "invites", force: :cascade do |t|
@@ -427,6 +443,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_205705) do
   add_foreign_key "projects", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "boards", "campaigns"
+  add_foreign_key "campaigns", "workspaces"
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

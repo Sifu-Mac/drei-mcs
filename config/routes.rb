@@ -37,9 +37,23 @@ Rails.application.routes.draw do
     post :regenerate_api_token
   end
 
+  resources :campaigns, only: [:create, :update] do
+    get :archived, on: :collection
+    member do
+      post :duplicate
+      patch :archive
+      patch :restore
+    end
+  end
+
   # Boards (multi-board kanban views)
   resources :boards, only: [ :index, :show, :create, :update, :destroy ] do
-    patch :update_task_status, on: :member
+    member do
+      patch :update_task_status
+      post :duplicate
+      patch :archive
+      patch :restore
+    end
     resources :tasks, only: [ :show, :new, :create, :edit, :update, :destroy ], controller: "boards/tasks" do
       member do
         patch :assign

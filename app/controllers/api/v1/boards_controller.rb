@@ -2,8 +2,8 @@ module Api
   module V1
     class BoardsController < BaseController
       before_action :set_board, only: [ :show, :update, :destroy ]
+      before_action :require_internal_workspace_member, only: [ :create, :update, :destroy ]
 
-      # GET /api/v1/boards
       def index
         @boards = current_user.current_workspace_boards
           .left_joins(:tasks)
@@ -13,15 +13,18 @@ module Api
         render json: @boards.map { |board| board_json(board, use_cached_count: true) }
       end
 
-      # GET /api/v1/boards/:id
       def show
         render json: board_json(@board, include_tasks: params[:include_tasks] == "true")
       end
 
-      # POST /api/v1/boards
       def create
         workspace = current_user.current_workspace || current_user.owned_workspaces.create!(name: "DREI Asset Review")
-        @board = workspace.boards.new(board_params.merge(user: current_user))
+        campaign = if params[:campaign_id].present?
+          workspace.campaigns.active.find(params[:campaign_id])
+        else
+          workspace.campaigns.active.find_or_create_by!(name: "Allgemein")
+        end
+        @board = workspace.boards.new(board_params.merge(user: current_user, campaign: campaign))
 
         if @board.save
           render json: board_json(@board), status: :created
@@ -30,7 +33,6 @@ module Api
         end
       end
 
-      # PATCH /api/v1/boards/:id
       def update
         if @board.update(board_params)
           render json: board_json(@board)
@@ -39,12 +41,11 @@ module Api
         end
       end
 
-      # DELETE /api/v1/boards/:id
       def destroy
         if @board.workspace.boards.count <= 1
-          render json: { error: "Cannot delete your only board" }, status: :unprocessable_entity
+          render json: { error: "Das einzige Board kann nicht archiviert werden." }, status: :unprocessable_entity
         else
-          @board.destroy!
+          @board.archive!
           head :no_content
         end
       end
@@ -65,6 +66,7 @@ module Api
           name: board.name,
           icon: board.icon,
           color: board.color,
+          campaign_id: board.campaign_id,
           tasks_count: use_cached_count ? (board.tasks_count_cache || 0) : board.tasks.count,
           created_at: board.created_at.iso8601,
           updated_at: board.updated_at.iso8601,

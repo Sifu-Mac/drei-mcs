@@ -94,7 +94,7 @@ class AgentController < ApplicationController
     if completed_count > 0
       done_text = completed_names.first(3).join(", ")
       done_text += " and #{completed_count - 3} more" if completed_count > 3
-      lines << "Done this week (#{completed_count}): #{done_text}."
+      lines << "Diese Woche erledigt (#{completed_count}): #{done_text}."
     else
       lines << "No tasks completed this week yet."
     end
@@ -162,7 +162,7 @@ class AgentController < ApplicationController
     elsif q.match?(/blocked|stuck|help/)
       blocked = tasks.where(blocked: true).where.not(status: :done).pluck(:name)
       if blocked.any?
-        "Blocked tasks (#{blocked.length}):\n\n#{blocked.first(5).join("\n")}"
+        "Blockierte Karten (#{blocked.length}):\n\n#{blocked.first(5).join("\n")}"
       else
         "No blocked tasks right now."
       end
@@ -175,7 +175,7 @@ class AgentController < ApplicationController
         assigned = tasks.where(assigned_to_agent: true, completed: false).count
         "#{emoji} #{name} was last active #{ago} ago. #{assigned} tasks currently assigned to your agent."
       else
-        "No agent connected yet. Go to Settings to set up your OpenClaw integration."
+        "Noch kein Agent verbunden. Öffne die Einstellungen, um die OpenClaw-Integration einzurichten."
       end
 
     elsif q.match?(/how many|count|total|stat/)

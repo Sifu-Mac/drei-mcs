@@ -60,7 +60,7 @@
       <% if @all_today_tasks.empty? %>
         <div class="px-4 py-8 rounded-xl text-center animate-fade-up" style="animation-delay: 0.08s; background: #ffffff; border: 1px solid #e5e7eb; box-shadow:0 1px 2px rgba(15,23,42,0.04);">
           <div class="text-[13px] font-medium text-content-secondary">No tasks for today</div>
-          <div class="text-[11px] text-content-muted mt-1">Tasks in "Up Next" and "In Progress" will appear here</div>
+          <div class="text-[11px] text-content-muted mt-1">Karten aus "Bereit" und "In Bearbeitung" erscheinen hier</div>
         </div>
       <% else %>
         <% @all_today_tasks.each_with_index do |task, i| %>
@@ -110,7 +110,7 @@
                           border: 1px solid <%= is_done ? 'rgba(52,211,153,0.12)' : 'rgba(251,191,36,0.12)' %>;">
                 <span style="font-size: 10px;">🤖</span>
                 <span style="font-size: 10px; font-weight: 600; color: <%= is_done ? '#34d399' : '#fbbf24' %>;">
-                  <%= is_done ? "Review" : "Working" %>
+                  <%= is_done ? "Prüfung" : "In Arbeit" %>
                 </span>
                 <% unless is_done %>
                   <div style="width: 4px; height: 4px; border-radius: 50%; background: #fbbf24; animation: pulse 1.5s ease infinite;"></div>
@@ -136,7 +136,7 @@
                     background: rgba(251,191,36,0.03); border: 1px solid rgba(251,191,36,0.07);
                     animation-delay: 0.32s;">
           <div class="text-xs font-medium leading-[1.45]" style="color: #4b5563;">No recent agent activity</div>
-          <div class="text-[10px] font-medium mt-1" style="color: #6b7280;">Assign tasks to your agent to see updates here</div>
+          <div class="text-[10px] font-medium mt-1" style="color: #6b7280;">Weise Karten deinem Agent zu, um hier Updates zu sehen</div>
         </div>
       <% else %>
         <% @agent_updates.each_with_index do |activity, i| %>

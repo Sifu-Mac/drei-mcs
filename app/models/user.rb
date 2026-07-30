@@ -91,23 +91,29 @@ class User < ApplicationRecord
 
   def accessible_boards
     Board.joins(workspace: :workspace_memberships)
-         .where(workspace_memberships: { user_id: id })
+         .joins(:campaign)
+         .where(workspace_memberships: { user_id: id }, campaigns: { archived_at: nil })
          .distinct
   end
 
   def accessible_tasks
-    Task.joins(board: { workspace: :workspace_memberships })
-        .where(workspace_memberships: { user_id: id })
+    Task.joins(board: [:campaign, { workspace: :workspace_memberships }])
+        .where(workspace_memberships: { user_id: id }, campaigns: { archived_at: nil }, boards: { archived_at: nil })
         .distinct
   end
 
+  def current_workspace_campaigns
+    current_workspace&.campaigns&.active&.ordered || Campaign.none
+  end
+
   def current_workspace_boards
-    Board.where(workspace_id: current_workspace&.id)
+    Board.joins(:campaign)
+         .where(workspace_id: current_workspace&.id, campaigns: { archived_at: nil })
   end
 
   def current_workspace_tasks
-    Task.joins(:board)
-        .where(boards: { workspace_id: current_workspace&.id })
+    Task.joins(board: :campaign)
+        .where(boards: { workspace_id: current_workspace&.id, archived_at: nil }, campaigns: { archived_at: nil })
         .distinct
   end
 

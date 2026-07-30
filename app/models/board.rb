@@ -1,71 +1,51 @@
 class Board < ApplicationRecord
   belongs_to :user
   belongs_to :workspace
+  belongs_to :campaign
   has_many :tasks, dependent: :destroy
 
   validates :name, presence: true
   validates :position, presence: true
 
+  before_validation :ensure_campaign, on: :create
   before_create :set_position
 
-  # Default scope orders by position
-  default_scope { order(position: :asc) }
+  default_scope { where(archived_at: nil).order(position: :asc) }
+  scope :active, -> { where(archived_at: nil) }
+  scope :archived, -> { where.not(archived_at: nil) }
+  scope :ordered, -> { order(position: :asc, created_at: :asc) }
 
-  # Available board colors (Tailwind-compatible)
   COLORS = %w[gray red orange amber yellow lime green emerald teal cyan sky blue indigo violet purple fuchsia pink rose].freeze
-
-  # Available board icons (emojis)
   DEFAULT_ICONS = %w[📋 📝 🎯 🚀 💡 🔧 📊 🎨 📚 🏠 💼 🎮 🎵 📸 ✨ 🦞].freeze
 
   def self.create_onboarding_for(user, workspace: user.current_workspace)
+    campaign = workspace.campaigns.active.find_or_create_by!(name: "Allgemein")
+
     board = workspace.boards.create!(
       user: user,
-      name: "Getting Started",
+      campaign: campaign,
+      name: "Erste Schritte",
       icon: "🚀",
       color: "blue"
     )
 
     tasks = [
       {
-        name: "👋 Welcome to DREI Asset Review!",
-        description: "This is your shared operating board for projects, tasks and agent work. Move cards through the workflow and keep owners explicit.",
+        name: "Willkommen bei DREI Asset Review",
+        description: "Dies ist das gemeinsame Arbeitsboard für Kampagnen, Assets und Reviews. Verschiebe Karten durch den Workflow und halte Verantwortlichkeiten klar fest.",
         status: "ready",
         position: 0
       },
       {
-        name: "🔗 Connect your agent",
-        description: "Go to Settings → copy the integration prompt → paste it into your agent config. Once connected, you'll see the agent in the header.",
+        name: "Agent verbinden",
+        description: "Öffne Einstellungen, kopiere den Integrations-Prompt und füge ihn in deiner Agent-Konfiguration ein.",
         status: "inbox",
         position: 0
       },
       {
-        name: "✅ Assign your first task",
-        description: "Create a task, set the owner, then assign it when an agent should execute it. Watch the activity feed for updates.",
+        name: "Erste Karte zuweisen",
+        description: "Erstelle eine Karte, setze den Owner und weise sie zu, wenn ein Agent daran arbeiten soll.",
         status: "inbox",
-        position: 1
-      },
-      {
-        name: "💡 Example: Research task",
-        description: "\"Research the top 5 competitors to [product] and summarize their pricing models.\" — Great for agents with web access.",
-        status: "inbox",
-        position: 2
-      },
-      {
-        name: "💡 Example: Code task",
-        description: "\"Add a dark mode toggle to the settings page. Use Tailwind classes.\" — Perfect for coding agents.",
-        status: "inbox",
-        position: 3
-      },
-      {
-        name: "💡 Example: Writing task",
-        description: "\"Draft a welcome email for new users. Keep it short, friendly, 3 paragraphs max.\" — Works with any agent.",
-        status: "inbox",
-        position: 4
-      },
-      {
-        name: "🎯 Try it yourself!",
-        description: "Delete these cards and create your first real task. Keep scope and ownership clear.",
-        status: "ready",
         position: 1
       }
     ]
@@ -77,12 +57,58 @@ class Board < ApplicationRecord
     board
   end
 
+  def archived?
+    archived_at.present?
+  end
+
+  def archive!
+    update!(archived_at: Time.current)
+  end
+
+  def restore!
+    update!(archived_at: nil)
+  end
+
+  def duplicate_to!(campaign:, user: self.user)
+    Board.transaction do
+      copy = campaign.workspace.boards.create!(
+        user: user,
+        campaign: campaign,
+        name: "#{name} Kopie",
+        icon: icon,
+        color: color
+      )
+
+      tasks.reorder(:position, :created_at).find_each do |task|
+        new_task = task.dup
+        new_task.board = copy
+        new_task.user = task.user || user
+        new_task.activity_source = "web"
+        new_task.save!
+        new_task.activities.delete_all
+      end
+
+      copy
+    end
+  end
+
   private
 
-  def set_position
-    return if position.present? && position > 0
+  def ensure_campaign
+    return if campaign.present? || workspace.blank?
 
-    max_position = workspace.boards.unscoped.where(workspace_id: workspace_id).maximum(:position) || 0
-    self.position = max_position + 1
+    self.campaign = workspace.campaigns.active.find_or_create_by!(name: "Allgemein")
+  end
+
+  def set_position
+    return if position.present? && position.positive?
+
+    scope = if campaign_id.present?
+      self.class.unscoped.where(campaign_id: campaign_id)
+    else
+      workspace.boards.unscoped.where(workspace_id: workspace_id)
+    end
+
+    self.position = (scope.maximum(:position) || 0) + 1
   end
 end

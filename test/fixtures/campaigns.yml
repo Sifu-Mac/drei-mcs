@@ -1,0 +1,9 @@
+general:
+  workspace: primary
+  name: Allgemein
+  position: 1
+
+secondary_general:
+  workspace: secondary
+  name: Allgemein
+  position: 1

@@ -1,13 +1,13 @@
 class Task < ApplicationRecord
   STATUS_VALUES = { inbox: 0, planned: 1, ready: 2, in_progress: 3, blocked: 4, review: 5, done: 6 }.freeze
   STATUS_LABELS = {
-    "inbox" => "Inbox",
-    "planned" => "Planned",
-    "ready" => "Ready",
-    "in_progress" => "In Progress",
-    "blocked" => "Blocked",
-    "review" => "Review",
-    "done" => "Done"
+    "inbox" => "Eingang",
+    "planned" => "Geplant",
+    "ready" => "Bereit",
+    "in_progress" => "In Bearbeitung",
+    "blocked" => "Blockiert",
+    "review" => "Prüfung",
+    "done" => "Erledigt"
   }.freeze
   STATUS_COLORS = {
     "inbox" => "#666",

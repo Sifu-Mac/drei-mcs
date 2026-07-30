@@ -1,4 +1,4 @@
-<%# Board-specific modals — Board Settings only (New Board modal is in shared/navbar) %>
+<%# Board-spezifische Modals — Board-Einstellungen only (Neue-Kampagne-Modal is in shared/navbar) %>
 
 <script>
   function selectEditBoardIcon(btn, icon) {
@@ -10,12 +10,12 @@
   }
 </script>
 
-<%# Board Settings Modal %>
+<%# Board-Einstellungen Modal %>
 <div id="board-settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
   <div class="absolute inset-0 bg-slate-900/25 backdrop-blur-sm" onclick="document.getElementById('board-settings-modal').classList.add('hidden')"></div>
   <div class="relative bg-bg-surface border border-border rounded-xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden" style="box-shadow:0 24px 70px rgba(15,23,42,0.18);">
     <div class="px-5 py-4 border-b border-border flex items-center justify-between">
-      <span class="text-sm font-bold text-content">Board Settings</span>
+      <span class="text-sm font-bold text-content">Board-Einstellungen</span>
       <button type="button"
               onclick="document.getElementById('board-settings-modal').classList.add('hidden')"
               class="p-2 rounded-lg text-content-muted hover:text-content hover:bg-bg-hover transition-colors cursor-pointer">
@@ -27,10 +27,10 @@
 
     <%= form_with model: @board, url: board_path(@board), method: :patch, class: "p-5 space-y-4" do |form| %>
       <div>
-        <label class="block text-sm font-medium text-content-secondary mb-2">Board Name</label>
+        <label class="block text-sm font-medium text-content-secondary mb-2">Boardname</label>
         <%= form.text_field :name,
             required: true,
-            placeholder: "e.g., Work, Personal, Side Project",
+            placeholder: "z. B. Assets, Social, Print",
             class: "w-full px-3 py-2 text-sm bg-bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-content placeholder-content-muted" %>
       </div>
 
@@ -58,11 +58,11 @@
 
       <div class="flex items-center justify-between pt-2">
         <% if @boards.count > 1 %>
-          <%= link_to board_path(@board),
-              method: :delete,
-              data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this board? All tasks will be permanently deleted." },
+          <%= link_to archive_board_path(@board),
+              method: :patch,
+              data: { turbo_method: :patch, turbo_confirm: "Board archivieren? Karten bleiben erhalten." },
               class: "text-sm text-status-error hover:text-status-error/80 transition-colors cursor-pointer" do %>
-            Delete board
+            Board archivieren
           <% end %>
         <% else %>
           <span></span>
@@ -72,9 +72,9 @@
           <button type="button"
                   onclick="document.getElementById('board-settings-modal').classList.add('hidden')"
                   class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-bg-elevated hover:bg-bg-hover text-content-secondary border border-border transition-colors cursor-pointer">
-            Cancel
+            Abbrechen
           </button>
-          <%= form.submit "Save Changes", class: "px-3 py-1.5 text-xs font-semibold rounded-lg bg-accent text-content-inverse hover:bg-accent-hover transition-colors cursor-pointer" %>
+          <%= form.submit "Speichern", class: "px-3 py-1.5 text-xs font-semibold rounded-lg bg-accent text-content-inverse hover:bg-accent-hover transition-colors cursor-pointer" %>
         </div>
       </div>
     <% end %>

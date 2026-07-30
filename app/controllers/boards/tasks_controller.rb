@@ -22,7 +22,7 @@ class Boards::TasksController < ApplicationController
     if @task.save
       respond_to do |format|
         format.turbo_stream
-        format.html { redirect_to board_path(@board), notice: "Task created." }
+        format.html { redirect_to board_path(@board), notice: "Karte wurde erstellt." }
       end
     else
       respond_to do |format|
@@ -41,7 +41,7 @@ class Boards::TasksController < ApplicationController
     if @task.update(task_params)
       respond_to do |format|
         format.turbo_stream
-        format.html { redirect_to(request.referer.presence || board_task_path(@board, @task), notice: "Task updated.") }
+        format.html { redirect_to(request.referer.presence || board_task_path(@board, @task), notice: "Karte wurde aktualisiert.") }
       end
     else
       render :edit, status: :unprocessable_entity, layout: false
@@ -54,7 +54,7 @@ class Boards::TasksController < ApplicationController
     @task.destroy
     respond_to do |format|
       format.turbo_stream
-      format.html { redirect_to board_path(@board), notice: "Task deleted." }
+      format.html { redirect_to board_path(@board), notice: "Karte wurde gelöscht." }
     end
   end
 
@@ -68,7 +68,7 @@ class Boards::TasksController < ApplicationController
           turbo_stream.replace("task_#{@task.id}_agent_assignment", partial: "boards/tasks/agent_assignment", locals: { task: @task, board: @board })
         ]
       end
-      format.html { redirect_to board_path(@board), notice: "Task assigned to agent." }
+      format.html { redirect_to board_path(@board), notice: "Karte wurde dem Agent zugewiesen." }
     end
   end
 
@@ -82,7 +82,7 @@ class Boards::TasksController < ApplicationController
           turbo_stream.replace("task_#{@task.id}_agent_assignment", partial: "boards/tasks/agent_assignment", locals: { task: @task, board: @board })
         ]
       end
-      format.html { redirect_to board_path(@board), notice: "Task unassigned from agent." }
+      format.html { redirect_to board_path(@board), notice: "Zuweisung wurde entfernt." }
     end
   end
 

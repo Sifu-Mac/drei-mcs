@@ -94,12 +94,12 @@ class TaskActivity < ApplicationRecord
   def format_status(status)
     case status
     when "inbox" then "Inbox"
-    when "planned" then "Planned"
-    when "ready" then "Ready"
-    when "in_progress" then "In Progress"
-    when "blocked" then "Blocked"
-    when "review" then "Review"
-    when "done" then "Done"
+    when "planned" then "Geplant"
+    when "ready" then "Bereit"
+    when "in_progress" then "In Bearbeitung"
+    when "blocked" then "Blockiert"
+    when "review" then "Prüfung"
+    when "done" then "Erledigt"
     else status.to_s.titleize
     end
   end
