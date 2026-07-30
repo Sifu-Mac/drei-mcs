@@ -22,6 +22,21 @@ Wichtige Architekturpunkte:
 - Unversionierte Dateien wie `backup-postgres.sh` auf dem VPS nicht anfassen, sofern nicht explizit beauftragt.
 - Am Ende jeder Arbeitssession muss `docs/HANDOFF.md` aktualisiert werden, bevor ein Abschlussbericht ausgegeben wird.
 
+## Lead-Agent-Arbeitsweise
+
+- Der aktive Hauptagent traegt die Verantwortung als Lead Agent fuer Analyse, Planung, Koordination, Review, Merge-Reihenfolge, Gesamttests, Deployment und Abschlussbericht.
+- Jede Anforderung zuerst analysieren und danach entscheiden, ob sie direkt oder mit Subagents umgesetzt wird.
+- Subagents nur fuer klar getrennte, unabhaengige Teilaufgaben einsetzen.
+- Kleine, zusammenhaengende oder riskante Aenderungen durch den Lead Agent selbst bearbeiten.
+- Niemals mehrere Agenten gleichzeitig an denselben Dateien oder eng gekoppelten Bereichen arbeiten lassen.
+- Parallele Aenderungen nur in getrennten Worktrees oder Branches ausfuehren.
+- Bei groesseren Aufgaben zuerst einen verstaendlichen Plan erstellen, parallelisierbare Teile ausweisen und die Freigabe des Benutzers abwarten.
+- Nach der Freigabe selbststaendig umsetzen und nur bei einem echten technischen Risiko oder einer erforderlichen fachlichen Entscheidung stoppen.
+- Vor Merge und Deployment alle relevanten Tests vollstaendig ausfuehren.
+- Nach erfolgreichem Merge `main` zu GitHub pushen, auf `/docker/drei-review` deployen und Production pruefen.
+- Reine Dokumentationsaenderungen erfordern keinen Production-Rebuild; der Healthcheck bleibt dennoch Pflicht.
+- Vor jedem Abschlussbericht `docs/HANDOFF.md` aktualisieren.
+
 ## VPS- und Docker-Struktur
 
 Nur dieses Projekt bearbeiten:

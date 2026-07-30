@@ -8,7 +8,7 @@ Stand: 2026-07-30
 - VPS-Projektpfad: `/docker/drei-review`
 - Live-URL: `https://drei.digitalbackup.cloud`
 - Aktueller Branch: `main`
-- Repository-Stand vor dieser Handoff-Aktualisierung: `5b3afe0 Update QA fix handoff`
+- Repository-Stand vor dieser Handoff-Aktualisierung: `1847dae Add maintained project roadmap`
 - Deployter Code-Commit: `e8fab25 Merge PWA icon fix`
 - Aktuelle QA-Fix-Commits: `2a94ffe Fix production QA issues`, `642bdda Fix PWA icon links`
 - VPS-Git-Status nach Deployment: `main...origin/main`, nur `backup-postgres.sh` ist unversioniert und unberuehrt.
@@ -164,6 +164,7 @@ Repository, Betrieb und Arbeitsgrundlage:
 - Automatische taegliche PostgreSQL-Backups per aktivem Systemd-Timer eingerichtet; letzter verifizierter Lauf am 2026-07-30 erfolgreich.
 - Aufbewahrung der letzten 14 lokalen Backups im Backup-Skript konfiguriert.
 - `AGENTS.md` und `docs/HANDOFF.md` als dauerhafte Arbeits- und Uebergabedokumentation eingerichtet.
+- Lead-Agent-Arbeitsweise mit Regeln fuer Planung, Subagents, getrennte Worktrees, Review, Tests, Merge und Deployment dauerhaft in `AGENTS.md` verankert.
 - SSH-Zugriff vom Mac zum VPS und Codex CLI auf dem VPS eingerichtet.
 - VPS per SSH mit GitHub verbunden; direkte Commits und Pushes vom VPS funktionieren.
 
