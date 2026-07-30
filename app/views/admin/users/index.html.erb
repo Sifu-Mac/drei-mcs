@@ -66,7 +66,7 @@
                 <div class="flex items-center justify-between gap-3">
                   <span><%= user_data[:email] %></span>
                   <% unless user_data[:user] == current_user %>
-                    <%= button_to "Delete",
+                    <%= button_to "Löschen",
                         admin_user_path(user_data[:user]),
                         method: :delete,
                         data: { turbo_confirm: "User wirklich löschen?" },

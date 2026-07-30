@@ -1,11 +1,11 @@
-<%# New Board Modal — shared between board and home pages %>
-<div id="new-board-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
-  <div class="absolute inset-0 bg-slate-900/25 backdrop-blur-sm" onclick="document.getElementById('new-board-modal').classList.add('hidden')"></div>
+<% if internal_workspace_member? %>
+<div id="new-campaign-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+  <div class="absolute inset-0 bg-slate-900/25 backdrop-blur-sm" onclick="document.getElementById('new-campaign-modal').classList.add('hidden')"></div>
   <div class="relative bg-bg-surface border border-border rounded-xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden" style="box-shadow:0 24px 70px rgba(15,23,42,0.18);">
     <div class="px-5 py-4 border-b border-border flex items-center justify-between">
-      <span class="text-sm font-bold text-content">New Board</span>
+      <span class="text-sm font-bold text-content">Neue Kampagne</span>
       <button type="button"
-              onclick="document.getElementById('new-board-modal').classList.add('hidden')"
+              onclick="document.getElementById('new-campaign-modal').classList.add('hidden')"
               class="p-2 rounded-lg text-content-muted hover:text-content hover:bg-bg-hover transition-colors cursor-pointer">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -13,52 +13,25 @@
       </button>
     </div>
 
-    <%= form_with model: Board.new, url: boards_path, class: "p-5 space-y-4" do |form| %>
+    <%= form_with model: Campaign.new, url: campaigns_path, class: "p-5 space-y-4" do |form| %>
       <div>
-        <label class="block text-sm font-medium text-content-secondary mb-2">Board Name</label>
+        <label class="block text-sm font-medium text-content-secondary mb-2">Kampagnenname</label>
         <%= form.text_field :name,
             required: true,
-            placeholder: "e.g., Work, Personal, Side Project",
+            placeholder: "z. B. Herbstkampagne",
             class: "w-full px-3 py-2 text-sm bg-bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-content placeholder-content-muted" %>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-content-secondary mb-2">Icon</label>
-        <div class="flex flex-wrap gap-2" id="icon-group">
-          <% available_icons = Board::DEFAULT_ICONS.dup %>
-          <% if current_user.agent_last_active_at.present? && current_user.agent_emoji.present? && !available_icons.include?(current_user.agent_emoji) %>
-            <% available_icons << current_user.agent_emoji %>
-          <% end %>
-          <% available_icons.each do |icon| %>
-            <button type="button"
-                    onclick="selectBoardIcon(this, '<%= icon %>')"
-                    data-icon="<%= icon %>"
-                    class="w-10 h-10 flex items-center justify-center rounded-lg bg-bg-card hover:bg-bg-hover border border-border transition-colors text-xl cursor-pointer <%= icon == '📋' ? 'ring-2 ring-accent' : '' %>">
-              <%= icon %>
-            </button>
-          <% end %>
-        </div>
-        <%= form.hidden_field :icon, value: "📋", id: "board-icon-field" %>
       </div>
 
       <div class="flex items-center justify-end gap-3 pt-2">
         <button type="button"
-                onclick="document.getElementById('new-board-modal').classList.add('hidden')"
+                onclick="document.getElementById('new-campaign-modal').classList.add('hidden')"
                 class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-bg-elevated hover:bg-bg-hover text-content-secondary border border-border transition-colors cursor-pointer">
-          Cancel
+          Abbrechen
         </button>
-        <%= form.submit "Create Board", class: "px-3 py-1.5 text-xs font-semibold rounded-lg bg-accent text-content-inverse hover:bg-accent-hover transition-colors cursor-pointer" %>
+        <%= form.submit "Kampagne erstellen", class: "px-3 py-1.5 text-xs font-semibold rounded-lg bg-accent text-content-inverse hover:bg-accent-hover transition-colors cursor-pointer" %>
       </div>
     <% end %>
   </div>
 </div>
 
-<script>
-  function selectBoardIcon(btn, icon) {
-    document.getElementById('board-icon-field').value = icon;
-    document.querySelectorAll('#icon-group button').forEach(b => {
-      b.classList.remove('ring-2', 'ring-accent');
-    });
-    btn.classList.add('ring-2', 'ring-accent');
-  }
-</script>
+<% end %>

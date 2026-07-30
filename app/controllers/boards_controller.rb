@@ -1,30 +1,33 @@
 class BoardsController < ApplicationController
-  before_action :set_board, only: [:show, :update, :destroy, :update_task_status]
+  before_action :set_board, only: [:show, :update, :destroy, :duplicate, :archive, :restore, :update_task_status]
+  before_action :require_internal_workspace_member, only: [:create, :update, :destroy, :duplicate, :archive, :restore]
 
   def index
+    workspace = current_user.current_workspace || current_user.owned_workspaces.create!(name: "DREI Asset Review")
     @board = current_user.current_workspace_boards.reorder(:position, :created_at).first
 
     if @board
       redirect_to board_path(@board)
-    else
-      workspace = current_user.current_workspace || current_user.owned_workspaces.create!(name: "DREI Asset Review")
-      @board = workspace.boards.create!(user: current_user, name: "DREI Asset Review", icon: "📋", color: "gray")
+    elsif internal_workspace_member?
+      campaign = workspace.campaigns.active.find_or_create_by!(name: "Allgemein")
+      @board = workspace.boards.create!(user: current_user, campaign: campaign, name: "DREI Asset Review", icon: "📋", color: "gray")
       redirect_to board_path(@board)
+    else
+      redirect_to home_path, alert: "Es ist noch kein Board verfügbar."
     end
   end
 
   def show
     @board_page = true
+    @active_campaign = @board.campaign
     session[:last_board_id] = @board.id
     @tasks = @board.tasks.includes(:user)
 
-    # Filter by tag if specified
     if params[:tag].present?
       @tasks = @tasks.where("? = ANY(tags)", params[:tag])
       @current_tag = params[:tag]
     end
 
-    # Group tasks by status
     @columns = {
       inbox: @tasks.inbox.order(position: :asc),
       planned: @tasks.planned.order(position: :asc),
@@ -35,22 +38,19 @@ class BoardsController < ApplicationController
       done: @tasks.done.order(position: :asc)
     }
 
-    # Get all unique tags for the sidebar filter
     @all_tags = @board.tasks.where.not(tags: []).pluck(:tags).flatten.uniq.sort
-
-    # Get all boards for the sidebar
+    @campaigns = current_user.current_workspace_campaigns.includes(:boards)
     @boards = current_user.current_workspace_boards
-
-    # Get API token for agent status display
     @api_token = current_user.api_token
   end
 
   def create
     workspace = current_user.current_workspace || current_user.owned_workspaces.create!(name: "DREI Asset Review")
-    @board = workspace.boards.new(board_params.merge(user: current_user))
+    campaign = workspace.campaigns.active.find(params[:board][:campaign_id])
+    @board = workspace.boards.new(board_params.merge(user: current_user, campaign: campaign))
 
     if @board.save
-      redirect_to board_path(@board), notice: "Board created."
+      redirect_to board_path(@board), notice: "Board wurde erstellt."
     else
       redirect_to boards_path, alert: @board.errors.full_messages.join(", ")
     end
@@ -58,25 +58,38 @@ class BoardsController < ApplicationController
 
   def update
     if @board.update(board_params)
-      redirect_to board_path(@board), notice: "Board updated."
+      redirect_back fallback_location: board_path(@board), notice: "Board wurde umbenannt."
     else
       redirect_to board_path(@board), alert: @board.errors.full_messages.join(", ")
     end
   end
 
   def destroy
-    # Don't allow deleting the last board
-    if @board.workspace.boards.count <= 1
-      redirect_to board_path(@board), alert: "Cannot delete your only board."
+    archive
+  end
+
+  def duplicate
+    copy = @board.duplicate_to!(campaign: @board.campaign, user: current_user)
+    redirect_to board_path(copy), notice: "Board wurde dupliziert."
+  end
+
+  def archive
+    if @board.campaign.boards.count <= 1 && @board.workspace.campaigns.active.joins(:boards).where(boards: { archived_at: nil }).distinct.count <= 1
+      redirect_to board_path(@board), alert: "Das einzige aktive Board kann nicht archiviert werden."
       return
     end
 
-    @board.destroy
-    redirect_to boards_path, notice: "Board deleted."
+    @board.archive!
+    redirect_to boards_path, notice: "Board wurde archiviert."
+  end
+
+  def restore
+    @board.restore!
+    @board.campaign.restore! if @board.campaign.archived?
+    redirect_to board_path(@board), notice: "Board wurde wiederhergestellt."
   end
 
   def update_task_status
-    # Update positions for all tasks in the column
     if params[:task_ids].present?
       params[:task_ids].each_with_index do |task_id, index|
         task = @board.tasks.find(task_id)
@@ -84,7 +97,6 @@ class BoardsController < ApplicationController
       end
     end
 
-    # If a specific task changed status (moved between columns)
     if params[:task_id].present? && params[:status].present?
       @task = @board.tasks.find(params[:task_id])
       @task.activity_source = "web"
@@ -97,7 +109,10 @@ class BoardsController < ApplicationController
   private
 
   def set_board
-    @board = current_user.current_workspace_boards.find(params[:id])
+    @board = Board.unscoped.joins(:campaign)
+      .where(workspace_id: current_user.current_workspace&.id)
+      .where(campaigns: { workspace_id: current_user.current_workspace&.id })
+      .find(params[:id])
   end
 
   def board_params

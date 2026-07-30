@@ -72,7 +72,7 @@
           <%= form.text_field :name,
               placeholder: "Task title",
               class: "w-full bg-transparent border-0 outline-none p-0 text-xl md:text-[20px] font-extrabold leading-tight text-content",
-              data: { task_modal_target: "nameField", action: "input->task-modal#scheduleAutoSave" } %>
+              data: { task_modal_target: "nameField", action: "input->task-modal#scheduleAutoSpeichern" } %>
         </div>
 
         <!-- Notes -->
@@ -81,11 +81,11 @@
           <%= form.text_area :description,
               placeholder: "Add notes...",
               class: "w-full min-h-[140px] md:min-h-[120px] p-3.5 rounded-xl border border-border bg-bg-elevated text-[14px] text-content-secondary resize-y outline-none leading-6 placeholder:text-content-muted focus:ring-2 focus:ring-accent",
-              data: { task_modal_target: "descriptionField", action: "input->task-modal#scheduleAutoSave" } %>
+              data: { task_modal_target: "descriptionField", action: "input->task-modal#scheduleAutoSpeichern" } %>
         </div>
 
         <!-- Hidden submit button (triggered programmatically) -->
-        <%= form.submit "Save", class: "hidden", data: { task_modal_target: "submitButton" } %>
+        <%= form.submit "Speichern", class: "hidden", data: { task_modal_target: "submitButton" } %>
       <% end %>
 
       <%# === Details section: status, priority, agent — outside form === %>
@@ -126,7 +126,7 @@
           </div>
         </div>
 
-        <!-- Priority row -->
+        <!-- Priorität row -->
         <%
           priority_cycle = %w[none low medium high]
           priority_config = {
@@ -138,9 +138,9 @@
           current_p = priority_config[task.priority] || priority_config["none"]
         %>
         <div class="space-y-2">
-          <span class="text-xs font-medium text-content-muted">Priority</span>
+          <span class="text-xs font-medium text-content-muted">Priorität</span>
           <button type="button"
-                  data-action="click->task-modal#cyclePriority"
+                  data-action="click->task-modal#cyclePriorität"
                   data-task-modal-target="priorityButton"
                   data-priority-value="<%= task.priority %>"
                   class="w-full md:w-[100px] h-11 md:h-[30px] rounded-lg md:rounded-[7px] cursor-pointer flex items-center justify-center gap-2 transition-all"
@@ -164,7 +164,7 @@
               form: dom_id(task, :edit),
               id: nil,
               class: "w-full h-11 px-3 rounded-lg bg-bg-surface border border-border text-content text-sm font-semibold outline-none focus:ring-2 focus:ring-accent",
-              data: { action: "change->task-modal#scheduleAutoSave" } %>
+              data: { action: "change->task-modal#scheduleAutoSpeichern" } %>
         </div>
 
         <!-- Agent row -->
@@ -176,7 +176,7 @@
                     class="w-full h-11 flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all"
                     style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.2)">
               <span style="font-size:11px">🤖</span>
-              <span style="font-size:11px;font-weight:600;color:#fbbf24">Assigned</span>
+              <span style="font-size:11px;font-weight:600;color:#fbbf24">Zugewiesen</span>
             </button>
           <% else %>
             <% agent_connected = current_user.agent_last_active_at.present? %>
@@ -186,13 +186,13 @@
                       class="w-full h-11 flex items-center justify-center gap-2 rounded-lg cursor-pointer transition-all"
                       style="background:#ffffff;border:1px solid #e5e7eb">
                 <span style="font-size:11px">🤖</span>
-                <span style="font-size:11px;font-weight:600;color:#4b5563">Assign</span>
+                <span style="font-size:11px;font-weight:600;color:#4b5563">Zuweisen</span>
               </button>
             <% else %>
               <span class="w-full h-11 flex items-center justify-center gap-2 rounded-lg cursor-not-allowed"
                     style="background:#f9fafb;border:1px solid #e5e7eb">
                 <span style="font-size:11px">🤖</span>
-                <span style="font-size:11px;font-weight:600;color:#666">Assign unavailable</span>
+                <span style="font-size:11px;font-weight:600;color:#666">Zuweisung nicht verfügbar</span>
               </span>
             <% end %>
           <% end %>
@@ -210,7 +210,7 @@
               <%= agent_done ? 'Agent finished — needs review' : 'Agent is working on this' %>
             </div>
             <div style="font-size:11px;font-weight:500;color:#6b7280;margin-top:2px">
-              <%= agent_done ? 'Review changes before moving to Done' : 'Check back soon for updates' %>
+              <%= agent_done ? 'Änderungen prüfen, bevor die Karte erledigt wird' : 'Später erneut auf Updates prüfen' %>
             </div>
           </div>
         </div>
@@ -261,9 +261,9 @@
         </div>
       <% end %>
 
-      <!-- Comments -->
+      <!-- Kommentare -->
       <div class="rounded-2xl border border-border bg-bg-elevated p-4 md:p-5">
-        <div style="font-size:13px;font-weight:700;color:#1f2937;margin-bottom:14px">Comments</div>
+        <div style="font-size:13px;font-weight:700;color:#1f2937;margin-bottom:14px">Kommentare</div>
         <div style="display:flex;flex-direction:column;gap:12px">
           <%= render "boards/comments/list", task: task %>
           <%= render "boards/comments/form", board: @board, task: task %>
@@ -283,7 +283,7 @@
         <button type="button"
                 data-action="click->task-modal#deleteTask"
                 class="flex-1 md:flex-none min-h-11 px-4 py-2.5 rounded-xl border border-red-500/20 bg-red-500/10 text-red-300 text-sm md:text-xs font-bold cursor-pointer hover:bg-red-500/15 transition-colors">
-          Delete
+          Löschen
         </button>
         <button type="button"
                 data-action="click->task-modal#close"

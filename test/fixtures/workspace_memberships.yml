@@ -12,3 +12,9 @@ two_owner:
   workspace: secondary
   user: two
   role: owner
+
+
+client_member:
+  workspace: primary
+  user: client
+  role: client

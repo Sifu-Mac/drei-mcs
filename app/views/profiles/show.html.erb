@@ -1,5 +1,5 @@
-<% content_for :title, "Settings" %>
-<% content_for :breadcrumb_standalone, "Settings" %>
+<% content_for :title, "Einstellungen" %>
+<% content_for :breadcrumb_standalone, "Einstellungen" %>
 
 <div class="space-y-6 mt-12">
   <!-- Section 1: Profile -->
@@ -56,7 +56,7 @@
       </div>
 
       <div class="pt-2">
-        <%= form.submit "Save profile", class: "cursor-pointer px-4 py-2 bg-accent text-content hover:bg-accent-hover text-xs font-semibold rounded-md transition-colors duration-200" %>
+        <%= form.submit "Profil speichern", class: "cursor-pointer px-4 py-2 bg-accent text-content hover:bg-accent-hover text-xs font-semibold rounded-md transition-colors duration-200" %>
       </div>
     <% end %>
   </div>
@@ -69,7 +69,7 @@
     </div>
 
     <p class="text-xs text-content-secondary">
-      Connect your OpenClaw agent to DREI Asset Review. Copy the prompt below and add it to your agent's configuration.
+      Verbinde deinen OpenClaw-Agent mit DREI Asset Review. Kopiere den Prompt und füge ihn in der Agent-Konfiguration ein.
     </p>
 
     <% api_url = "#{request.base_url}/api/v1" %>
@@ -106,9 +106,9 @@
         <pre
           data-clipboard-target="source"
           class="px-3 py-3 text-xs font-mono text-content-secondary whitespace-pre-wrap break-words leading-relaxed">
-# DREI Asset Review - Your Work Dashboard
+# DREI Asset Review - Dein Arbeitsboard
 
-DREI Asset Review is where your human manages projects, tasks and reviews. Think of it as your shared operating board.
+DREI Asset Review ist der Ort, an dem Kampagnen, Karten und Prüfungen gesteuert werden. Betrachte es als gemeinsames Arbeitsboard.
 
 ## How it works
 
@@ -174,7 +174,7 @@ Body: `{ "name": "Task title", "status": "inbox" }`
 - `ready` — Prioritized and ready to execute
 - `in_progress` — You're working on it
 - `blocked` — Stuck and waiting for input
-- `review` — Done, needs human review
+- `review` - erledigt, benötigt menschliche Prüfung
 - `done` — Complete
 
 ## Priorities

@@ -3,6 +3,7 @@ class Workspace < ApplicationRecord
 
   has_many :workspace_memberships, dependent: :destroy
   has_many :members, through: :workspace_memberships, source: :user
+  has_many :campaigns, dependent: :restrict_with_error
   has_many :boards, dependent: :destroy
 
   validates :name, presence: true

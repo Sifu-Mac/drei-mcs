@@ -1,26 +1,93 @@
-<aside class="hidden lg:flex lg:w-[220px] xl:w-[240px] shrink-0 flex-col border-r border-border bg-bg-surface">
+<% campaigns = defined?(@campaigns) && @campaigns ? @campaigns : current_user.current_workspace_campaigns.includes(:boards) %>
+<% active_campaign_id = @active_campaign&.id || @board&.campaign_id %>
+
+<aside class="hidden lg:flex lg:w-[260px] xl:w-[280px] shrink-0 flex-col border-r border-border bg-bg-surface">
   <div class="px-4 py-4 border-b border-border">
-    <div class="text-[11px] font-semibold uppercase tracking-[0.08em] text-content-muted">Boards</div>
+    <div class="text-[11px] font-semibold uppercase tracking-[0.08em] text-content-muted">Kampagnen</div>
   </div>
 
-  <div class="flex-1 overflow-y-auto px-2 py-3 space-y-1.5">
-    <% @boards.each do |board| %>
-      <% active = @board&.id == board.id %>
-      <%= link_to board_path(board),
-          class: "flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors #{active ? 'bg-accent/10' : 'hover:bg-bg-hover'}",
-          data: { turbo_frame: "_top" } do %>
-        <span class="text-base leading-none"><%= board.icon %></span>
-        <span class="text-[13px] font-semibold truncate #{active ? 'text-accent' : 'text-content-secondary'}"><%= board.name %></span>
-      <% end %>
+  <div class="flex-1 overflow-y-auto px-2 py-3 space-y-3">
+    <% campaigns.each do |campaign| %>
+      <% campaign_active = active_campaign_id == campaign.id %>
+      <details class="group/campaign rounded-xl border <%= campaign_active ? 'border-blue-200 bg-accent-light' : 'border-transparent' %>" <%= "open" if campaign_active %>>
+        <summary class="flex cursor-pointer list-none items-center gap-2 rounded-xl px-2.5 py-2 text-content-secondary hover:bg-bg-hover">
+          <svg class="h-3.5 w-3.5 text-content-muted transition-transform group-open/campaign:rotate-90" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="min-w-0 flex-1 truncate text-[13px] font-bold <%= campaign_active ? 'text-accent' : 'text-content' %>"><%= campaign.name %></span>
+          <% if internal_workspace_member? %>
+            <details class="relative" onclick="event.stopPropagation()">
+              <summary class="flex h-7 w-7 cursor-pointer list-none items-center justify-center rounded-lg text-content-muted hover:bg-bg-hover hover:text-content" aria-label="Kampagnenaktionen">
+                <span class="text-lg leading-none">...</span>
+              </summary>
+              <div class="absolute right-0 top-8 z-50 w-56 rounded-xl border border-border bg-bg-card p-2 shadow-lg">
+                <%= form_with model: campaign, url: campaign_path(campaign), method: :patch, class: "space-y-2" do |form| %>
+                  <%= form.text_field :name, required: true, aria: { label: "Kampagne umbenennen" }, class: "w-full rounded-lg border border-border bg-bg-card px-2 py-1.5 text-xs text-content focus:outline-none focus:ring-2 focus:ring-accent" %>
+                  <%= form.submit "Umbenennen", class: "w-full rounded-lg bg-accent px-2 py-1.5 text-xs font-semibold text-content-inverse hover:bg-accent-hover cursor-pointer" %>
+                <% end %>
+                <div class="my-2 h-px bg-border"></div>
+                <%= button_to "Duplizieren", duplicate_campaign_path(campaign), method: :post, class: "w-full rounded-lg px-2 py-1.5 text-left text-xs font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer" %>
+                <%= button_to "Archivieren", archive_campaign_path(campaign), method: :patch, data: { turbo_confirm: "Kampagne archivieren? Die enthaltenen Boards bleiben erhalten." }, class: "w-full rounded-lg px-2 py-1.5 text-left text-xs font-semibold text-status-error hover:bg-red-50 cursor-pointer" %>
+              </div>
+            </details>
+          <% end %>
+        </summary>
+
+        <div class="pb-2 pl-6 pr-2 space-y-1">
+          <% campaign.boards.active.ordered.each do |board| %>
+            <% active = @board&.id == board.id %>
+            <div class="flex items-center gap-1">
+              <%= link_to board_path(board), class: "min-w-0 flex flex-1 items-center gap-2 rounded-lg px-2.5 py-2 transition-colors #{active ? 'bg-white text-accent shadow-sm' : 'text-content-secondary hover:bg-bg-hover'}", data: { turbo_frame: "_top" } do %>
+                <span class="text-sm leading-none"><%= board.icon %></span>
+                <span class="truncate text-[13px] font-semibold"><%= board.name %></span>
+              <% end %>
+              <% if internal_workspace_member? %>
+                <details class="relative">
+                  <summary class="flex h-7 w-7 cursor-pointer list-none items-center justify-center rounded-lg text-content-muted hover:bg-bg-hover hover:text-content" aria-label="Boardaktionen">
+                    <span class="text-lg leading-none">...</span>
+                  </summary>
+                  <div class="absolute right-0 top-8 z-50 w-56 rounded-xl border border-border bg-bg-card p-2 shadow-lg">
+                    <%= form_with model: board, url: board_path(board), method: :patch, class: "space-y-2" do |form| %>
+                      <%= form.text_field :name, required: true, aria: { label: "Board umbenennen" }, class: "w-full rounded-lg border border-border bg-bg-card px-2 py-1.5 text-xs text-content focus:outline-none focus:ring-2 focus:ring-accent" %>
+                      <%= form.submit "Umbenennen", class: "w-full rounded-lg bg-accent px-2 py-1.5 text-xs font-semibold text-content-inverse hover:bg-accent-hover cursor-pointer" %>
+                    <% end %>
+                    <div class="my-2 h-px bg-border"></div>
+                    <%= button_to "Duplizieren", duplicate_board_path(board), method: :post, class: "w-full rounded-lg px-2 py-1.5 text-left text-xs font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer" %>
+                    <%= button_to "Archivieren", archive_board_path(board), method: :patch, data: { turbo_confirm: "Board archivieren? Karten bleiben erhalten." }, class: "w-full rounded-lg px-2 py-1.5 text-left text-xs font-semibold text-status-error hover:bg-red-50 cursor-pointer" %>
+                  </div>
+                </details>
+              <% end %>
+            </div>
+          <% end %>
+
+          <% if internal_workspace_member? %>
+            <details class="rounded-lg">
+              <summary class="flex cursor-pointer list-none items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] font-semibold text-content-muted hover:bg-bg-hover hover:text-accent">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                Board hinzufügen
+              </summary>
+              <%= form_with model: Board.new, url: boards_path, class: "mt-2 space-y-2 px-2" do |form| %>
+                <%= form.hidden_field :campaign_id, value: campaign.id %>
+                <%= form.text_field :name, required: true, placeholder: "Boardname", class: "w-full rounded-lg border border-border bg-bg-card px-2 py-1.5 text-xs text-content placeholder-content-muted focus:outline-none focus:ring-2 focus:ring-accent" %>
+                <%= form.hidden_field :icon, value: "📋" %>
+                <%= form.submit "Erstellen", class: "w-full rounded-lg bg-accent px-2 py-1.5 text-xs font-semibold text-content-inverse hover:bg-accent-hover cursor-pointer" %>
+              <% end %>
+            </details>
+          <% end %>
+        </div>
+      </details>
     <% end %>
   </div>
 
-  <div class="px-3 py-3 border-t border-border">
-    <button type="button"
-            onclick="document.getElementById('new-board-modal').classList.remove('hidden')"
-            class="w-full flex items-center justify-center gap-2 rounded-xl bg-bg-elevated hover:bg-bg-hover text-content-secondary text-[13px] font-semibold px-3 py-2.5 transition-colors cursor-pointer border border-border">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-      New board
-    </button>
-  </div>
+  <% if internal_workspace_member? %>
+    <div class="space-y-2 border-t border-border px-3 py-3">
+      <button type="button"
+              onclick="document.getElementById('new-campaign-modal').classList.remove('hidden')"
+              class="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-bg-elevated px-3 py-2.5 text-[13px] font-semibold text-content-secondary transition-colors hover:bg-bg-hover cursor-pointer">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        Neue Kampagne
+      </button>
+      <%= link_to "Archivierte Kampagnen", archived_campaigns_path, class: "block rounded-lg px-2 py-1.5 text-center text-xs font-semibold text-content-muted hover:bg-bg-hover hover:text-content" %>
+    </div>
+  <% end %>
 </aside>

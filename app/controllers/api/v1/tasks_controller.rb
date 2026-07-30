@@ -129,7 +129,7 @@ module Api
           current_user.current_workspace_boards.find(board_id)
         else
           workspace = current_user.current_workspace || current_user.owned_workspaces.create!(name: "DREI Asset Review")
-          current_user.current_workspace_boards.first || workspace.boards.create!(user: current_user, name: "DREI Asset Review", icon: "📋", color: "gray")
+          current_user.current_workspace_boards.first || workspace.boards.create!(user: current_user, campaign: workspace.campaigns.active.find_or_create_by!(name: "Allgemein"), name: "DREI Asset Review", icon: "📋", color: "gray")
         end
 
         @task = board.tasks.new(task_params)
