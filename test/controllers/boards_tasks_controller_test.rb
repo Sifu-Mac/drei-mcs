@@ -29,6 +29,16 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_nil task.reload.archived_at
   end
 
+  test "task panel renders in turbo frame" do
+    sign_in_as users(:admin)
+
+    get board_task_path(boards(:one), tasks(:one)), headers: { "Turbo-Frame" => "task_panel" }
+
+    assert_response :success
+    assert_includes response.body, 'id="task_panel"'
+    assert_includes response.body, tasks(:one).board_column.name
+  end
+
   test "client cannot mutate card" do
     sign_in_as users(:client)
 
