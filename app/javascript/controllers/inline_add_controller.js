@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 // Connects to data-controller="inline-add"
 // Handles Trello-style inline card creation
 export default class extends Controller {
-  static targets = ["form", "button", "input"]
+  static targets = ["form", "button", "input", "submit", "error"]
   static values = {
     columnId: String,
     url: String
@@ -21,6 +21,7 @@ export default class extends Controller {
     this.buttonTarget.classList.add("hidden")
     this.formTarget.classList.remove("hidden")
     this.inputTarget.focus()
+    this.clearError()
     // Add click outside listener after a brief delay to avoid immediate trigger
     setTimeout(() => {
       document.addEventListener("click", this.handleClickOutside)
@@ -31,6 +32,7 @@ export default class extends Controller {
     this.formTarget.classList.add("hidden")
     this.buttonTarget.classList.remove("hidden")
     this.inputTarget.value = ""
+    this.clearError()
     document.removeEventListener("click", this.handleClickOutside)
   }
 
@@ -42,6 +44,8 @@ export default class extends Controller {
   }
 
   handleKeydown(event) {
+    this.clearError()
+
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault()
       this.submit()
@@ -52,7 +56,10 @@ export default class extends Controller {
 
   async submit() {
     const title = this.inputTarget.value.trim()
-    if (!title) return
+    if (!title) {
+      this.showError()
+      return
+    }
 
     try {
       const response = await fetch(this.urlValue, {
@@ -79,11 +86,29 @@ export default class extends Controller {
         this.inputTarget.value = ""
         this.inputTarget.focus()
       } else {
-        console.error("Failed to create task")
+        this.showError("Karte konnte nicht erstellt werden.")
       }
     } catch (error) {
       console.error("Error creating task:", error)
+      this.showError("Karte konnte nicht erstellt werden.")
     }
+  }
+
+  clearError() {
+    if (!this.hasErrorTarget) return
+
+    this.errorTarget.textContent = ""
+    this.errorTarget.classList.add("hidden")
+    this.inputTarget.removeAttribute("aria-invalid")
+  }
+
+  showError(message = "Bitte einen Kartentitel eingeben.") {
+    if (!this.hasErrorTarget) return
+
+    this.errorTarget.textContent = message
+    this.errorTarget.classList.remove("hidden")
+    this.inputTarget.setAttribute("aria-invalid", "true")
+    this.inputTarget.focus()
   }
 
   get csrfToken() {

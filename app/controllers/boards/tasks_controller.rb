@@ -49,8 +49,12 @@ class Boards::TasksController < ApplicationController
   end
 
   def duplicate
-    copy = @task.duplicate_for!(user: current_user)
-    redirect_to board_task_path(@board, copy), notice: "Karte wurde dupliziert."
+    @copy = @task.duplicate_for!(user: current_user)
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to board_path(@board), notice: "Karte wurde dupliziert." }
+    end
   end
 
   def archive

@@ -1,0 +1,16 @@
+<%= turbo_stream.append "column-#{@copy.board_column_id}" do %>
+  <%= render "boards/task_card", task: @copy %>
+<% end %>
+
+<% column_count = @board.tasks.where(board_column_id: @copy.board_column_id).count %>
+<%= turbo_stream.replace "column-#{@copy.board_column_id}-count" do %>
+  <span id="column-<%= @copy.board_column_id %>-count"
+        class="shrink-0"
+        style="font-size:12px;font-weight:700;color:#4b5563;background:#eaf1ff;padding:0 8px;border-radius:7px;line-height:24px"><%= column_count %></span>
+<% end %>
+
+<%= turbo_stream.replace "task_panel" do %>
+  <%= turbo_frame_tag "task_panel" do %>
+    <%= render "boards/tasks/panel", task: @copy %>
+  <% end %>
+<% end %>

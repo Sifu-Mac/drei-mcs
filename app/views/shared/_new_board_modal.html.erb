@@ -1,11 +1,20 @@
 <% if internal_workspace_member? %>
-<div id="new-campaign-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
-  <div class="absolute inset-0 bg-slate-900/25 backdrop-blur-sm" onclick="document.getElementById('new-campaign-modal').classList.add('hidden')"></div>
+<div id="new-campaign-modal"
+     data-modal-manager-target="modal"
+     aria-hidden="true"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="new-campaign-modal-title"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center"
+     data-action="click->modal-manager#closeOnBackdrop">
+  <div class="absolute inset-0 bg-slate-900/25 backdrop-blur-sm"
+       data-action="click->modal-manager#close"></div>
   <div class="relative bg-bg-surface border border-border rounded-xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden" style="box-shadow:0 24px 70px rgba(15,23,42,0.18);">
     <div class="px-5 py-4 border-b border-border flex items-center justify-between">
-      <span class="text-sm font-bold text-content">Neue Kampagne</span>
+      <span id="new-campaign-modal-title" class="text-sm font-bold text-content">Neue Kampagne</span>
       <button type="button"
-              onclick="document.getElementById('new-campaign-modal').classList.add('hidden')"
+              data-action="click->modal-manager#close"
+              aria-label="Dialog schließen"
               class="p-2 rounded-lg text-content-muted hover:text-content hover:bg-bg-hover transition-colors cursor-pointer">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -24,7 +33,7 @@
 
       <div class="flex items-center justify-end gap-3 pt-2">
         <button type="button"
-                onclick="document.getElementById('new-campaign-modal').classList.add('hidden')"
+                data-action="click->modal-manager#close"
                 class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-bg-elevated hover:bg-bg-hover text-content-secondary border border-border transition-colors cursor-pointer">
           Abbrechen
         </button>

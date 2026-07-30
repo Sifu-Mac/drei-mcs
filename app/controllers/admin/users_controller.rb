@@ -24,7 +24,7 @@ module Admin
       @new_user = User.new(user_params)
 
       if @new_user.save
-        redirect_to admin_users_path, notice: "User created."
+        redirect_to admin_users_path, notice: "Benutzer wurde erstellt."
       else
         index
         render :index, status: :unprocessable_entity
@@ -35,12 +35,12 @@ module Admin
       user = User.find(params[:id])
 
       if user == current_user
-        redirect_to admin_users_path, alert: "You cannot delete your own account."
+        redirect_to admin_users_path, alert: "Das eigene Konto kann nicht gelöscht werden."
       elsif user.admin? && User.where(admin: true).count <= 1
-        redirect_to admin_users_path, alert: "Cannot delete the last admin."
+        redirect_to admin_users_path, alert: "Der letzte Admin kann nicht gelöscht werden."
       else
         user.destroy!
-        redirect_to admin_users_path, notice: "User deleted."
+        redirect_to admin_users_path, notice: "Benutzer wurde gelöscht."
       end
     end
 

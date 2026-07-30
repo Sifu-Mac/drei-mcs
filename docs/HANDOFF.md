@@ -111,33 +111,33 @@ Production-Smoke:
 
 ## Letzter Browser-QA-Stand
 
-Browser-QA gegen `https://drei.digitalbackup.cloud` wurde am 2026-07-30 mit Playwright-Fallback ausgefuehrt, weil der In-App-Browser in der lokalen Sitzung nicht verfuegbar war. Es wurden keine mutierenden Aktionen ausgefuehrt.
+Umfassender Browser-QA-Lauf gegen `https://drei.digitalbackup.cloud` am 2026-07-30 mit isoliertem Headless-Chromium/Selenium-Fallback, weil `Browser Use` in der Sitzung nicht als Tool verfuegbar war. Fuer mutierende Flows wurde nach ausdruecklicher Freigabe ein temporaerer Admin-/Owner-Benutzer verwendet. Der Benutzer, seine Sessions, API-Tokens und beide erzeugten `CODEX-QA-*`-Karten wurden danach geloescht; die Bereinigung wurde mit 0 verbleibenden QA-Benutzern und 0 QA-Karten verifiziert.
 
 Geprueft:
-- Login und Redirect auf Board.
-- Boardansicht, Karten, Spalten, Kartenmenue, Spaltenmenue, Task-Panel, Archivseite.
-- Links zu `/boards`, `/settings`, `/admin`, `/admin/invites` und Task-Detailrouten.
-- Responsive Desktop, Laptop, Tablet und Mobile.
-- Unauthentifizierter Zugriff auf `/boards`.
+- Public Login, fehlende oeffentliche Registrierung, Passwort-Reset-Link und Login-Redirect.
+- Boardansicht, komplette Kartenflaeche, Kartenmenue, Kartenanlage, Kartenkopie, Task-Panel, Spaltenmenue und Kampagnenmodal.
+- Direkte Seiten und interne Links fuer `/boards`, `/settings`, `/admin`, `/admin/users`, `/admin/invites`, Task-Detailrouten und `/boards/:id/tasks/archived`.
+- Archiv-Leerzustand und leere Inline-Karteneingabe.
+- Responsive Viewports `1280x800`, `1024x768`, `768x1024`, `390x844` und `360x800`.
+- Sichtbarkeit des API-Tokens, Sprachkonsistenz und Browserkonsole.
 
 Bestanden:
-- Login funktioniert.
-- `/boards`, `/settings`, `/admin`, `/admin/invites`, Task-Links und Archivseite liefern `200`.
-- Kartenflaeche oeffnet Task-Panel.
-- Kartenmenue oeffnet, ohne Task-Panel auszuloesen.
-- Kommentare im Task-Panel sichtbar.
-- Archivierte-Karten-Leerzustand vorhanden.
-- Responsive: Desktop/Laptop/Tablet mit `320px`-Spalten und internem horizontalem Board-Scroll; Mobile ohne Body-Level-Horizontaloverflow.
-- Keine Browser-Konsolefehler oder Page Errors im QA-Lauf.
+- Login, alle geprueften internen Links und Direktseiten funktionieren ohne sichtbaren HTTP-/Routing-/Application-Fehler.
+- Ganze Kartenflaeche oeffnet das Task-Panel; `Karte bearbeiten` oeffnet die Kopie ebenfalls im Modal.
+- Kartenkopie funktioniert technisch: Klick auf `Karte duplizieren` erzeugte genau eine Kopie, leitete auf deren Task-URL und die Kopie war nach Board-Reload sichtbar.
+- Backdrop-Klick schliesst das `Neue Kampagne`-Modal im automatisierten Lauf.
+- Archivseite zeigt den korrekten Leerzustand.
+- Kein Body-Level-Horizontaloverflow in allen fuenf Viewports.
+- Keine Browser-Konsolenfehler im Lauf.
 
 Gefundene Bugs:
-- P1: Spaltenmenue-Aktion `Spalte umbenennen` oeffnet das Bearbeitungsformular nicht. Fix: `dropdown_controller` fuer portaled Menues pruefen; Commands aus dem nach `document.body` verschobenen Menue muessen verlaesslich delegiert und danach neu positioniert werden.
-- P1: `Neue Kampagne`-Modal schliesst nicht per Escape und kann danach Board-Klicks blockieren. Fix: Modal auf Stimulus-Controller oder globalen `keydown.esc`-Handler umstellen, Root-Modal sicher verstecken und Fokus zurueckgeben.
-- P1: Backdrop-Klick beim `Neue Kampagne`-Modal schliesst nicht zuverlaessig. Fix: Backdrop-Click auf Root-Modal-Schliessen normalisieren und Klickabfang durch innere Layer verhindern.
-- P1: Settings zeigt API-Token vollstaendig sichtbar an. Fix: Token standardmaessig maskieren, explizite Anzeigen-Aktion ergaenzen, Copy beibehalten und Regenerate bestaetigen lassen.
-- P2: Admin- und Invite-Seiten sind teilweise Englisch (`Welcome`, `Admin dashboard`, `Invite user`, `Send invite`, `Back to Dashboard`). Fix: sichtbare Admin-/Invite-Texte deutsch lokalisieren.
-- P2: Settings/Profile-Agent-Prompt enthaelt gemischte Sprache. Fix: Prompt-Template vollstaendig deutsch lokalisieren oder bewusst als technischer englischer Prompt kennzeichnen.
-- P2: Production-Board enthaelt englische Beispielkarten (`Connect your agent`, `Assign your first task`, `Welcome to DREI Asset Review`). Fix: Default-/Demo-Karten deutsch lokalisieren oder aus Production entfernen.
+- P1: `Spalte umbenennen` oeffnet im portalierten Spaltenmenue kein sichtbares Bearbeitungsformular. Fix: Command-Handling im `dropdown_controller` am portalierten `document.body`-Menue binden; `editPanel`/`actionList` vor dem Repositionieren toggeln und mit einem Browser-Systemtest absichern.
+- P1: `Neue Kampagne` schliesst nicht per Escape und kann Eingaben hinter dem Modal blockieren. Fix: Inline-JavaScript durch den bestehenden Modal-Stimulus-Controller ersetzen, `keydown.esc` am Modal-Root registrieren, Fokus beim Oeffnen setzen und beim Schliessen zurueckgeben.
+- P1: Settings zeigt den API-Token vollstaendig sichtbar an. Fix: Token standardmaessig maskieren, eine explizite Anzeigen/Verbergen-Aktion anbieten, Copy weiterhin mit dem echten Wert speisen und Regeneration bestaetigen.
+- P1/P2 UX: Kartenkopie ist technisch erfolgreich, wirkt aber defekt, weil der POST direkt auf `/boards/:board_id/tasks/:copy_id` navigiert und keine eindeutige Erfolgsdarstellung im Board liefert. Fix: `duplicate` als Turbo-Stream beantworten, die neue Karte in die richtige Spalte einfuegen, Spaltenzaehler aktualisieren, Flash anzeigen und optional das neue Task-Panel oeffnen; HTML-Fallback zur Boardseite statt zur isolierten Task-URL umleiten.
+- P2: Admin-, User- und Invite-Seiten sind teilweise Englisch (`Welcome`, `Total Users`, `Create user`, `Invite user`, `Send invite`, `Back to Dashboard`). Fix: alle sichtbaren Texte deutsch lokalisieren.
+- P2: Settings/Profile-Agent-Prompt enthaelt gemischte Sprache (`Profile`, `Email Address`, `Copy token`, `Regenerate token`, englische Prompt-Abschnitte). Fix: UI-Texte vollstaendig deutsch lokalisieren und den technischen Prompt entweder konsistent deutsch verfassen oder klar als englisches Integrations-Template kennzeichnen.
+- P2: Leere Inline-Karteneingabe bleibt offen, zeigt aber keine sichtbare Validierungsrueckmeldung. Fix: Button bei leerem/Whitespace-Titel deaktivieren oder inline `Bitte einen Kartentitel eingeben` anzeigen und Fokus im Feld belassen.
 
 ## Offene Fehler
 

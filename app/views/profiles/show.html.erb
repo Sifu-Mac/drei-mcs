@@ -2,9 +2,9 @@
 <% content_for :breadcrumb_standalone, "Einstellungen" %>
 
 <div class="space-y-6 mt-12">
-  <!-- Section 1: Profile -->
+  <!-- Profil -->
   <div class="bg-bg-surface border border-border rounded-lg p-5 space-y-4">
-    <h3 class="text-xs font-medium text-content-muted uppercase tracking-wider font-display">Profile</h3>
+    <h3 class="text-xs font-medium text-content-muted uppercase tracking-wider font-display">Profil</h3>
 
     <%= form_with(model: @user, url: settings_path, method: :patch, class: "space-y-4") do |form| %>
       <!-- Avatar -->
@@ -22,14 +22,14 @@
           <% end %>
           <div class="flex-1">
             <%= form.file_field :avatar, accept: "image/jpeg,image/jpg,image/png,image/webp", class: "block w-full text-xs text-content-secondary file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-bg-elevated file:text-content-secondary hover:file:bg-bg-hover file:cursor-pointer file:transition-colors" %>
-            <p class="text-xs text-content-muted mt-1">Max 512KB, 256x256px. JPEG, PNG, or WebP.</p>
+            <p class="text-xs text-content-muted mt-1">Maximal 512 KB und 256 × 256 Pixel. JPEG, PNG oder WebP.</p>
           </div>
         </div>
         <% if @user.avatar.attached? || @user.avatar_url.present? %>
           <div class="mt-3">
             <label class="flex items-center text-xs text-content-secondary cursor-pointer">
               <%= form.check_box :remove_avatar, class: "mr-2 rounded border-border bg-bg-elevated text-accent focus:ring-accent focus:ring-offset-bg-surface" %>
-              Remove avatar
+              Avatar entfernen
             </label>
           </div>
         <% end %>
@@ -42,10 +42,10 @@
         <% end %>
       </div>
 
-      <!-- Email -->
+      <!-- E-Mail -->
       <div class="pt-4 border-t border-border">
-        <label class="block text-xs font-medium text-content-secondary mb-1.5">Email Address</label>
-        <%= form.email_field :email_address, placeholder: "your@email.com", class: "block w-full bg-bg-elevated border-0 rounded-md px-3 py-2 text-sm text-content placeholder:text-content-muted focus:ring-1 focus:ring-accent focus:outline-none" %>
+        <label class="block text-xs font-medium text-content-secondary mb-1.5">E-Mail-Adresse</label>
+        <%= form.email_field :email_address, placeholder: "name@domain.de", class: "block w-full bg-bg-elevated border-0 rounded-md px-3 py-2 text-sm text-content placeholder:text-content-muted focus:ring-1 focus:ring-accent focus:outline-none" %>
         <% if @user.errors[:email_address].any? %>
           <div class="mt-1">
             <% @user.errors[:email_address].each do |error| %>
@@ -61,11 +61,11 @@
     <% end %>
   </div>
 
-  <!-- Section 2: OpenClaw Integration -->
+  <!-- OpenClaw-Integration -->
   <div class="bg-bg-surface border border-border rounded-lg p-5 space-y-4">
     <div class="flex items-center gap-2">
       <span class="text-lg">🦞</span>
-      <h3 class="text-sm font-semibold text-content font-display">OpenClaw Integration</h3>
+      <h3 class="text-sm font-semibold text-content font-display">OpenClaw-Integration</h3>
     </div>
 
     <p class="text-xs text-content-secondary">
@@ -75,11 +75,15 @@
     <% api_url = "#{request.base_url}/api/v1" %>
     <% api_token = @api_token.token %>
 
-    <div class="bg-bg-elevated rounded-md p-4 space-y-3 border border-border/50">
+    <div class="bg-bg-elevated rounded-md p-4 space-y-3 border border-border/50"
+         data-controller="token-visibility"
+         data-token-visibility-token-value="<%= api_token %>">
       <div>
         <p class="text-xs font-medium text-content-secondary mb-2">API Token</p>
         <div class="rounded-md bg-bg-surface px-3 py-2 border border-border">
-          <code class="text-xs font-mono text-content-secondary break-all"><%= api_token %></code>
+          <code class="text-xs font-mono text-content-secondary break-all"
+                data-token-visibility-target="value"
+                aria-label="Maskierter API-Token"></code>
         </div>
       </div>
       <div class="flex items-center gap-3">
@@ -89,19 +93,26 @@
             data-action="click->clipboard#copy"
             class="cursor-pointer px-3 py-1.5 bg-bg-surface hover:bg-bg-hover text-content-secondary text-xs font-medium rounded-md transition-colors border border-border"
           >
-            <span data-clipboard-target="label">Copy token</span>
+            <span data-clipboard-target="label">Token kopieren</span>
           </button>
         </div>
-        <%= button_to "Regenerate token", regenerate_api_token_settings_path,
+        <button type="button"
+                data-action="click->token-visibility#toggle"
+                data-token-visibility-target="button"
+                aria-pressed="false"
+                class="cursor-pointer px-3 py-1.5 bg-bg-surface hover:bg-bg-hover text-content-secondary text-xs font-medium rounded-md transition-colors border border-border">
+          Anzeigen
+        </button>
+        <%= button_to "Token neu erstellen", regenerate_api_token_settings_path,
             method: :post,
-            data: { turbo_confirm: "This will invalidate your current token. Continue?" },
+            data: { turbo_confirm: "Der aktuelle Token wird dadurch ungültig. Fortfahren?" },
             class: "cursor-pointer text-xs text-content-muted hover:text-content-secondary transition-colors" %>
       </div>
     </div>
 
-    <!-- Comprehensive agent prompt -->
+    <!-- Ausführlicher Agent-Prompt -->
     <div data-controller="clipboard">
-      <p class="text-xs font-medium text-content-secondary mb-2">Agent Prompt</p>
+      <p class="text-xs font-medium text-content-secondary mb-2">Agent-Prompt</p>
       <div class="bg-bg-elevated rounded-md max-h-96 overflow-y-auto">
         <pre
           data-clipboard-target="source"
@@ -110,80 +121,80 @@
 
 DREI Asset Review ist der Ort, an dem Kampagnen, Karten und Prüfungen gesteuert werden. Betrachte es als gemeinsames Arbeitsboard.
 
-## How it works
+## So funktioniert es
 
-1. Your human creates tasks and organizes them on the board
-2. Your human explicitly assigns tasks to you when ready
-3. You poll for assigned tasks and work on them
-4. You update progress and mark things done
-5. Your human sees everything in real-time
+1. Dein Mensch erstellt Karten und organisiert sie auf dem Board.
+2. Sobald eine Karte bereit ist, weist dein Mensch sie dir ausdrücklich zu.
+3. Du fragst regelmäßig zugewiesene Karten ab und bearbeitest sie.
+4. Du aktualisierst den Fortschritt und markierst abgeschlossene Arbeit.
+5. Dein Mensch sieht alle Änderungen in Echtzeit.
 
-## Connection
+## Verbindung
 
-- **API URL:** <%= api_url %>
+- **API-URL:** <%= api_url %>
 - **Token:** <%= api_token %>
-- **Auth Header:** `Authorization: Bearer <%= api_token %>`
+- **Authentifizierungs-Header:** `Authorization: Bearer <%= api_token %>`
 
-## Identify yourself
+## Identifikation
 
-Include these headers with every request so your human knows who's connected:
-- `X-Agent-Name`: Your name (e.g., "<%= @user.agent_name.presence || "OpenClaw" %>")
-- `X-Agent-Emoji`: Your emoji (e.g., "<%= @user.agent_emoji.presence || "🦞" %>")
+Sende diese Header bei jeder Anfrage, damit dein Mensch den verbundenen Agenten erkennt:
+- `X-Agent-Name`: Dein Name (z. B. "<%= @user.agent_name.presence || "OpenClaw" %>")
+- `X-Agent-Emoji`: Dein Emoji (z. B. "<%= @user.agent_emoji.presence || "🦞" %>")
 
-## Your workflow
+## Arbeitsablauf
 
-### Polling for assigned tasks (every 30s or on heartbeat):
-1. Call `GET /tasks?assigned=true` to get tasks assigned to you
-2. Pick the first task (oldest assignment)
-3. Move it to `in_progress` and start working
+### Zugewiesene Karten abfragen (alle 30 Sekunden oder beim Heartbeat):
+1. Rufe `GET /tasks?assigned=true` auf.
+2. Waehle die erste und damit aelteste Zuweisung.
+3. Verschiebe sie nach `in_progress` und beginne mit der Arbeit.
 
-### When working on a task:
-- **Need help:** Move it to `blocked` — your human will unblock you
-- **Finished:** Move to `review` (needs human review) or `done` (complete)
+### Beim Bearbeiten:
+- **Hilfe benoetigt:** Verschiebe die Karte nach `blocked`.
+- **Fertig:** Verschiebe sie nach `review` oder `done`.
 
-### You can also:
-- Create new tasks (ideas, follow-ups, things you noticed)
-- Check task details and history
+### Ausserdem kannst du:
+- Neue Karten fuer Ideen und Folgearbeiten erstellen.
+- Kartendetails und Aktivitaeten pruefen.
 
-## API Reference
+## API-Referenz
 
-**Get assigned tasks (your work queue):**
+**Zugewiesene Karten abrufen:**
 `GET /tasks?assigned=true`
-Returns tasks assigned to you, ordered by assignment time (oldest first).
+Liefert zugewiesene Karten, aelteste Zuweisung zuerst.
 
-**List all tasks:**
-`GET /tasks` or `GET /tasks?status=in_progress`
+**Alle Karten auflisten:**
+`GET /tasks` oder `GET /tasks?status=in_progress`
 
-**Get task:**
+**Karte abrufen:**
 `GET /tasks/:id`
 
-**Update task:**
+**Karte aktualisieren:**
 `PATCH /tasks/:id`
-Body: `{ "status": "in_progress" }` or `{ "status": "blocked" }`
+Anfragekörper: `{ "status": "in_progress" }` oder `{ "status": "blocked" }`
 
-**Complete task:**
+**Karte abschliessen:**
 `PATCH /tasks/:id/complete`
 
-**Create task:**
+**Karte erstellen:**
 `POST /tasks`
-Body: `{ "name": "Task title", "status": "inbox" }`
+Anfragekörper: `{ "name": "Kartentitel", "status": "inbox" }`
 
-## Statuses
-- `inbox` — New, not prioritized
-- `planned` — Captured, but not ready yet
-- `ready` — Prioritized and ready to execute
-- `in_progress` — You're working on it
-- `blocked` — Stuck and waiting for input
-- `review` - erledigt, benötigt menschliche Prüfung
-- `done` — Complete
+## Statuswerte
+- `inbox` — Neu und noch nicht priorisiert
+- `planned` — Erfasst, aber noch nicht bereit
+- `ready` — Priorisiert und bereit
+- `in_progress` — In Bearbeitung
+- `blocked` — Blockiert und wartet auf Hilfe
+- `review` — Erledigt, benötigt menschliche Prüfung
+- `done` — Abgeschlossen
 
-## Priorities
+## Prioritaeten
 `none`, `low`, `medium`, `high`
 
-## Tips
-- Poll for assigned tasks frequently — your human assigns work explicitly
-- When stuck, move the task to `blocked`
-- Create tasks for things you notice but can't tackle now</pre>
+## Tipps
+- Frage Zuweisungen regelmaessig ab.
+- Verschiebe blockierte Arbeit nach `blocked`.
+- Erstelle Karten fuer spaetere Beobachtungen und Folgearbeiten.</pre>
       </div>
       <div class="flex items-center gap-3 mt-2">
         <button
@@ -191,24 +202,24 @@ Body: `{ "name": "Task title", "status": "inbox" }`
           data-action="click->clipboard#copy"
           class="cursor-pointer px-3 py-1.5 bg-bg-elevated hover:bg-bg-hover text-content-secondary text-xs font-medium rounded-md transition-colors"
         >
-          <span data-clipboard-target="label">Copy prompt</span>
+          <span data-clipboard-target="label">Prompt kopieren</span>
         </button>
       </div>
     </div>
 
-    <!-- Connected Agent (within same box) -->
+    <!-- Verbundener Agent -->
     <div class="pt-4 border-t border-border">
-      <p class="text-xs font-medium text-content-secondary mb-3">Connected Agent</p>
+      <p class="text-xs font-medium text-content-secondary mb-3">Verbundener Agent</p>
 
       <% if @user.agent_last_active_at.present? %>
         <div class="flex items-center gap-3">
           <span class="text-xl"><%= @user.agent_emoji || "🦞" %></span>
           <span class="text-sm text-content"><%= @user.agent_name || "Agent" %></span>
           <span class="text-xs text-content-muted">•</span>
-          <span class="text-xs text-content-muted">Last active: <%= time_ago_in_words(@user.agent_last_active_at) %> ago</span>
+          <span class="text-xs text-content-muted">Zuletzt aktiv: vor <%= time_ago_in_words(@user.agent_last_active_at) %></span>
         </div>
       <% else %>
-        <p class="text-xs text-content-muted">No agent connected yet</p>
+        <p class="text-xs text-content-muted">Noch kein Agent verbunden</p>
       <% end %>
     </div>
   </div>

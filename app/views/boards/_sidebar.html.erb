@@ -83,7 +83,8 @@
   <% if internal_workspace_member? %>
     <div class="space-y-2 border-t border-border px-3 py-3">
       <button type="button"
-              onclick="document.getElementById('new-campaign-modal').classList.remove('hidden')"
+              data-action="click->modal-manager#open"
+              data-modal-manager-id-param="new-campaign-modal"
               class="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-bg-elevated px-3 py-2.5 text-[13px] font-semibold text-content-secondary transition-colors hover:bg-bg-hover cursor-pointer">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
         Neue Kampagne

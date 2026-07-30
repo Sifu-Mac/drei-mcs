@@ -8,6 +8,8 @@ export default class extends Controller {
   connect() {
     this.menuElement = this.hasMenuTarget ? this.menuTarget : null
     this.buttonElement = this.hasButtonTarget ? this.buttonTarget : (this.hasTriggerTarget ? this.triggerTarget : null)
+    this.actionListElement = this.hasActionListTarget ? this.actionListTarget : null
+    this.editPanelElement = this.hasEditPanelTarget ? this.editPanelTarget : null
     this.placeholder = null
 
     this.handleClickOutside = this.handleClickOutside.bind(this)
@@ -95,14 +97,14 @@ export default class extends Controller {
       event.preventDefault()
       event.stopPropagation()
     }
-    if (this.hasActionListTarget) this.actionListTarget.classList.remove("hidden")
-    if (this.hasEditPanelTarget) this.editPanelTarget.classList.add("hidden")
+    this.actionListElement?.classList.remove("hidden")
+    this.editPanelElement?.classList.add("hidden")
     this.positionMenu()
   }
 
   showEditPanel() {
-    if (this.hasActionListTarget) this.actionListTarget.classList.add("hidden")
-    if (this.hasEditPanelTarget) this.editPanelTarget.classList.remove("hidden")
+    this.actionListElement?.classList.add("hidden")
+    this.editPanelElement?.classList.remove("hidden")
   }
 
   select(event) {
