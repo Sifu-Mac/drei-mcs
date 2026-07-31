@@ -14,6 +14,7 @@ Stand: 2026-07-31
 - Neue Board-Regressionspruefungen decken Marke, fehlenden Board-Wechsler, zentrierte Kartenaktion und die Sichtbarkeit des Admin-Einstiegs ab. Clients sehen den Eintrag nicht.
 - Verifiziert im frisch gebauten isolierten Testimage: Board- und Admin-Controller `13 runs, 112 assertions`; vollstaendige Suite `169 runs, 882 assertions, 0 failures, 0 errors`; RuboCop `176 files inspected, no offenses`; Brakeman `0 security warnings`; Bundler- und Importmap-Audit ohne bekannte Schwachstellen.
 - Vor Merge und Deployment steht das erneute unabhaengige `QA & Review`-Go aus.
+- Das unabhaengige QA-Review erteilte fuer `1a1b34d` Go. Der Stand wurde als Merge-Commit `d5cf1af` nach `main` gemergt, gepusht und deployt; `db` ist healthy, `web` running und `/up` liefert `200`.
 
 ### Textuelle Kartenaktion (noch nicht gemergt)
 
