@@ -74,7 +74,11 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "overflow-y-auto rounded-b-xl"
     assert_includes response.body, "m-0 flex min-h-[2rem] flex-col list-none gap-3 overflow-x-hidden"
     assert_includes response.body, "inline-flex min-h-11 cursor-pointer items-center gap-2"
+    assert_includes response.body, "flex justify-center pt-3"
     assert_not_includes response.body, "border-dashed border-border bg-bg-surface"
+    assert_includes response.body, "DB <span"
+    assert_not_includes response.body, "Board wechseln"
+    assert_select "a[href='#{admin_users_path}']", text: "User hinzufügen"
     assert_includes response.body, "padding:16px"
     assert_includes response.body, "font-size:15px"
     assert_includes response.body, "-webkit-line-clamp:3"
@@ -89,6 +93,7 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
 
     get board_path(boards(:one))
     assert_response :success
+    assert_not_includes response.body, "User hinzufügen"
 
     assert_no_difference "Board.count" do
       post boards_path, params: { board: { name: "Client Board", campaign_id: campaigns(:general).id } }
