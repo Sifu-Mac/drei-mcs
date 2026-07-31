@@ -27,6 +27,7 @@ Stand: 2026-07-31
 - Aktueller, noch nicht gemergter Kandidat: `codex/user-nicknames` bei `4d509af`. Er ergänzt optionale, global eindeutige Nicknames mit E-Mail-Alias als Fallback, zeigt sie in Kommentaren, neuen Zitat-Snapshots und Profil-Dropdowns und erlaubt allen Rollen die eigene Änderung im Profil.
 - Verifiziert im frischen isolierten Teststack: gezielte Nickname-/Profil-/Kommentar-Tests `30 runs, 128 assertions`; vollständige Rails-Suite `168 runs, 862 assertions, 0 failures, 0 errors`; RuboCop `176 files inspected, no offenses`; Brakeman `0 security warnings`; Dependency-Audit ohne bekannte Schwachstellen. Vor Merge/Deployment steht das unabhängige `QA & Review`-Go aus.
 - Der unabhängige QA-Thread hat am 2026-07-31 für `ef715d4` ausdrücklich Go erteilt: From-scratch-Migration, Rechte-/Historien- und XSS-Prüfung, fokussierte Tests `40 runs, 230 assertions`, vollständige Suite `168 runs, 862 assertions`, Selenium `6 runs, 37 assertions`, RuboCop, Brakeman sowie Dependency-/Importmap-Audits sind grün.
+- Der Stand wurde danach als Merge-Commit `9d8b6e2` nach `main` gemergt, zu GitHub gepusht und in Production ausgerollt. `db` ist healthy, `web` aktiv, `20260731120000 Add display name to users` ist `up` und `https://drei.digitalbackup.cloud/up` liefert `200`.
 - Das unabhaengige Re-Review des SMTP-Kandidaten `a316ccc` hat ausdruecklich Go erteilt.
 - SMTP-Haertung wurde am 2026-07-31 nach `main` gemergt, zu GitHub gepusht und in Production deployt.
 - `backup-postgres.sh` bleibt bewusst unversioniert und wurde nicht beruehrt.
