@@ -139,4 +139,21 @@ class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
       })()
     JS
   end
+
+  test "card creation action follows the cards instead of the viewport bottom" do
+    task = tasks(:one)
+    sign_in_through_browser(users(:one))
+
+    visit board_path(task.board)
+
+    assert page.evaluate_script(<<~JS)
+      (() => {
+        const column = document.getElementById("board-column-#{task.board_column_id}")
+        const cards = column.querySelector("ul")
+        const addAction = column.querySelector("[data-inline-add-target='button']")
+        const gap = addAction.getBoundingClientRect().top - cards.getBoundingClientRect().bottom
+        return getComputedStyle(cards).flexGrow === "0" && gap >= 0 && gap <= 16
+      })()
+    JS
+  end
 end
