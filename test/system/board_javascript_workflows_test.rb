@@ -7,6 +7,7 @@ class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
     open_task_panel(task)
 
     title = "Automatisch gespeichert #{SecureRandom.hex(4)}"
+    find("#task_name").click
     fill_in "task_name", with: title
 
     assert_selector "[data-task-modal-target='saveStatus']", text: "Gespeichert"
