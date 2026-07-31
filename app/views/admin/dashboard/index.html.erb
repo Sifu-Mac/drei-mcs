@@ -54,6 +54,11 @@
         Offene Einladungen
       </div>
     <% end %>
+
+    <%= link_to admin_audit_events_path, class: "block bg-bg-surface border border-border p-5 rounded-lg hover:bg-bg-hover transition-colors col-span-2 shadow-sm" do %>
+      <div class="text-sm font-semibold text-content">Aktivitätsprotokoll</div>
+      <div class="mt-1 text-sm text-content-secondary">Sicherheitsrelevante Verwaltungsaktionen nachvollziehen</div>
+    <% end %>
   </div>
 </section>
 <% end %>

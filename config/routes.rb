@@ -24,8 +24,14 @@ Rails.application.routes.draw do
 
   namespace :admin do
     root to: "dashboard#index"
-    resources :users, only: [ :index, :create, :destroy ]
+    resources :users, only: [ :index, :destroy ] do
+      member do
+        patch :promote
+        patch :demote
+      end
+    end
     resources :invites, only: [ :index, :create, :destroy ]
+    resources :audit_events, only: :index
   end
 
   resource :session, only: [:new, :create, :destroy]
@@ -36,6 +42,7 @@ Rails.application.routes.draw do
   resource :settings, only: [ :show, :update ], controller: "profiles" do
     post :regenerate_api_token
   end
+  resource :password_change, only: [ :edit, :update ]
 
   resources :campaigns, only: [:create, :update] do
     get :archived, on: :collection
@@ -43,6 +50,7 @@ Rails.application.routes.draw do
       post :duplicate
       patch :archive
       patch :restore
+      delete :destroy_permanently
     end
   end
 

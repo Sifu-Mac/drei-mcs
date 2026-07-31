@@ -77,8 +77,13 @@
             </svg>
             Einstellungen
           <% end %>
+          <%= link_to edit_password_change_path,
+              class: "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] font-medium text-content-secondary hover:bg-bg-hover transition-colors" do %>
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" class="opacity-35" aria-hidden="true"><path d="M5 7V5.5a3 3 0 016 0V7M3.5 7h9v6h-9V7z" stroke="#6b7280" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Passwort ändern
+          <% end %>
           <% if current_user.admin? %>
-            <%= link_to admin_users_path,
+            <%= link_to admin_invites_path,
                 data: { turbo_frame: "admin_panel" },
                 class: "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] font-medium text-content-secondary hover:bg-bg-hover transition-colors" do %>
               <svg width="15" height="15" viewBox="0 0 16 16" fill="none" class="opacity-35" aria-hidden="true">

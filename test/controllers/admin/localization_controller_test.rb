@@ -19,7 +19,8 @@ class Admin::LocalizationControllerTest < ActionDispatch::IntegrationTest
     get admin_users_path
 
     assert_response :success
-    assert_includes response.body, "Benutzer erstellen"
+    assert_includes response.body, "Benutzerrechte"
+    assert_includes response.body, "Es gibt nur zwei Rollen"
     assert_includes response.body, "Letzte Anmeldung"
     assert_no_match(/Create user|Back to Dashboard|Last Login/, response.body)
   end

@@ -20,10 +20,11 @@ class InvitesController < ApplicationController
         password: params[:password],
         password_confirmation: params[:password_confirmation]
       )
-      @user.invited_role = @invite.client? ? :client : :member
+      @user.invited_role = :client
 
       if @user.save
         @invite.update!(accepted_at: Time.current)
+        AuditEvent.record!(actor: @user, action: "invite_accepted", target: @invite, target_label: @invite.email)
         accepted = true
       else
         raise ActiveRecord::Rollback

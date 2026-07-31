@@ -4,6 +4,17 @@ Stand: 2026-07-31
 
 ## Aktueller Stand
 
+### Admin-/Client-Verwaltung, Passwortwechsel, Audit-Protokoll und Kampagnenlöschung (noch nicht gemergt)
+
+- Kandidat: `codex/admin-client-governance`.
+- Das sichtbare Rollenmodell besteht nur noch aus Admin und Client. Neue Einladungen erzeugen serverseitig immer Clients; historische `owner`-/`member`-Mitgliedschaften sowie interne Einladungen werden mit Migration `20260731130000` auf Client vereinheitlicht.
+- `User hinzufügen` führt zur Einladung statt zur unsicheren manuellen Passwortvergabe. Bestehende Admins können aktivierte Clients mit Bestätigung zu Admins machen oder zurückstufen; eigene und letzte Adminrechte sind geschützt.
+- Jeder eingeloggte User kann unter Einstellungen bzw. Profilmenü sein Passwort nach Eingabe des aktuellen Passworts ändern. Andere aktive Sitzungen werden beendet.
+- Das neue admin-only Aktivitätsprotokoll speichert Verwaltungsmetadaten für Einladungen, Rollenwechsel, Passwortwechsel, Archivieren/Wiederherstellen/endgültiges Löschen von Kampagnen und Benutzerlöschung. Es speichert keine Passwörter, Tokens oder Inhalte.
+- Archivierte Kampagnen können nur von Admins und erst nach Eingabe des exakten Kampagnennamens endgültig gelöscht werden. Die Kaskade entfernt zunächst alle aktiven und archivierten Karten, dann Boards und Spalten; der bestehende Task-Broadcast ist gegen das Fehlen eines bereits gelöschten Boards abgesichert.
+- Verifiziert: gezielte Tests `20 runs, 104 assertions`; vollständige Suite vor dem From-scratch-Reset `176 runs, 922 assertions, 0 failures, 0 errors`; RuboCop `183 files inspected, no offenses`; Brakeman `0 security warnings`; Bundler- und Importmap-Audit ohne bekannte Schwachstellen; isolierter `db:migrate:reset` bis zur neuen Migration erfolgreich.
+- Das erneute unabhängige `QA & Review` erteilte für `7c8af1b` ausdrücklich Go: JavaScript-Systemtests `7 runs, 39 assertions`; vollständige Rails-Suite `176 runs, 922 assertions`; Migrationsreset, RuboCop, Brakeman, Bundler- und Importmap-Audit sowie Diff-/Secret-Prüfung sind grün. Merge und Deployment stehen als nächste Schritte an.
+
 ### UI-/UX-Navigations- und Board-Dichte-Kandidat (noch nicht gemergt)
 
 ### Klickbare Kommentar-URLs (noch nicht gemergt)

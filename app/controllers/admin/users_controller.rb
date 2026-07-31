@@ -4,7 +4,6 @@ module Admin
     require_admin
 
     def index
-      @new_user = User.new
       @users = User.includes(:sessions, :tasks)
                    .order(created_at: :desc)
                    .map do |user|
@@ -20,16 +19,26 @@ module Admin
       render layout: false if turbo_frame_request?
     end
 
-    def create
-      @new_user = User.new(user_params)
-      @new_user.admin = ActiveModel::Type::Boolean.new.cast(params.dig(:user, :admin))
+    def promote
+      user = User.find(params[:id])
+      user.update!(admin: true)
+      AuditEvent.record!(actor: current_user, action: "user_promoted_to_admin", target: user, target_label: user.email_address)
+      redirect_to admin_users_path, notice: "#{user.display_label} ist jetzt Admin."
+    end
 
-      if @new_user.save
-        redirect_to admin_users_path, notice: "Benutzer wurde erstellt."
-      else
-        index
-        render :index, status: :unprocessable_entity
+    def demote
+      user = User.find(params[:id])
+
+      if user == current_user
+        return redirect_to(admin_users_path, alert: "Die eigenen Adminrechte können nicht entzogen werden.")
       end
+      if user.admin? && User.where(admin: true).count <= 1
+        return redirect_to(admin_users_path, alert: "Der letzte Admin kann nicht herabgestuft werden.")
+      end
+
+      user.update!(admin: false)
+      AuditEvent.record!(actor: current_user, action: "user_demoted_to_client", target: user, target_label: user.email_address)
+      redirect_to admin_users_path, notice: "#{user.display_label} ist jetzt Client."
     end
 
     def destroy
@@ -40,15 +49,10 @@ module Admin
       elsif user.admin? && User.where(admin: true).count <= 1
         redirect_to admin_users_path, alert: "Der letzte Admin kann nicht gelöscht werden."
       else
+        AuditEvent.record!(actor: current_user, action: "user_deleted", target: user, target_label: user.email_address)
         user.destroy!
         redirect_to admin_users_path, notice: "Benutzer wurde gelöscht."
       end
-    end
-
-    private
-
-    def user_params
-      params.require(:user).permit(:email_address, :password, :password_confirmation)
     end
   end
 end

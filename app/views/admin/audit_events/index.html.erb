@@ -1,0 +1,15 @@
+<% content_for :title, "Aktivitätsprotokoll - Admin - #{app_name}" %>
+<% content_for :nav_center, "Aktivitätsprotokoll" %>
+
+<section class="space-y-6">
+  <div class="flex items-center justify-between gap-3">
+    <div><h1 class="text-xl font-semibold text-content">Aktivitätsprotokoll</h1><p class="mt-1 text-sm text-content-secondary">Sicherheitsrelevante Verwaltungsaktionen der letzten 200 Einträge.</p></div>
+    <%= link_to "Benutzerrechte", admin_users_path, class: "text-sm font-semibold text-accent hover:underline" %>
+  </div>
+  <div class="overflow-x-auto rounded-lg border border-border bg-bg-surface">
+    <table class="w-full text-left text-sm"><thead class="border-b border-border text-xs text-content-muted"><tr><th class="px-4 py-3">Zeit</th><th class="px-4 py-3">Akteur</th><th class="px-4 py-3">Aktion</th><th class="px-4 py-3">Ziel</th></tr></thead>
+      <tbody class="divide-y divide-border"><% @audit_events.each do |event| %><tr><td class="px-4 py-3 text-content-secondary"><%= l(event.created_at, format: :short) %></td><td class="px-4 py-3 text-content"><%= event.actor&.display_label || "Gelöschter User" %></td><td class="px-4 py-3 text-content-secondary"><%= event.action.humanize %></td><td class="px-4 py-3 text-content"><%= event.target_label %></td></tr><% end %></tbody>
+    </table>
+    <% if @audit_events.empty? %><p class="p-6 text-sm text-content-muted">Noch keine Einträge vorhanden.</p><% end %>
+  </div>
+</section>

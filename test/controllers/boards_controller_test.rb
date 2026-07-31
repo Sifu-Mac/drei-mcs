@@ -78,7 +78,7 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "border-dashed border-border bg-bg-surface"
     assert_includes response.body, "DB <span"
     assert_not_includes response.body, "Board wechseln"
-    assert_select "a[href='#{admin_users_path}']", text: "User hinzufügen"
+    assert_select "a[href='#{admin_invites_path}']", text: "User hinzufügen"
     assert_includes response.body, "padding:16px"
     assert_includes response.body, "font-size:15px"
     assert_includes response.body, "-webkit-line-clamp:3"

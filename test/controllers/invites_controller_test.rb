@@ -16,7 +16,7 @@ class InvitesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
   end
 
-  test "accepting a pending internal invite creates a member user and starts a session" do
+  test "accepting any pending invite creates a client user and starts a session" do
     invite = invites(:pending_internal)
 
     assert_difference("User.count", 1) do
@@ -29,7 +29,7 @@ class InvitesControllerTest < ActionDispatch::IntegrationTest
     assert invite.reload.accepted_at.present?
 
     membership = WorkspaceMembership.find_by(user: user, workspace: workspaces(:primary))
-    assert membership.member?
+    assert membership.client?
   end
 
   test "accepting a pending client invite grants the client workspace role" do
