@@ -1,0 +1,3 @@
+<%= turbo_stream.replace "task_comment_#{@comment.id}" do %>
+  <%= render "boards/comments/comment", comment: @comment %>
+<% end %>
