@@ -129,6 +129,9 @@ class Task < ApplicationRecord
     copy.name = "#{name} Kopie"
     copy.user = user
     copy.archived_at = nil
+    copy.assigned_to_agent = false
+    copy.assigned_at = nil
+    copy.agent_claimed_at = nil
     copy.activity_source = "web"
     copy.save!
     copy.activities.delete_all

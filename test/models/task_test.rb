@@ -11,11 +11,15 @@ class TaskTest < ActiveSupport::TestCase
   test "duplicate copies asset list titles but resets completion" do
     @task.subtasks.create!(title: "1:1", done: true)
     @task.subtasks.create!(title: "9:16", done: false)
+    @task.update!(assigned_to_agent: true, assigned_at: Time.current, agent_claimed_at: Time.current)
 
     copy = @task.duplicate_for!(user: users(:admin))
 
     assert_equal [ "1:1", "9:16" ], copy.subtasks.pluck(:title)
     assert_equal [ false, false ], copy.subtasks.pluck(:done)
+    assert_not copy.assigned_to_agent?
+    assert_nil copy.assigned_at
+    assert_nil copy.agent_claimed_at
   end
 
   test "completion and blocked state follow board column kind" do
