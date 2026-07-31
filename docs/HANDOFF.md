@@ -35,9 +35,9 @@ Auf dem Integrationsbranch umgesetzt:
 - Chromium/ChromeDriver und echte JavaScript-Systemtests fuer Auto-Save, Client-Panel/Kommentar und Drag-and-drop-Fehlerrollback hinzugefuegt.
 - Isoliertes PostgreSQL-Restore-Runbook, Restore-Compose und Verifikationsskript hinzugefuegt.
 
-## Client-Karten-Erweiterung (noch nicht gemergt oder deployt)
+## Client-Karten-Erweiterung (gemergt und deployt)
 
-- Branch: `codex/client-task-create-duplicate`.
+- Branch: `codex/client-task-create-duplicate`; Merge-Commit auf `main`: `5a72176`.
 - Clients duerfen damit Karten in sichtbaren Spalten anlegen und sichtbare Karten duplizieren. Neue Karten und Kopien gehoeren jeweils dem Client; Kommentare, Aktivitaeten und Uploads werden nicht kopiert.
 - Der Server akzeptiert bei Client-Kartenanlage ausschliesslich Titel und Board-Spalte. Eingeschleuste Felder fuer Beschreibung, Prioritaet, Owner, Farbe, Status, Agent oder Uploads werden nicht uebernommen.
 - Bestehende Karten bleiben fuer Clients read-only: Bearbeiten, Verschieben, Archivieren, Loeschen, Agent-Zuweisungen, Subtasks, Board-/Spalten-/Kampagnenmutationen und API-Mutationen bleiben serverseitig gesperrt. Drag-and-drop bleibt im Client-Browser deaktiviert.
@@ -45,8 +45,9 @@ Auf dem Integrationsbranch umgesetzt:
 - Direkte Aufrufe des internen Formulars `new` liefern fuer Clients `404`; die Kartenanlage erfolgt ausschliesslich ueber die minimale Inline-Eingabe.
 - Archivierte und daher im Board unsichtbare Karten koennen von Clients auch bei Kenntnis ihrer ID nicht dupliziert werden; der Server liefert `404` und erzeugt keine Kopie.
 - Der Inline-Add-Controller verwendet jetzt den robusten `meta[name="csrf-token"]`-Selektor, damit Kartenanlage auch im echten Browser mit CSRF-Schutz funktioniert.
-- Der erste unabhaengige QA-Lauf hatte genau diese zwei Grenzen beanstandet; beide sind mit Negativtests behoben. Der korrigierte Stand wartet auf erneutes QA-Go.
-- Verifiziert im frisch gebauten isolierten Teststack: fokussierte Controller-Tests `17 runs, 191 assertions`; Selenium-Systemtests `6 runs, 33 assertions`; vollständige Suite nach dem QA-Fix `155 runs, 775 assertions`; RuboCop `171 files inspected, no offenses`.
+- Der erste unabhaengige QA-Lauf hatte genau diese zwei Grenzen beanstandet; beide sind mit Negativtests im Commit `33f0d64` behoben. Der zweite unabhaengige QA-Lauf erteilte ausdruecklich Go.
+- Verifiziert im frisch gebauten isolierten Teststack: fokussierte Controller-Tests `18 runs, 195 assertions`; Selenium-Systemtests `6 runs, 33 assertions`; vollständige Suite nach dem QA-Fix `155 runs, 775 assertions`; RuboCop `171 files inspected, no offenses`; Brakeman ohne Warnungen.
+- Am 2026-07-31 nach `main` gepusht und als Runtime-Deployment auf Production ausgerollt. `db` war healthy, `web` lief und `https://drei.digitalbackup.cloud/up` lieferte `200`.
 
 Verifikation auf dem vollstaendigen Integrationsstand:
 - Frisch gebautes Testimage: erfolgreich.
