@@ -38,9 +38,9 @@
         </main>
       </div>
     <% else %>
-      <%# Other pages - centered content with navbar %>
+      <%# Other pages retain a direct, contextual route back to the board. %>
       <div class="h-screen flex flex-col bg-bg-base">
-        <%= render "shared/navbar" %>
+        <%= render "application/navbar" %>
         <div class="flex-1 overflow-y-auto px-4 pb-8 overscroll-contain [-webkit-overflow-scrolling:touch]">
           <main class="max-w-[680px] mx-auto text-content-secondary font-medium text-sm">
             <%= yield %>
