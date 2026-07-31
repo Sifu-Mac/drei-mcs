@@ -9,7 +9,7 @@ class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
     title = "Automatisch gespeichert #{SecureRandom.hex(4)}"
     title_field = find("#task_name")
     title_field.click
-    assert_not title_field[:readonly]
+    assert_not page.evaluate_script("document.getElementById('task_name').readOnly")
     title_field.send_keys([ :control, "a" ], title)
 
     assert_selector "[data-task-modal-target='saveStatus']", text: "Gespeichert"
@@ -31,7 +31,7 @@ class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
     title = "Client-Titel #{SecureRandom.hex(4)}"
     title_field = find("#task_name")
     title_field.click
-    assert_not title_field[:readonly]
+    assert_not page.evaluate_script("document.getElementById('task_name').readOnly")
     title_field.send_keys([ :control, "a" ], title)
     assert_selector "[data-task-modal-target='saveStatus']", text: "Gespeichert"
     assert_equal title, task.reload.name
