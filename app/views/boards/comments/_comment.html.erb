@@ -9,7 +9,7 @@
       <div style="margin-top:2px;white-space:pre-wrap"><%= comment.quoted_body %></div>
     </blockquote>
   <% end %>
-  <div style="font-size:14px;font-weight:500;color:#374151;line-height:1.7;white-space:pre-wrap"><%= simple_format(h(comment.body), {}, wrapper_tag: "div") %></div>
+  <div style="font-size:14px;font-weight:500;color:#374151;line-height:1.7;white-space:pre-wrap"><%= simple_format(comment_body_with_links(comment.body), {}, wrapper_tag: "div", sanitize: false) %></div>
   <% if comment.images.attached? %>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;margin-top:10px">
       <% comment.images.each do |image| %>

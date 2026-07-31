@@ -28,6 +28,18 @@ class BoardsCommentsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Sifu Review"
   end
 
+  test "task view renders https urls in comments as safe external links" do
+    comment = task_comments(:one)
+    comment.update!(body: "Details: https://example.test/review?asset=hero&state=ready <script>alert('xss')</script>")
+
+    get board_task_path(@board, @task)
+
+    assert_response :success
+    assert_select "#task_comment_#{comment.id} a[href*='example.test/review'][target='_blank'][rel='noopener noreferrer']", count: 1
+    assert_includes response.body, 'href="https://example.test/review?asset=hero&amp;state=ready"'
+    assert_includes response.body, "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;"
+  end
+
   test "rejects corrupt image without retaining attachment or blob" do
     assert_no_difference [ "TaskComment.count", "ActiveStorage::Attachment.count", "ActiveStorage::Blob.count" ] do
       post board_task_comments_path(@board, @task),
