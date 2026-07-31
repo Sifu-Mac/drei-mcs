@@ -42,9 +42,11 @@ Auf dem Integrationsbranch umgesetzt:
 - Der Server akzeptiert bei Client-Kartenanlage ausschliesslich Titel und Board-Spalte. Eingeschleuste Felder fuer Beschreibung, Prioritaet, Owner, Farbe, Status, Agent oder Uploads werden nicht uebernommen.
 - Bestehende Karten bleiben fuer Clients read-only: Bearbeiten, Verschieben, Archivieren, Loeschen, Agent-Zuweisungen, Subtasks, Board-/Spalten-/Kampagnenmutationen und API-Mutationen bleiben serverseitig gesperrt. Drag-and-drop bleibt im Client-Browser deaktiviert.
 - Die Client-UI zeigt nur `Karte hinzufügen` und `Karte duplizieren`; interne Kartenaktionen bleiben verborgen.
+- Direkte Aufrufe des internen Formulars `new` liefern fuer Clients `404`; die Kartenanlage erfolgt ausschliesslich ueber die minimale Inline-Eingabe.
+- Archivierte und daher im Board unsichtbare Karten koennen von Clients auch bei Kenntnis ihrer ID nicht dupliziert werden; der Server liefert `404` und erzeugt keine Kopie.
 - Der Inline-Add-Controller verwendet jetzt den robusten `meta[name="csrf-token"]`-Selektor, damit Kartenanlage auch im echten Browser mit CSRF-Schutz funktioniert.
-- Verifiziert im isolierten Teststack: fokussierte Controller-Tests `17 runs, 191 assertions`; Selenium-Systemtests `6 runs, 33 assertions`; vollständige Suite `154 runs, 771 assertions`; RuboCop `171 files inspected, no offenses`.
-- Vor Merge und Deployment ist noch ein unabhängiges QA-Review erforderlich.
+- Der erste unabhaengige QA-Lauf hatte genau diese zwei Grenzen beanstandet; beide sind mit Negativtests behoben. Der korrigierte Stand wartet auf erneutes QA-Go.
+- Verifiziert im frisch gebauten isolierten Teststack: fokussierte Controller-Tests `17 runs, 191 assertions`; Selenium-Systemtests `6 runs, 33 assertions`; vollständige Suite nach dem QA-Fix `155 runs, 775 assertions`; RuboCop `171 files inspected, no offenses`.
 
 Verifikation auf dem vollstaendigen Integrationsstand:
 - Frisch gebautes Testimage: erfolgreich.

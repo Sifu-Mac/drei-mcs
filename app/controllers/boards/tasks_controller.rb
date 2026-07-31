@@ -3,8 +3,8 @@ class Boards::TasksController < ApplicationController
 
   before_action :set_board
   before_action :set_task, only: [:show, :edit, :update, :destroy, :assign, :unassign, :duplicate, :archive, :restore]
-  before_action :require_internal_workspace_member, except: [:show, :archived, :new, :create, :duplicate]
-  before_action :require_task_creation_or_duplication_permission, only: [:new, :create, :duplicate]
+  before_action :require_internal_workspace_member, except: [:show, :archived, :create, :duplicate]
+  before_action :require_task_creation_or_duplication_permission, only: [:create, :duplicate]
 
   def show
     @api_token = current_user.api_token
@@ -127,6 +127,7 @@ class Boards::TasksController < ApplicationController
 
   def set_task
     @task = @board.tasks.unscoped.where(board_id: @board.id).includes(:activities, comments: :user).find(params[:id])
+    raise ActionController::RoutingError, "Not Found" if action_name == "duplicate" && client_workspace_member? && @task.archived_at.present?
   end
 
   def task_params

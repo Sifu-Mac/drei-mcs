@@ -107,6 +107,18 @@ class ClientPermissionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "text/vnd.turbo-stream.html", response.media_type
   end
 
+  test "client cannot open the internal new card form or duplicate an archived card" do
+    get new_board_task_path(@board)
+    assert_response :not_found
+
+    @task.archive!
+
+    assert_no_difference "Task.count" do
+      post duplicate_board_task_path(@board, @task)
+    end
+    assert_response :not_found
+  end
+
   test "client cannot mutate existing cards subtasks or agent assignment" do
     original_name = @task.name
 
