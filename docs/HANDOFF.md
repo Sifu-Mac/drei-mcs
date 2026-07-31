@@ -6,6 +6,15 @@ Stand: 2026-07-31
 
 ### UI-/UX-Navigations- und Board-Dichte-Kandidat (noch nicht gemergt)
 
+### DB × DREI-Marke und Admin-Benutzernavigation (noch nicht gemergt)
+
+- Kandidat: `codex/brand-admin-navigation` bei `64a0264`.
+- Der Board-Wechsler links oben ist durch die absichtlich nicht klickbare Wortmarke `DB × DREI` ersetzt. Die Kartenaktion bleibt rahmen- und hintergrundlos, ist nun aber zentriert.
+- Das Profilmenue zeigt `User hinzufuegen` ausschliesslich fuer `current_user.admin?`; es oeffnet die vorhandene, serverseitig per `require_admin` geschuetzte Benutzerverwaltung.
+- Neue Board-Regressionspruefungen decken Marke, fehlenden Board-Wechsler, zentrierte Kartenaktion und die Sichtbarkeit des Admin-Einstiegs ab. Clients sehen den Eintrag nicht.
+- Verifiziert im frisch gebauten isolierten Testimage: Board- und Admin-Controller `13 runs, 112 assertions`; vollstaendige Suite `169 runs, 882 assertions, 0 failures, 0 errors`; RuboCop `176 files inspected, no offenses`; Brakeman `0 security warnings`; Bundler- und Importmap-Audit ohne bekannte Schwachstellen.
+- Vor Merge und Deployment steht das erneute unabhaengige `QA & Review`-Go aus.
+
 ### Textuelle Kartenaktion (noch nicht gemergt)
 
 - Kandidat: `codex/text-card-add-action` bei `dcc06ff`.
