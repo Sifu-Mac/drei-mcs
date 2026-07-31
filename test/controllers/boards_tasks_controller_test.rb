@@ -59,7 +59,7 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "click->task-modal#cyclePriority"
     assert_not_includes response.body, "scheduleAutoSpeichern"
     assert_includes response.body, 'role="status"'
-    assert_includes response.body, "Auto-Speichern aktiv"
+    assert_includes response.body, "Klicken zum Bearbeiten"
   end
 
   test "auto-save update persists supported card panel fields" do
@@ -135,15 +135,14 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "data-task-modal-unassign-url-value"
     assert_includes response.body, "data-task-modal-delete-url-value"
     assert_includes response.body, 'name="task[name]"'
-    assert_includes response.body, 'name="task[board_column_id]"'
+    assert_includes response.body, "Spalte"
     assert_not_includes response.body, 'name="task[priority]"'
     assert_includes response.body, 'name="task[color]"'
     assert_not_includes response.body, 'name="task[owner]"'
     assert_includes response.body, board_task_subtask_path(boards(:one), task, task.subtasks.first)
     assert_not_includes response.body, "click-&gt;task-modal#toggleAgent"
-    assert_includes response.body, "click-&gt;task-modal#deleteTask"
+    assert_includes response.body, "click->task-modal#deleteTask"
     assert_includes response.body, "Klicken zum Bearbeiten"
     assert_not_includes response.body, "Activity"
   end
-
 end

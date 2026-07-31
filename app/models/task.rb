@@ -132,6 +132,9 @@ class Task < ApplicationRecord
     copy.activity_source = "web"
     copy.save!
     copy.activities.delete_all
+    subtasks.each do |subtask|
+      copy.subtasks.create!(title: subtask.title, position: subtask.position, done: false)
+    end
     copy
   end
 

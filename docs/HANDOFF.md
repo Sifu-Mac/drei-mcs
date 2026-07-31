@@ -9,6 +9,9 @@ Stand: 2026-07-31
 - Live-URL: `https://drei.digitalbackup.cloud`
 - Aktueller Release-Branch: `main`
 - Deployter Runtime-/Merge-Commit: `747c003 Merge Postmark transactional email hardening`
+- Aktueller, noch nicht gemergter Integrationsbranch: `codex/card-panel-inline-editing`.
+- Der Integrationsstand erweitert Karten für alle Workspace-Mitglieder, entfernt Task-Coverbilder, führt Inline-Titel/-Beschreibung, Details nur mit Spalte/Farbe, eine Assetliste mit Fortschritt sowie editierbare/zitierbare Kommentare ein und entfernt GitHub-/Discord-Navigation sowie die OpenClaw-Einstellungen.
+- Vor Merge/Deployment dieses Stands: vollständige Tests, Security-Audits und ein unabhängiges `QA & Review`-Go.
 - Das unabhaengige Re-Review des SMTP-Kandidaten `a316ccc` hat ausdruecklich Go erteilt.
 - SMTP-Haertung wurde am 2026-07-31 nach `main` gemergt, zu GitHub gepusht und in Production deployt.
 - `backup-postgres.sh` bleibt bewusst unversioniert und wurde nicht beruehrt.

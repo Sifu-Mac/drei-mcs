@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_160100) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_31_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -332,11 +332,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_160100) do
   create_table "task_comments", force: :cascade do |t|
     t.text "body", null: false
     t.datetime "created_at", null: false
+    t.bigint "quoted_comment_id"
+    t.string "quoted_comment_author_label"
+    t.text "quoted_comment_body"
+    t.datetime "quoted_comment_created_at"
     t.bigint "task_id", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["task_id", "created_at"], name: "index_task_comments_on_task_id_and_created_at"
     t.index ["task_id"], name: "index_task_comments_on_task_id"
+    t.index ["quoted_comment_id"], name: "index_task_comments_on_quoted_comment_id"
     t.index ["user_id"], name: "index_task_comments_on_user_id"
   end
 
@@ -475,6 +480,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_160100) do
   add_foreign_key "task_activities", "tasks"
   add_foreign_key "task_activities", "users"
   add_foreign_key "task_comments", "tasks"
+  add_foreign_key "task_comments", "task_comments", column: "quoted_comment_id", on_delete: :nullify
   add_foreign_key "task_comments", "users"
   add_foreign_key "task_lists", "projects"
   add_foreign_key "task_lists", "users"

@@ -132,5 +132,4 @@ class Boards::TasksController < ApplicationController
     permitted[:board_column_id] = @board.board_columns.find(permitted[:board_column_id]).id if permitted[:board_column_id].present?
     permitted
   end
-
 end

@@ -8,6 +8,16 @@ class TaskTest < ActiveSupport::TestCase
     assert_nil Task.attachment_reflections["cover_image"]
   end
 
+  test "duplicate copies asset list titles but resets completion" do
+    @task.subtasks.create!(title: "1:1", done: true)
+    @task.subtasks.create!(title: "9:16", done: false)
+
+    copy = @task.duplicate_for!(user: users(:admin))
+
+    assert_equal [ "1:1", "9:16" ], copy.subtasks.pluck(:title)
+    assert_equal [ false, false ], copy.subtasks.pluck(:done)
+  end
+
   test "completion and blocked state follow board column kind" do
     task = tasks(:one)
 
