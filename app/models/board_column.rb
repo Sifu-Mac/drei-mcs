@@ -28,7 +28,8 @@ class BoardColumn < ApplicationRecord
       ["In Bearbeitung", "active"],
       ["Kunden-Review", "review"],
       ["Änderungen angefordert", "blocked"],
-      ["Freigegeben", "done"]
+      ["Freigegeben", "review"],
+      ["Fertig", "done"]
     ]
   end
 

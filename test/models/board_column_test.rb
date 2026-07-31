@@ -1,4 +1,5 @@
 require "test_helper"
+require Rails.root.join("db/migrate/20260731110000_make_finished_the_final_board_column")
 
 class BoardColumnTest < ActiveSupport::TestCase
   test "creates with name kind and position" do
@@ -14,6 +15,35 @@ class BoardColumnTest < ActiveSupport::TestCase
 
     assert_not column.valid?
     assert_includes column.errors[:name], "can't be blank"
+  end
+
+  test "standard review template keeps approval separate from completion" do
+    assert_equal [
+      ["Eingang", "backlog"],
+      ["In Bearbeitung", "active"],
+      ["Kunden-Review", "review"],
+      ["Änderungen angefordert", "blocked"],
+      ["Freigegeben", "review"],
+      ["Fertig", "done"]
+    ], BoardColumn.standard_review_template
+  end
+
+  test "workflow migration converts an existing finished column into the final state" do
+    board = workspaces(:primary).boards.new(user: users(:one), campaign: campaigns(:general), name: "Migrations-Board")
+    board.column_template = "skip"
+    board.save!
+    approved = board.board_columns.create!(name: "Freigegeben", kind: :done)
+    existing_finished = board.board_columns.create!(name: "Fertig", kind: :review)
+    approved_task = board.tasks.create!(name: "Abgenommen", user: users(:one), board_column: approved)
+    finished_task = board.tasks.create!(name: "Abgeschlossen", user: users(:one), board_column: existing_finished)
+
+    MakeFinishedTheFinalBoardColumn.new.up
+
+    assert approved.reload.kind_review?
+    assert_equal [false, false, "review"], approved_task.reload.attributes.values_at("completed", "blocked", "status")
+    assert existing_finished.reload.kind_done?
+    assert_equal [true, false, "done"], finished_task.reload.attributes.values_at("completed", "blocked", "status")
+    assert_equal 1, board.board_columns.where(name: "Fertig").count
   end
 
   test "moves left and right" do

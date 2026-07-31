@@ -89,6 +89,14 @@
     <% end %>
 
     <% if authenticated? %>
+      <% if @board %>
+        <%= link_to export_board_path(@board, format: :csv),
+            data: { turbo: false },
+            class: "hidden sm:inline-flex items-center gap-2 rounded-lg border border-border bg-bg-card px-3 py-2 text-xs font-bold text-content-secondary transition-colors hover:bg-bg-hover hover:text-content" do %>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2V10M5 7L8 10L11 7M3 12V13H13V12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Board exportieren
+        <% end %>
+      <% end %>
       <%# User avatar dropdown %>
       <div class="relative" data-controller="dropdown">
         <button type="button"
@@ -157,6 +165,9 @@
               Admin
             <% end %>
           <% end %>
+          <div class="mx-2.5 mt-2 border-t border-border pt-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-content-muted">
+            DREI Asset Review · <%= release_version %>
+          </div>
           <%# Divider + Abmelden %>
           <div class="h-px bg-border my-1"></div>
           <%= link_to session_path,

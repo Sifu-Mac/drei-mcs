@@ -32,4 +32,13 @@ class UserTest < ActiveSupport::TestCase
     assert_not user.valid?
     assert user.errors[:avatar].any? { |message| message.include?("must be a valid JPEG") }
   end
+
+  test "all workspace roles can see every active board and campaign in their workspace" do
+    [users(:admin), users(:one), users(:client)].each do |user|
+      assert_includes user.current_workspace_campaigns, campaigns(:general)
+      assert_includes user.current_workspace_boards, boards(:one)
+    end
+
+    assert_not_includes users(:client).current_workspace_boards, boards(:two)
+  end
 end
