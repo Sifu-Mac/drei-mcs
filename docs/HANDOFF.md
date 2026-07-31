@@ -1,6 +1,6 @@
 # HANDOFF.md
 
-Stand: 2026-07-30
+Stand: 2026-07-31
 
 ## Aktueller Stand
 
@@ -8,18 +8,16 @@ Stand: 2026-07-30
 - VPS-Projektpfad: `/docker/drei-review`
 - Live-URL: `https://drei.digitalbackup.cloud`
 - Aktueller Branch: `main`
-- Aktueller `main`-/`origin/main`-Stand: `a3797b2 Document lead agent workflow`
-- Deployter Code-Commit: `e8fab25 Merge PWA icon fix`
-- Aktuelle QA-Fix-Commits: `2a94ffe Fix production QA issues`, `642bdda Fix PWA icon links`
-- VPS-Git-Status nach Deployment: `main...origin/main`, nur `backup-postgres.sh` ist unversioniert und unberuehrt.
+- Deployter Runtime-/Merge-Commit: `f3c90d8 Merge QA remediation`
+- Die abschliessende Handoff-Aktualisierung folgt als reiner Dokumentationscommit auf `main`; sie erfordert keinen weiteren Production-Rebuild.
+- Der Hauptcheckout `/docker/drei-review` bleibt wegen der getrennten, uncommitteten SMTP-Arbeit auf `codex/postmark-transactional-email`; diese Aenderungen und `backup-postgres.sh` wurden beim Release nicht beruehrt.
 
-## QA-Sanierungsstand (noch nicht gemergt oder deployt)
+## QA-Sanierungsstand (gemergt und deployt)
 
 - Integrationsbranch: `codex/qa-remediation-integration`
-- Vollstaendig getesteter Integrationsstand vor dieser Dokumentationsaktualisierung: `c16e3d4 Disable board drag and drop while filtered`
-- `main`, `origin/main` und der deployte Production-Stand wurden nicht veraendert.
-- Der Integrationsbranch wartet auf das unabhaengige Re-Review und ausdrueckliche Go des Threads `QA & Review`.
-- Vor diesem Go darf nichts nach `main` gemergt oder deployt werden.
+- Freigegebener Integrationsstand: `2816365 Clarify migration reset metadata`
+- Der unabhaengige Thread `QA & Review` hat nach der Nachpruefung der From-scratch-Migrationen und des gefilterten Drag-and-drop ausdruecklich Go erteilt.
+- Merge nach `main`, GitHub-Push und Production-Deployment erfolgten am 2026-07-31 mit Runtime-Commit `f3c90d8`.
 
 Auf dem Integrationsbranch umgesetzt:
 - Verwundbare Ruby-Abhaengigkeiten aktualisiert; Rails/Active Storage `8.1.3.1`, Rack `3.2.6`, Puma `8.0.2`, Nokogiri `1.19.4`, OAuth2 `2.0.25`, JWT `3.2.0`, `action_text-trix` `2.1.19` sowie weitere Advisory-Fixes.
@@ -48,7 +46,8 @@ Verifikation auf dem vollstaendigen Integrationsstand:
 - Separat benanntes Production-Pruefimage inklusive Asset-Precompile: erfolgreich und ohne Docker-Secret-Warnung gebaut; nicht deployt und danach entfernt.
 - Isolierter Restore des vorhandenen Dumps: Import erfolgreich, aktuelle Migrationen erfolgreich, `36` Tabellen, `61` Repository-Migrationen, `8/8` Kerntabellen; temporaere Container, Images, Netzwerke und Volumes entfernt.
 - Diff-/Secret-Pruefung: keine versehentlich aufgenommenen Secret-, Dump- oder ENV-Dateien.
-- Production nach allen isolierten Pruefungen: `db` healthy, `web` running, `/up` liefert `200`.
+- Production nach dem Deployment: `db` healthy, `web` running, `/up` liefert `200`; alle aktuellen Repository-Migrationen sind `up`.
+- Der Production-Migrationsstatus enthaelt weiterhin den historischen Eintrag `20260222000001 NO FILE` aus der frueheren separaten Cache-Datenbankkonfiguration. Die abloesende Primary-Migration `20260222100002` ist `up`; der Alt-Eintrag war bereits vorhanden und blockiert weder Start noch Migration.
 
 ## Laufende Container und Services
 
@@ -56,13 +55,13 @@ Production-Stack in `/docker/drei-review`:
 - `drei-review-db-1`: Service `db`, running, healthy
 - `drei-review-web-1`: Service `web`, running
 - Healthcheck: `https://drei.digitalbackup.cloud/up` liefert `200`
-- Zuletzt erneut verifiziert am 2026-07-30: `db` healthy, `web` running, Production-Healthcheck `200`.
+- Zuletzt erneut verifiziert am 2026-07-31 nach Deployment von `f3c90d8`: `db` healthy, `web` running, Production-Healthcheck `200`.
 
 Test-Stack:
 - `docker-compose.test.yml` definiert `test-db` und `test`.
 - Testdatenbank ist getrennt von Production: `drei_mcs_test`.
 - Test-Container verwendet keine `.env.production` und keine Production-Secrets.
-- Test-Stack wurde nach der letzten Ausfuehrung gestoppt; das gemeinsame Compose-Netz blieb wegen laufender Production-Container erhalten.
+- Die vom abschliessenden unabhaengigen QA-Lauf hinterlassenen Testcontainer und das zugehoerige isolierte Testvolume wurden nach dem Deployment gezielt entfernt.
 
 ## Umgesetzte Funktionen
 
