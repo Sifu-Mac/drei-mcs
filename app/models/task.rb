@@ -272,7 +272,12 @@ class Task < ApplicationRecord
     stream = "board_#{cached_board_id}"
 
     Turbo::StreamsChannel.broadcast_action_to(stream, action: :remove, target: "task_#{cached_id}")
-    count = Board.find(cached_board_id).tasks.where(board_column_id: cached_column_id).count
+    # A task can be removed as part of a board/campaign deletion. In that case
+    # the after-commit callback runs after its board is already gone.
+    board = Board.unscoped.find_by(id: cached_board_id)
+    return unless board
+
+    count = board.tasks.where(board_column_id: cached_column_id).count
     Turbo::StreamsChannel.broadcast_action_to(stream, action: :replace, target: "column-#{cached_column_id}-count", html: %(<span id="column-#{cached_column_id}-count" style="font-size:11px;font-weight:600;color:#6b7280;background:#eef2ff;padding:0 7px;border-radius:5px;line-height:20px">#{count}</span>))
   end
 

@@ -13,7 +13,7 @@ module Admin
     def create
       email = params.dig(:invite, :email).to_s.strip.downcase
       @new_invite = Invite.new(invite_params)
-      @new_invite.role = params.dig(:invite, :role) if params.dig(:invite, :role).present?
+      @new_invite.role = :client
       @new_invite.invited_by = current_user
 
       if User.exists?(email_address: email)
@@ -22,6 +22,7 @@ module Admin
         @new_invite.errors.add(:email, "hat bereits eine offene Einladung")
       elsif @new_invite.save
         if enqueue_invitation
+          AuditEvent.record!(actor: current_user, action: "invite_created", target: @new_invite, target_label: @new_invite.email, metadata: { role: "client" })
           redirect_to admin_invites_path, notice: "Einladung an #{@new_invite.email} wurde zum Versand eingereiht." and return
         end
       end
@@ -32,7 +33,10 @@ module Admin
 
     def destroy
       invite = Invite.find(params[:id])
-      invite.update!(revoked_at: Time.current) if invite.usable?
+      if invite.usable?
+        invite.update!(revoked_at: Time.current)
+        AuditEvent.record!(actor: current_user, action: "invite_revoked", target: invite, target_label: invite.email)
+      end
       redirect_to admin_invites_path, notice: "Einladung wurde widerrufen."
     end
 

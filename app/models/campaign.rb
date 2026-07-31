@@ -23,6 +23,20 @@ class Campaign < ApplicationRecord
     update!(archived_at: nil)
   end
 
+  def destroy_permanently!
+    raise ActiveRecord::RecordInvalid, self unless archived?
+
+    transaction do
+      boards.unscoped.where(campaign_id: id).find_each do |board|
+        # BoardColumn deliberately restricts deletion while cards reference it.
+        # Delete all cards first, including archived cards hidden by Task's scope.
+        board.tasks.unscoped.where(board_id: board.id).find_each(&:destroy!)
+        board.destroy!
+      end
+      destroy!
+    end
+  end
+
   def duplicate_for!(user:)
     Campaign.transaction do
       copy = workspace.campaigns.create!(name: "#{name} Kopie", position: next_position)

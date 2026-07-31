@@ -1,39 +1,33 @@
 require "test_helper"
 
 class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
-  test "admin can explicitly create another admin" do
+  test "admin can promote and demote a client" do
     sign_in_as users(:admin)
+    client = users(:client)
 
-    assert_difference("User.count", 1) do
-      post admin_users_path, params: {
-        user: {
-          email_address: "new-admin@example.com",
-          password: "password123",
-          password_confirmation: "password123",
-          admin: "1"
-        }
-      }
+    assert_difference "AuditEvent.count", 1 do
+      patch promote_admin_user_path(client)
     end
+    assert_predicate client.reload, :admin?
 
-    assert_redirected_to admin_users_path
-    assert_predicate User.find_by!(email_address: "new-admin@example.com"), :admin?
+    assert_difference "AuditEvent.count", 1 do
+      patch demote_admin_user_path(client)
+    end
+    assert_not client.reload.admin?
   end
 
-  test "admin creates a regular user when admin is not selected" do
+  test "last admin and current admin cannot be demoted" do
     sign_in_as users(:admin)
 
-    assert_difference("User.count", 1) do
-      post admin_users_path, params: {
-        user: {
-          email_address: "new-member@example.com",
-          password: "password123",
-          password_confirmation: "password123",
-          admin: "0"
-        }
-      }
-    end
-
+    patch demote_admin_user_path(users(:admin))
     assert_redirected_to admin_users_path
-    assert_not User.find_by!(email_address: "new-member@example.com").admin?
+    assert_predicate users(:admin).reload, :admin?
+  end
+
+  test "client cannot manage user rights" do
+    sign_in_as users(:client)
+
+    patch promote_admin_user_path(users(:one))
+    assert_response :not_found
   end
 end

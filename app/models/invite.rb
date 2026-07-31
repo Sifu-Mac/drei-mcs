@@ -1,7 +1,8 @@
 class Invite < ApplicationRecord
   belongs_to :invited_by, class_name: "User"
 
-  enum :role, { internal: 0, client: 1 }, default: :internal
+  # internal remains readable for historic records only. New invitations are clients.
+  enum :role, { internal: 0, client: 1 }, default: :client
 
   normalizes :email, with: ->(e) { e.strip.downcase }
 

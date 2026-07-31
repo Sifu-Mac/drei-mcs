@@ -48,7 +48,7 @@ module Authentication
     end
 
     def internal_workspace_member?
-      current_user&.admin? || current_workspace_membership&.owner? || current_workspace_membership&.member?
+      current_user&.admin?
     end
 
     def require_internal_workspace_member

@@ -15,6 +15,7 @@ class Admin::InvitesControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to admin_invites_path
     assert_predicate Invite.find_by!(email: "new-client@example.com"), :client?
+    assert_equal "invite_created", AuditEvent.order(:created_at).last.action
     assert_equal "Einladung an new-client@example.com wurde zum Versand eingereiht.", flash[:notice]
   end
 
@@ -22,7 +23,7 @@ class Admin::InvitesControllerTest < ActionDispatch::IntegrationTest
     sign_in_as(@member)
 
     assert_no_difference("Invite.count") do
-      post admin_invites_path, params: { invite: { email: "new-hire@example.com", role: "internal" } }
+      post admin_invites_path, params: { invite: { email: "new-hire@example.com", role: "client" } }
     end
 
     assert_response :not_found
@@ -32,7 +33,7 @@ class Admin::InvitesControllerTest < ActionDispatch::IntegrationTest
     sign_in_as(@admin)
 
     assert_no_difference("Invite.count") do
-      post admin_invites_path, params: { invite: { email: @member.email_address, role: "internal" } }
+      post admin_invites_path, params: { invite: { email: @member.email_address, role: "client" } }
     end
 
     assert_response :unprocessable_entity
@@ -43,7 +44,7 @@ class Admin::InvitesControllerTest < ActionDispatch::IntegrationTest
     pending_email = invites(:pending_internal).email
 
     assert_no_difference("Invite.count") do
-      post admin_invites_path, params: { invite: { email: pending_email, role: "internal" } }
+      post admin_invites_path, params: { invite: { email: pending_email, role: "client" } }
     end
 
     assert_response :unprocessable_entity
@@ -74,7 +75,7 @@ class Admin::InvitesControllerTest < ActionDispatch::IntegrationTest
 
     assert_no_difference("Invite.count") do
       with_invite_delivery(delivery) do
-        post admin_invites_path, params: { invite: { email: "queue-rejected@example.com", role: "internal" } }
+      post admin_invites_path, params: { invite: { email: "queue-rejected@example.com", role: "client" } }
       end
     end
 
@@ -90,6 +91,7 @@ class Admin::InvitesControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to admin_invites_path
     assert invite.reload.revoked_at.present?
+    assert_equal "invite_revoked", AuditEvent.order(:created_at).last.action
   end
 
   private
