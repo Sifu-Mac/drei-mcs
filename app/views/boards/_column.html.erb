@@ -60,7 +60,8 @@
         data-controller="sortable"
         data-sortable-group-value="board"
         data-sortable-column-id-value="<%= column.id %>"
-        data-sortable-url-value="<%= update_task_status_board_path(@board) %>">
+        data-sortable-disabled-value="<%= @current_tag.present? %>"
+        data-sortable-url-value="<%= update_task_status_board_path(@board, tag: @current_tag.presence) %>">
       <% tasks.each do |task| %>
         <%= render "boards/task_card", task: task %>
       <% end %>

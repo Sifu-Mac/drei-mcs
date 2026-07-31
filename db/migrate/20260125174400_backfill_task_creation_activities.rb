@@ -1,9 +1,17 @@
 class BackfillTaskCreationActivities < ActiveRecord::Migration[8.1]
+  class MigrationTask < ActiveRecord::Base
+    self.table_name = "tasks"
+  end
+
+  class MigrationTaskActivity < ActiveRecord::Base
+    self.table_name = "task_activities"
+  end
+
   def up
-    Task.find_each do |task|
-      TaskActivity.create!(
-        task: task,
-        user: task.user,
+    MigrationTask.find_each do |task|
+      MigrationTaskActivity.create!(
+        task_id: task.id,
+        user_id: task.user_id,
         action: "created",
         source: "web",
         created_at: task.created_at,
@@ -13,6 +21,6 @@ class BackfillTaskCreationActivities < ActiveRecord::Migration[8.1]
   end
 
   def down
-    TaskActivity.where(action: "created").delete_all
+    MigrationTaskActivity.where(action: "created").delete_all
   end
 end

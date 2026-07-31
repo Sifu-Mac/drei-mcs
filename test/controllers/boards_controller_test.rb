@@ -90,4 +90,99 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :not_found
   end
+
+  test "internal user atomically moves and orders a task in another column" do
+    sign_in_as users(:admin)
+    board = boards(:one)
+    source = board_columns(:one_backlog)
+    target = board_columns(:one_active)
+    moved = tasks(:one)
+    remaining = board.tasks.create!(
+      name: "Bleibt im Eingang",
+      user: users(:admin),
+      board_column: source,
+      position: 2
+    )
+    existing = board.tasks.create!(
+      name: "Bereits aktiv",
+      user: users(:admin),
+      board_column: target,
+      position: 1
+    )
+
+    patch update_task_status_board_path(board), params: {
+      task_id: moved.id,
+      source_column_id: source.id,
+      board_column_id: target.id,
+      task_ids: [existing.id, moved.id]
+    }, as: :json
+
+    assert_response :success
+    assert_equal target, moved.reload.board_column
+    assert_equal 2, moved.position
+    assert_equal "in_progress", moved.status
+    assert_equal 1, remaining.reload.position
+    assert_equal 1, existing.reload.position
+  end
+
+  test "invalid task order rolls back the complete move" do
+    sign_in_as users(:admin)
+    board = boards(:one)
+    source = board_columns(:one_backlog)
+    target = board_columns(:one_active)
+    moved = tasks(:one)
+
+    patch update_task_status_board_path(board), params: {
+      task_id: moved.id,
+      source_column_id: source.id,
+      board_column_id: target.id,
+      task_ids: [moved.id, moved.id]
+    }, as: :json
+
+    assert_response :unprocessable_entity
+    assert_equal source, moved.reload.board_column
+    assert_nil moved.position
+    assert_equal "inbox", moved.status
+    assert_equal "Ungültige oder veraltete Kartenreihenfolge.", response.parsed_body["error"]
+  end
+
+  test "filtered board context rejects task moves before changing positions" do
+    sign_in_as users(:admin)
+    board = boards(:one)
+    moved = tasks(:one)
+    source = board_columns(:one_backlog)
+    target = board_columns(:one_active)
+
+    patch update_task_status_board_path(board, tag: "review"), params: {
+      task_id: moved.id,
+      source_column_id: source.id,
+      board_column_id: target.id,
+      task_ids: [moved.id]
+    }, as: :json
+
+    assert_response :unprocessable_entity
+    assert_equal source, moved.reload.board_column
+    assert_nil moved.position
+    assert_equal(
+      "Karten können in einer gefilterten Ansicht nicht verschoben werden. Filter entfernen und erneut versuchen.",
+      response.parsed_body["error"]
+    )
+  end
+
+  test "stale source column rejects a competing move" do
+    sign_in_as users(:admin)
+    board = boards(:one)
+    moved = tasks(:one)
+
+    patch update_task_status_board_path(board), params: {
+      task_id: moved.id,
+      source_column_id: board_columns(:one_active).id,
+      board_column_id: board_columns(:one_review).id,
+      task_ids: [moved.id]
+    }, as: :json
+
+    assert_response :conflict
+    assert_equal board_columns(:one_backlog), moved.reload.board_column
+    assert_equal "Das Board wurde zwischenzeitlich geändert. Bitte erneut versuchen.", response.parsed_body["error"]
+  end
 end

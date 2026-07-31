@@ -44,7 +44,8 @@ test:
 
 # Production database configuration
 # Uses DATABASE_URL from environment (Render, Railway, etc.)
-# All databases share the same connection for single-db deployments (MVP)
+# All roles share one physical database. Only primary owns database tasks and
+# migrations; the Solid migrations already live in db/migrate.
 production:
   primary:
     <<: *default
@@ -52,12 +53,12 @@ production:
   cache:
     <<: *default
     url: <%= ENV['DATABASE_URL'] %>
-    migrations_paths: db/cache_migrate
+    database_tasks: false
   queue:
     <<: *default
     url: <%= ENV['DATABASE_URL'] %>
-    migrations_paths: db/queue_migrate
+    database_tasks: false
   cable:
     <<: *default
     url: <%= ENV['DATABASE_URL'] %>
-    migrations_paths: db/cable_migrate
+    database_tasks: false

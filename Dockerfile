@@ -26,8 +26,7 @@ RUN bundle install
 COPY . .
 RUN mkdir -p tmp/pids log storage && chmod +x docker/entrypoint-web.sh
 
-ENV SECRET_KEY_BASE_DUMMY=dummy
-RUN bundle exec rails assets:precompile
+RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
 
 EXPOSE 3000
 CMD ["./docker/entrypoint-web.sh"]

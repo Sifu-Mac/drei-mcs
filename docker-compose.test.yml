@@ -1,3 +1,5 @@
+name: ${COMPOSE_PROJECT_NAME:-drei-review-test}
+
 services:
   test-db:
     image: postgres:16-alpine
@@ -29,3 +31,4 @@ services:
 
 volumes:
   drei-review-test-postgres:
+    name: ${COMPOSE_PROJECT_NAME:-drei-review-test}-postgres

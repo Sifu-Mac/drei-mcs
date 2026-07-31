@@ -10,10 +10,11 @@ class Admin::InvitesControllerTest < ActionDispatch::IntegrationTest
     sign_in_as(@admin)
 
     assert_difference("Invite.count", 1) do
-      post admin_invites_path, params: { invite: { email: "new-hire@example.com", role: "internal" } }
+      post admin_invites_path, params: { invite: { email: "new-client@example.com", role: "client" } }
     end
 
     assert_redirected_to admin_invites_path
+    assert_predicate Invite.find_by!(email: "new-client@example.com"), :client?
   end
 
   test "non-admin cannot access invites admin area" do

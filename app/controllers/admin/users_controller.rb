@@ -22,6 +22,7 @@ module Admin
 
     def create
       @new_user = User.new(user_params)
+      @new_user.admin = ActiveModel::Type::Boolean.new.cast(params.dig(:user, :admin))
 
       if @new_user.save
         redirect_to admin_users_path, notice: "Benutzer wurde erstellt."
@@ -47,7 +48,7 @@ module Admin
     private
 
     def user_params
-      params.require(:user).permit(:email_address, :password, :password_confirmation, :admin)
+      params.require(:user).permit(:email_address, :password, :password_confirmation)
     end
   end
 end

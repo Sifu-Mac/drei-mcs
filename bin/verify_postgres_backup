@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -ne 1 ]]; then
+  echo "Usage: $0 /absolute/path/to/backup.sql.gz" >&2
+  exit 64
+fi
+
+backup_path=$1
+if [[ "$backup_path" != /* || ! -f "$backup_path" || "$backup_path" != *.sql.gz ]]; then
+  echo "Backup must be an existing absolute path ending in .sql.gz" >&2
+  exit 64
+fi
+
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+project_dir=$(cd -- "$script_dir/.." && pwd)
+compose_file="$project_dir/docker-compose.restore.yml"
+restore_project="drei-restore-$(date -u +%Y%m%d%H%M%S)-$$"
+
+cleanup() {
+  docker compose --project-name "$restore_project" --file "$compose_file" down \
+    --volumes --remove-orphans --rmi local >/dev/null 2>&1 || true
+}
+trap cleanup EXIT INT TERM
+
+gzip --test "$backup_path"
+docker compose --project-name "$restore_project" --file "$compose_file" up --detach --wait restore-db
+
+gzip --decompress --stdout "$backup_path" |
+  docker compose --project-name "$restore_project" --file "$compose_file" exec --no-TTY restore-db \
+    psql --set ON_ERROR_STOP=1 --username drei_review --dbname drei_restore >/dev/null
+
+docker compose --project-name "$restore_project" --file "$compose_file" run --rm --no-deps restore-app \
+  bin/rails db:migrate
+
+restore_checks=$(docker compose --project-name "$restore_project" --file "$compose_file" exec --no-TTY restore-db \
+  psql --set ON_ERROR_STOP=1 --username drei_review --dbname drei_restore --tuples-only --no-align <<'SQL'
+SELECT 'schema_tables=' || count(*)
+FROM information_schema.tables
+WHERE table_schema = 'public' AND table_type = 'BASE TABLE';
+
+SELECT 'schema_migrations=' || count(*)
+FROM schema_migrations;
+
+SELECT 'required_tables=' || count(*) || '/8'
+FROM information_schema.tables
+WHERE table_schema = 'public'
+  AND table_name IN (
+    'users',
+    'workspaces',
+    'workspace_memberships',
+    'campaigns',
+    'boards',
+    'board_columns',
+    'tasks',
+    'active_storage_blobs'
+  );
+SQL
+)
+printf '%s\n' "$restore_checks"
+
+if ! grep --quiet '^required_tables=8/8$' <<<"$restore_checks"; then
+  echo "Restore import succeeded, but the backup does not contain the complete required schema." >&2
+  exit 1
+fi
+
+docker compose --project-name "$restore_project" --file "$compose_file" exec --no-TTY restore-db \
+  psql --set ON_ERROR_STOP=1 --username drei_review --dbname drei_restore --tuples-only --no-align <<'SQL'
+SELECT format('%s=%s', table_name, row_count)
+FROM (
+  SELECT 'campaigns' AS table_name, count(*) AS row_count FROM campaigns
+  UNION ALL SELECT 'boards', count(*) FROM boards
+  UNION ALL SELECT 'board_columns', count(*) FROM board_columns
+  UNION ALL SELECT 'tasks', count(*) FROM tasks
+) checks
+ORDER BY table_name;
+SQL
+
+echo "Restore verification completed; the isolated project and volume will now be removed."

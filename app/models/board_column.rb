@@ -17,6 +17,7 @@ class BoardColumn < ApplicationRecord
   validates :position, presence: true, uniqueness: { scope: :board_id }
 
   before_validation :set_position, on: :create
+  after_update :sync_task_states, if: :saved_change_to_kind?
   after_commit :broadcast_board_refresh
 
   scope :ordered, -> { order(position: :asc, created_at: :asc) }
@@ -65,6 +66,13 @@ class BoardColumn < ApplicationRecord
     return if position.present? && position.positive?
 
     self.position = (board.board_columns.maximum(:position) || 0) + 1
+  end
+
+  def sync_task_states
+    Task.unscoped.where(board_column_id: id).find_each(&:save!)
+  rescue ActiveRecord::RecordInvalid => error
+    errors.add(:base, "Kartenstatus konnte nicht synchronisiert werden: #{error.record.errors.full_messages.join(", ")}")
+    raise ActiveRecord::Rollback
   end
 
   def swap_with(other)

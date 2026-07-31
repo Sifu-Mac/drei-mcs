@@ -18,14 +18,12 @@ class TaskComment < ApplicationRecord
   private
 
   def images_are_supported
-    images.each do |image|
-      unless image.blob.content_type.in?(MediaUploadValidator::ALLOWED_IMAGE_TYPES)
-        errors.add(:images, "#{image.filename} must be a JPEG, PNG, WebP, or GIF image")
-      end
+    if images.size > MediaUploadValidator::MAX_COMMENT_IMAGES
+      errors.add(:images, "must contain no more than #{MediaUploadValidator::MAX_COMMENT_IMAGES} images")
+    end
 
-      if image.blob.byte_size > MediaUploadValidator::MAX_IMAGE_SIZE
-        errors.add(:images, "#{image.filename} must be 5 MB or smaller")
-      end
+    images.each do |image|
+      MediaUploadValidator.validate_image(self, image, attribute: :images)
     end
   end
 end

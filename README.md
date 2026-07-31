@@ -21,6 +21,23 @@ cp .env.production.example .env.production
 docker compose --env-file .env.production up -d --build
 ```
 
+## Tests
+
+Der Test-Stack verwendet den festen Compose-Projektnamen
+`drei-review-test` und ausschließlich das Volume
+`drei-review-test-postgres`. Dadurch bleiben seine Container, sein Netzwerk
+und seine Datenbank vom Production-Stack getrennt.
+
+```bash
+docker compose -f docker-compose.test.yml build test
+docker compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from test test
+```
+
+Die Production-Konfiguration verwendet eine physische PostgreSQL-Datenbank
+für `primary`, `cache`, `queue` und `cable`. Migrationen werden ausschließlich
+über `primary` aus `db/migrate` verwaltet; dort liegen auch die Migrationen für
+Solid Cache, Solid Queue und Solid Cable.
+
 ## Lokale Entwicklung
 
 ### Voraussetzungen

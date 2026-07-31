@@ -161,17 +161,14 @@ class User < ApplicationRecord
   end
 
   def acceptable_avatar
-    return unless avatar.attached?
-    return unless avatar.blob.present?
-
-    unless avatar.blob.byte_size <= 512.kilobytes
-      errors.add(:avatar, "is too large (maximum is 512KB)")
-    end
-
-    acceptable_types = [ "image/jpeg", "image/jpg", "image/png", "image/webp" ]
-    unless acceptable_types.include?(avatar.blob.content_type)
-      errors.add(:avatar, "must be a JPEG, PNG, or WebP")
-    end
+    MediaUploadValidator.validate_image(
+      self,
+      avatar,
+      attribute: :avatar,
+      max_size: 512.kilobytes,
+      allowed_types: %w[image/jpeg image/png image/webp]
+    )
+    return if errors[:avatar].any?
 
     return unless avatar.blob.representable?
     return unless avatar.blob.metadata.present?

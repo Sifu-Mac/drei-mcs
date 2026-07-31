@@ -5,4 +5,31 @@ class UserTest < ActiveSupport::TestCase
     user = User.new(email_address: " DOWNCASED@EXAMPLE.COM ")
     assert_equal("downcased@example.com", user.email_address)
   end
+
+  test "avatar accepts a valid small image" do
+    user = users(:admin)
+    attach_png(user.avatar)
+
+    assert user.valid?, user.errors.full_messages.join(", ")
+  end
+
+  test "avatar rejects spoofed and oversized images" do
+    user = users(:admin)
+    attach_png(user.avatar, filename: "avatar.jpg", content_type: "image/jpeg")
+    assert_not user.valid?
+    assert user.errors[:avatar].any? { |message| message.include?("does not match") }
+
+    user.avatar.purge
+    attach_png(user.avatar, bytes: png_bytes.ljust(512.kilobytes + 1, "\0"))
+    assert_not user.valid?
+    assert user.errors[:avatar].any? { |message| message.include?("512 KB or smaller") }
+  end
+
+  test "avatar rejects corrupt image data" do
+    user = users(:admin)
+    user.avatar.attach(io: StringIO.new("broken"), filename: "avatar.png", content_type: "image/png")
+
+    assert_not user.valid?
+    assert user.errors[:avatar].any? { |message| message.include?("must be a valid JPEG") }
+  end
 end

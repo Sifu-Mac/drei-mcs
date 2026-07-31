@@ -1,6 +1,8 @@
 module Api
   module V1
     class SettingsController < BaseController
+      before_action :require_internal_workspace_member, only: :update
+
       # GET /api/v1/settings - get current user's agent settings
       def show
         render json: settings_json
@@ -34,7 +36,7 @@ module Api
       def agent_status
         # Check if agent has ever been used (API token used)
         return "not_configured" unless current_user.api_tokens.exists?(["last_used_at IS NOT NULL"])
-        
+
         # Check if agent is currently working on a task
         working = current_user.current_workspace_tasks.where(status: :in_progress).where.not(agent_claimed_at: nil).exists?
         working ? "working" : "idle"

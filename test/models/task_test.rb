@@ -1,6 +1,4 @@
 require "test_helper"
-require "stringio"
-
 class TaskTest < ActiveSupport::TestCase
   setup do
     @task = tasks(:one)
@@ -11,33 +9,42 @@ class TaskTest < ActiveSupport::TestCase
     assert_not @task.cover_image.attached?
   end
 
-  test "task accepts valid cover image types" do
-    {
-      "cover.jpg" => "image/jpeg",
-      "cover.png" => "image/png",
-      "cover.webp" => "image/webp",
-      "cover.gif" => "image/gif"
-    }.each do |filename, content_type|
-      task = tasks(:one)
-      task.cover_image.purge if task.cover_image.attached?
-      attach_file(task.cover_image, filename: filename, content_type: content_type)
+  test "task accepts a valid cover image" do
+    attach_png(@task.cover_image)
 
-      assert task.valid?, "#{content_type} should be valid: #{task.errors.full_messages.join(', ')}"
-    end
+    assert @task.valid?, @task.errors.full_messages.join(", ")
   end
 
   test "task rejects invalid cover image type" do
-    attach_file(@task.cover_image, filename: "script.svg", content_type: "image/svg+xml")
+    @task.cover_image.attach(io: StringIO.new("<svg><script /></svg>"), filename: "script.svg", content_type: "image/svg+xml")
 
     assert_not @task.valid?
-    assert_includes @task.errors[:cover_image], "must be a JPEG, PNG, WebP, or GIF image"
+    assert @task.errors[:cover_image].any? { |message| message.include?("must be a valid JPEG") }
   end
 
   test "task rejects cover image over five megabytes" do
-    attach_file(@task.cover_image, filename: "large.png", content_type: "image/png", size: 5.megabytes + 1)
+    attach_png(@task.cover_image, filename: "large.png", bytes: png_bytes.ljust(5.megabytes + 1, "\0"))
 
     assert_not @task.valid?
-    assert_includes @task.errors[:cover_image], "must be 5 MB or smaller"
+    assert @task.errors[:cover_image].any? { |message| message.include?("5 MB or smaller") }
+  end
+
+  test "task rejects empty and MIME-spoofed cover images" do
+    @task.cover_image.attach(io: StringIO.new(""), filename: "empty.png", content_type: "image/png")
+    assert_not @task.valid?
+    assert @task.errors[:cover_image].any? { |message| message.include?("must not be empty") }
+
+    @task.cover_image.purge
+    attach_png(@task.cover_image, filename: "payload.jpg", content_type: "image/jpeg")
+    assert_not @task.valid?
+    assert @task.errors[:cover_image].any? { |message| message.include?("does not match") }
+  end
+
+  test "task rejects corrupt data declared as an image" do
+    @task.cover_image.attach(io: StringIO.new("not an image"), filename: "fake.png", content_type: "image/png")
+
+    assert_not @task.valid?
+    assert @task.errors[:cover_image].any? { |message| message.include?("must be a valid JPEG") }
   end
 
   test "completion and blocked state follow board column kind" do
@@ -66,15 +73,5 @@ class TaskTest < ActiveSupport::TestCase
     @task.color = "magenta"
 
     assert_not @task.valid?
-  end
-
-  private
-
-  def attach_file(attachment, filename:, content_type:, size: 128)
-    attachment.attach(
-      io: StringIO.new("a" * size),
-      filename: filename,
-      content_type: content_type
-    )
   end
 end

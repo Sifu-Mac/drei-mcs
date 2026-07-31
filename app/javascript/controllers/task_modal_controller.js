@@ -8,6 +8,10 @@ export default class extends Controller {
   connect() {
     this.boundHandleKeydown = this.handleKeydown.bind(this)
     this.autoSaveTimeout = null
+    this.saveInFlight = null
+    this.changeVersion = 0
+    this.hasUnsavedChanges = false
+    this.isClosing = false
     this.isAssigned = this.element.querySelector('[data-action="click->task-modal#toggleAgent"]')?.textContent?.includes('Zugewiesen') || false
 
     // Auto-open the modal when it's loaded
@@ -46,14 +50,27 @@ export default class extends Controller {
     }, 10)
   }
 
-  close() {
-    // Save any pending changes before closing
+  async close() {
+    if (this.isClosing) return
+    this.isClosing = true
+
     if (this.autoSaveTimeout) {
       clearTimeout(this.autoSaveTimeout)
       this.autoSaveTimeout = null
-      this.save()
     }
 
+    if (this.hasUnsavedChanges || this.saveInFlight) {
+      const saved = await this.save()
+      if (!saved) {
+        this.isClosing = false
+        return
+      }
+    }
+
+    this.hide()
+  }
+
+  hide() {
     // Hide modal
     this.modalTarget.classList.add("opacity-0", "scale-95")
     this.backdropTarget.classList.add("opacity-0")
@@ -75,40 +92,76 @@ export default class extends Controller {
   }
 
   save(event) {
-    if (event) event.preventDefault()
+    if (event) {
+      event.preventDefault()
+      this.markChanged()
+    }
 
-    const form = this.formTarget
-    const formData = new FormData(form)
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
+    if (this.autoSaveTimeout) {
+      clearTimeout(this.autoSaveTimeout)
+      this.autoSaveTimeout = null
+    }
 
-    this.setSaveState("saving")
+    if (this.saveInFlight) return this.saveInFlight
 
-    return fetch(form.action, {
-      method: 'PATCH',
-      body: formData,
-      headers: {
-        'Accept': 'text/vnd.turbo-stream.html',
-        'X-CSRF-Token': csrfToken
-      }
-    }).then(response => {
-      if (!response.ok) throw new Error('save failed')
-      return response.text()
-    }).then(html => {
-      if (html) this._handleTurboResponse(html)
-      this.setSaveState("saved")
-    }).catch(() => {
-      this.setSaveState("error")
+    this.saveInFlight = this.flushChanges().finally(() => {
+      this.saveInFlight = null
     })
+
+    return this.saveInFlight
+  }
+
+  async flushChanges() {
+    while (this.hasUnsavedChanges) {
+      const savedVersion = this.changeVersion
+      const form = this.formTarget
+      const formData = new FormData(form)
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
+
+      this.setSaveState("saving")
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'PATCH',
+          body: formData,
+          headers: {
+            'Accept': 'text/vnd.turbo-stream.html',
+            'X-CSRF-Token': csrfToken
+          }
+        })
+
+        if (!response.ok) throw new Error('save failed')
+
+        const html = await response.text()
+        if (html) this._handleTurboResponse(html)
+
+        if (this.changeVersion === savedVersion) {
+          this.hasUnsavedChanges = false
+          this.setSaveState("saved")
+        }
+      } catch (_error) {
+        this.setSaveState("error")
+        return false
+      }
+    }
+
+    return true
+  }
+
+  markChanged() {
+    this.changeVersion += 1
+    this.hasUnsavedChanges = true
   }
 
   scheduleAutoSave() {
     if (this.autoSaveTimeout) {
       clearTimeout(this.autoSaveTimeout)
     }
+    this.markChanged()
     this.setSaveState("pending")
     this.autoSaveTimeout = setTimeout(() => {
-      this.save()
       this.autoSaveTimeout = null
+      this.save()
     }, 500)
   }
 
@@ -172,7 +225,7 @@ export default class extends Controller {
       btn.appendChild(label)
     }
 
-    this.save()
+    this.scheduleAutoSave()
   }
 
   // --- Status (fetch-based, no form submission) ---
@@ -303,6 +356,7 @@ export default class extends Controller {
 
   setSaveState(state) {
     if (!this.hasSaveStatusTarget) return
+    this.currentSaveState = state
 
     const states = {
       pending: { text: 'Ungespeicherte Änderungen', color: '#fbbf24' },
@@ -318,7 +372,7 @@ export default class extends Controller {
     if (state === 'saved') {
       clearTimeout(this.saveStateTimer)
       this.saveStateTimer = setTimeout(() => {
-        if (this.hasSaveStatusTarget) {
+        if (this.hasSaveStatusTarget && this.currentSaveState === 'saved' && !this.hasUnsavedChanges) {
           this.saveStatusTarget.textContent = 'Auto-Speichern aktiv'
           this.saveStatusTarget.style.color = '#666'
         }
