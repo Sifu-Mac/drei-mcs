@@ -53,7 +53,7 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
     assert_equal copy.board_columns.first.id, copy.tasks.first.board_column_id
   end
 
-  test "board view renders spacious interactive card and column contracts" do
+  test "board view renders compact interactive card and column contracts" do
     sign_in_as users(:admin)
     long_name = "Sehr langer Spaltenname fuer Asset Review und finale Freigabe"
     board_columns(:one_backlog).update!(name: long_name)
@@ -70,10 +70,11 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'data-action="click->modal-manager#close"'
     assert_includes response.body, 'data-inline-add-target="error"'
     assert_includes response.body, "Bitte einen Kartentitel eingeben."
-    assert_includes response.body, "md:w-[320px]"
-    assert_includes response.body, "gap-3 overflow-x-hidden overflow-y-auto"
+    assert_includes response.body, "md:w-[304px]"
+    assert_includes response.body, "overflow-y-auto rounded-b-xl"
+    assert_includes response.body, "m-0 flex min-h-[2rem] flex-col list-none gap-3 overflow-x-hidden"
     assert_includes response.body, "padding:16px"
-    assert_includes response.body, "font-size:15.5px"
+    assert_includes response.body, "font-size:15px"
     assert_includes response.body, "-webkit-line-clamp:3"
     assert_includes response.body, %(title="#{ERB::Util.html_escape(long_name)}")
     assert_includes response.body, "DREI Asset Review · GoLive v1.0.0"
