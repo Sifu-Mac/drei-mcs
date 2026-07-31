@@ -21,8 +21,9 @@ module Admin
       elsif Invite.pending.exists?(email: email)
         @new_invite.errors.add(:email, "hat bereits eine offene Einladung")
       elsif @new_invite.save
-        InviteMailer.invitation(@new_invite).deliver_later
-        redirect_to admin_invites_path, notice: "Einladung an #{@new_invite.email} wurde versendet." and return
+        if enqueue_invitation
+          redirect_to admin_invites_path, notice: "Einladung an #{@new_invite.email} wurde zum Versand eingereiht." and return
+        end
       end
 
       @invites = Invite.includes(:invited_by).order(created_at: :desc)
@@ -39,6 +40,24 @@ module Admin
 
     def invite_params
       params.require(:invite).permit(:email)
+    end
+
+    def enqueue_invitation
+      return true if InviteMailer.invitation(@new_invite).deliver_later
+
+      cleanup_failed_invitation_enqueue(ActiveJob::EnqueueError.new("Mail delivery job was not enqueued"))
+    rescue StandardError => error
+      cleanup_failed_invitation_enqueue(error)
+    end
+
+    def cleanup_failed_invitation_enqueue(error)
+      failed_attributes = @new_invite.attributes.slice("email", "role")
+      @new_invite.delete
+      @new_invite = Invite.new(failed_attributes)
+      @new_invite.invited_by = current_user
+      @new_invite.errors.add(:base, "Einladung konnte nicht zum Versand eingereiht werden. Bitte erneut versuchen.")
+      Rails.logger.error("Invite email enqueue failed error_class=#{error.class.name}")
+      false
     end
   end
 end

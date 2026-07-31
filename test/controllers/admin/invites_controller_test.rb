@@ -15,6 +15,7 @@ class Admin::InvitesControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to admin_invites_path
     assert_predicate Invite.find_by!(email: "new-client@example.com"), :client?
+    assert_equal "Einladung an new-client@example.com wurde zum Versand eingereiht.", flash[:notice]
   end
 
   test "non-admin cannot access invites admin area" do
@@ -48,6 +49,39 @@ class Admin::InvitesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "enqueue failure removes the saved invite and shows an error" do
+    sign_in_as(@admin)
+    delivery = Object.new
+    delivery.define_singleton_method(:deliver_later) do
+      raise ActiveJob::EnqueueError, "test enqueue failure"
+    end
+
+    assert_no_difference("Invite.count") do
+      with_invite_delivery(delivery) do
+        post admin_invites_path, params: { invite: { email: "queue-failure@example.com", role: "client" } }
+      end
+    end
+
+    assert_response :unprocessable_entity
+    assert_select ".text-red-400", text: /Einladung konnte nicht zum Versand eingereiht werden/
+    assert_not Invite.exists?(email: "queue-failure@example.com")
+  end
+
+  test "unsuccessful enqueue result removes the saved invite" do
+    sign_in_as(@admin)
+    delivery = Object.new
+    delivery.define_singleton_method(:deliver_later) { false }
+
+    assert_no_difference("Invite.count") do
+      with_invite_delivery(delivery) do
+        post admin_invites_path, params: { invite: { email: "queue-rejected@example.com", role: "internal" } }
+      end
+    end
+
+    assert_response :unprocessable_entity
+    assert_not Invite.exists?(email: "queue-rejected@example.com")
+  end
+
   test "revoking an invite sets revoked_at" do
     sign_in_as(@admin)
     invite = invites(:pending_internal)
@@ -56,5 +90,15 @@ class Admin::InvitesControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to admin_invites_path
     assert invite.reload.revoked_at.present?
+  end
+
+  private
+
+  def with_invite_delivery(delivery)
+    original_method = InviteMailer.method(:invitation)
+    InviteMailer.define_singleton_method(:invitation) { |_invite| delivery }
+    yield
+  ensure
+    InviteMailer.define_singleton_method(:invitation, original_method)
   end
 end

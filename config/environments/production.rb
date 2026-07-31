@@ -57,6 +57,8 @@ Rails.application.configure do
   # Configure Action Mailer
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.delivery_method = :smtp
+  config.action_mailer.deliver_later_queue_name = :mailers
+  config.action_mailer.delivery_job = "MailDeliveryJob"
   config.action_mailer.smtp_settings = {
     address: ENV.fetch("SMTP_ADDRESS", nil),
     port: ENV.fetch("SMTP_PORT", 587).to_i,
@@ -64,11 +66,14 @@ Rails.application.configure do
     user_name: ENV.fetch("SMTP_USERNAME", nil),
     password: ENV.fetch("SMTP_PASSWORD", nil),
     authentication: ENV.fetch("SMTP_AUTHENTICATION", "plain").to_sym,
-    enable_starttls_auto: ActiveModel::Type::Boolean.new.cast(ENV.fetch("SMTP_ENABLE_STARTTLS_AUTO", "true"))
+    enable_starttls: :always,
+    openssl_verify_mode: "peer",
+    open_timeout: 10,
+    read_timeout: 10
   }
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: app_host }
+  config.action_mailer.default_url_options = { host: app_host, protocol: "https" }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
