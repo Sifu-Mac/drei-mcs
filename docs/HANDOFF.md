@@ -48,6 +48,7 @@ Auf dem Integrationsbranch umgesetzt:
 - Der erste unabhaengige QA-Lauf hatte genau diese zwei Grenzen beanstandet; beide sind mit Negativtests im Commit `33f0d64` behoben. Der zweite unabhaengige QA-Lauf erteilte ausdruecklich Go.
 - Verifiziert im frisch gebauten isolierten Teststack: fokussierte Controller-Tests `18 runs, 195 assertions`; Selenium-Systemtests `6 runs, 33 assertions`; vollständige Suite nach dem QA-Fix `155 runs, 775 assertions`; RuboCop `171 files inspected, no offenses`; Brakeman ohne Warnungen.
 - Am 2026-07-31 nach `main` gepusht und als Runtime-Deployment auf Production ausgerollt. `db` war healthy, `web` lief und `https://drei.digitalbackup.cloud/up` lieferte `200`.
+- Der Benutzer hat anschliessend die Kartenanlage und Kartenduplizierung mit einem Client-Account in Production manuell erfolgreich bestaetigt.
 
 Verifikation auf dem vollstaendigen Integrationsstand:
 - Frisch gebautes Testimage: erfolgreich.
