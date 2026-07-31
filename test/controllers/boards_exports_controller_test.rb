@@ -38,4 +38,13 @@ class BoardsExportsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :not_found
   end
+
+  test "owner and member can export a board in their shared workspace" do
+    [users(:admin), users(:one)].each do |user|
+      sign_in_as user
+      get export_board_path(@board, format: :csv)
+      assert_response :success
+      delete session_path
+    end
+  end
 end

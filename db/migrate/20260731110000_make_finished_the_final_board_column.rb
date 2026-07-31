@@ -15,6 +15,24 @@ class MakeFinishedTheFinalBoardColumn < ActiveRecord::Migration[8.1]
     SQL
 
     execute <<~SQL.squish
+      UPDATE board_columns
+      SET kind = 4, updated_at = CURRENT_TIMESTAMP
+      WHERE name = 'Fertig' AND kind != 4
+    SQL
+
+    execute <<~SQL.squish
+      UPDATE tasks
+      SET completed = TRUE,
+          completed_at = COALESCE(completed_at, CURRENT_TIMESTAMP),
+          blocked = FALSE,
+          status = 6,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE board_column_id IN (
+        SELECT id FROM board_columns WHERE name = 'Fertig' AND kind = 4
+      )
+    SQL
+
+    execute <<~SQL.squish
       INSERT INTO board_columns (board_id, name, kind, position, created_at, updated_at)
       SELECT source.board_id, 'Fertig', 4, source.next_position, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
       FROM (
