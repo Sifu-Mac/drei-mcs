@@ -12,6 +12,7 @@ Stand: 2026-07-31
 - `Karte hinzufuegen` ist nun ein linksbuendiger Text-Button ohne Rahmen und ohne Hintergrund. Seine linke Kante entspricht der Kartenkante; sichtbare Fokus- und aktive Zustande bleiben erhalten.
 - Verifiziert im frisch gebauten isolierten Testimage: Board-Controller `11 runs, 89 assertions`; vollstaendige Suite `169 runs, 872 assertions, 0 failures, 0 errors`; RuboCop `176 files inspected, no offenses`; Brakeman `0 security warnings`; Importmap-Audit ohne bekannte Schwachstellen.
 - Vor Merge und Deployment steht das erneute unabhaengige `QA & Review`-Go aus.
+- Das unabhaengige QA-Review erteilte fuer `861b6a4` Go. Der Stand wurde als Merge-Commit `66efc44` nach `main` gemergt, gepusht und deployt; `db` ist healthy, `web` running und `/up` liefert `200`.
 
 - Arbeitsstand: `codex/board-sidebar-density` auf Basis von `codex/ui-foundation-navigation`.
 - Der Kandidat aktiviert fuer Subseiten die vorhandene, aber zuvor ungenutzte Kontextnavigation. Einstellungen und weitere Nicht-Board-Seiten zeigen nun einen sichtbaren deutschen Rueckweg zum zuletzt geoeffneten, berechtigten Board oder zur Board-Uebersicht.
