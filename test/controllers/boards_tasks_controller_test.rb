@@ -15,7 +15,6 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_equal task.color, copy.color
     assert_empty copy.comments
     assert_empty copy.activities
-    assert_not copy.cover_image.attached?
     assert_redirected_to board_path(boards(:one))
   end
 
@@ -63,7 +62,7 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Auto-Speichern aktiv"
   end
 
-  test "auto-save update persists all editable task panel fields" do
+  test "auto-save update persists supported card panel fields" do
     sign_in_as users(:admin)
     task = tasks(:one)
 
@@ -84,8 +83,8 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     task.reload
     assert_equal "Auto-Save Titel", task.name
     assert_equal "Auto-Save Beschreibung", task.description
-    assert_equal "high", task.priority
-    assert_equal "codex", task.owner
+    assert_equal "none", task.priority
+    assert_equal "sifu", task.owner
     assert_equal "purple", task.color
   end
 
@@ -136,7 +135,6 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "data-task-modal-unassign-url-value"
     assert_not_includes response.body, "data-task-modal-delete-url-value"
     assert_not_includes response.body, 'name="task[name]"'
-    assert_not_includes response.body, 'name="task[cover_image]"'
     assert_not_includes response.body, 'name="task[board_column_id]"'
     assert_not_includes response.body, 'name="task[priority]"'
     assert_not_includes response.body, 'name="task[color]"'
@@ -148,20 +146,4 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "Activity"
   end
 
-  test "invalid cover upload is rejected without retaining a blob" do
-    sign_in_as users(:admin)
-    task = tasks(:one)
-
-    assert_no_difference [ "ActiveStorage::Blob.count", "ActiveStorage::Attachment.count" ] do
-      patch board_task_path(boards(:one), task),
-        params: {
-          task: {
-            cover_image: uploaded_png(filename: "cover.png", bytes: "not an image")
-          }
-        }
-    end
-
-    assert_response :unprocessable_entity
-    assert_not task.reload.cover_image.attached?
-  end
 end

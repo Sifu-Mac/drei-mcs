@@ -26,7 +26,6 @@ class BoardTest < ActiveSupport::TestCase
     assert_equal board.tasks.count, copy.tasks.count
     assert_equal copy.id, copy.tasks.first.board_id
     assert_empty copy.tasks.first.comments
-    assert_not copy.tasks.first.cover_image.attached?
     assert_empty copy.tasks.first.activities
   end
 end

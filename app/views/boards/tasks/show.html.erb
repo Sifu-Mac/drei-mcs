@@ -23,23 +23,6 @@
     </div>
 
     <%= form_with model: [@board, @task], class: "space-y-5", data: { turbo: false }, html: { multipart: true } do |form| %>
-      <div class="space-y-2">
-        <label class="block text-xs font-semibold text-content-muted">Coverbild</label>
-        <% if @task.cover_image.attached? %>
-          <div class="overflow-hidden rounded-xl border border-border bg-bg-elevated">
-            <%= image_tag @task.cover_image, alt: "", class: "block w-full h-auto max-h-[520px] object-contain" %>
-          </div>
-        <% else %>
-          <div class="h-48 rounded-xl border border-border bg-bg-elevated flex items-center justify-center text-content-muted text-3xl" aria-hidden="true">▧</div>
-        <% end %>
-        <%= form.file_field :cover_image,
-            accept: "image/jpeg,image/png,image/webp,image/gif",
-            class: "block w-full text-xs text-content-secondary file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-bg-elevated file:text-content-secondary hover:file:bg-bg-hover file:cursor-pointer" %>
-        <% if @task.errors[:cover_image].any? %>
-          <div class="text-xs text-status-error"><%= @task.errors[:cover_image].join(", ") %></div>
-        <% end %>
-      </div>
-
       <div class="grid gap-4 md:grid-cols-3">
         <div>
           <label class="block text-xs font-semibold text-content-muted mb-2">Spalte</label>
