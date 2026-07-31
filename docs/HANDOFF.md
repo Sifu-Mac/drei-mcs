@@ -7,12 +7,10 @@ Stand: 2026-07-31
 - Repository: `Sifu-Mac/drei-mcs`
 - VPS-Projektpfad: `/docker/drei-review`
 - Live-URL: `https://drei.digitalbackup.cloud`
-- Aktueller Branch: `codex/postmark-transactional-email`
-- Verbindliche Basis: `main` / `origin/main` auf `abd3e4a Document QA remediation deployment`
-- Deployter Runtime-/Merge-Commit: `f3c90d8 Merge QA remediation`
-- SMTP-Feature-Commit auf dem von `main` abgeleiteten Feature-Branch: `b6f031a Harden Postmark transactional email delivery`.
-- SMTP-Job-Test und Handoff-Aktualisierung liegen in einem separaten zweiten Feature-Commit.
-- Die SMTP-Aenderungen sind noch nicht nach `main` gemergt, nicht zu GitHub gepusht und nicht deployt.
+- Aktueller Release-Branch: `main`
+- Deployter Runtime-/Merge-Commit: `747c003 Merge Postmark transactional email hardening`
+- Das unabhaengige Re-Review des SMTP-Kandidaten `a316ccc` hat ausdruecklich Go erteilt.
+- SMTP-Haertung wurde am 2026-07-31 nach `main` gemergt, zu GitHub gepusht und in Production deployt.
 - `backup-postgres.sh` bleibt bewusst unversioniert und wurde nicht beruehrt.
 
 ## QA-Sanierungsstand (gemergt und deployt)
@@ -52,14 +50,14 @@ Verifikation auf dem vollstaendigen Integrationsstand:
 - Production nach dem Deployment: `db` healthy, `web` running, `/up` liefert `200`; alle aktuellen Repository-Migrationen sind `up`.
 - Der Production-Migrationsstatus enthaelt weiterhin den historischen Eintrag `20260222000001 NO FILE` aus der frueheren separaten Cache-Datenbankkonfiguration. Die abloesende Primary-Migration `20260222100002` ist `up`; der Alt-Eintrag war bereits vorhanden und blockiert weder Start noch Migration.
 
-## SMTP-/Postmark-Kandidat (noch nicht gemergt oder deployt)
+## SMTP-/Postmark-Stand (gemergt und deployt)
 
 - `digitalbackup.at` ist in Postmark fuer DKIM und Return-Path verifiziert.
 - Der transaktionale Message Stream ist `outbound`; SMTP-Zugriff und ein eigener streamgebundener SMTP-Token wurden eingerichtet.
 - SMTP-Zugangsdaten und der verifizierte Absender sind ausschliesslich in der unversionierten `.env.production` hinterlegt; die Werte wurden weder ausgegeben noch dokumentiert.
 - Ein waehrend der Einrichtung in einem Screenshot sichtbar gewordener Postmark Server API Token wurde unmittelbar erneuert und nicht fuer die Rails-Konfiguration verwendet.
 - Der Postmark-Account befindet sich noch im Testmodus und kann derzeit nur an Empfaenger auf verifizierten eigenen Domains senden.
-- Der Feature-Branch nutzt `smtp.postmarkapp.com` auf Port `587` mit zwingendem STARTTLS (`enable_starttls: :always`), TLS-Zertifikatspruefung sowie begrenzten Verbindungs- und Lese-Timeouts. Ein Production-Konfigurationstest verhindert eine Rueckkehr zu opportunistischem STARTTLS.
+- Production nutzt `smtp.postmarkapp.com` auf Port `587` mit zwingendem STARTTLS (`enable_starttls: :always`), TLS-Zertifikatspruefung sowie begrenzten Verbindungs- und Lese-Timeouts. Ein Production-Konfigurationstest verhindert eine Rueckkehr zu opportunistischem STARTTLS.
 - Transaktionale Mails laufen ueber die dedizierte Solid-Queue-Queue `mailers`. Temporaere Verbindungs-/SMTP-Fehler werden begrenzt wiederholt; Fehlerlogs enthalten nur Job-ID und Fehlerklasse, weder Empfaenger noch Mailinhalt.
 - Schlaegt das Einreihen einer Invite-Mail als Exception oder erfolgloser Enqueue-Rueckgabewert fehl, wird der zuvor gespeicherte Invite sofort geloescht und der Admin erhaelt eine sichtbare Fehlermeldung; dadurch bleibt kein blockierender offener Invite zurueck.
 - Invite- und Passwort-Reset-Links werden in Production explizit mit `https` erzeugt.
@@ -67,7 +65,8 @@ Verifikation auf dem vollstaendigen Integrationsstand:
 - Mailer-Tests decken Absender, Empfaenger und HTTPS-Links fuer Invite und Passwort-Reset ab.
 - Fokussierte Production-Konfigurations-, Mailer-, Job- und Invite-Tests nach Behebung der QA-Blocker: `14 runs, 57 assertions, 0 failures, 0 errors, 0 skips`.
 - Vollstaendige kombinierte Rails-Suite: `152 runs, 735 assertions, 0 failures, 0 errors, 0 skips`; RuboCop: `171 files inspected, no offenses`.
-- Ein separat benanntes, nicht deploytes Production-Pruefimage inklusive Asset-Precompile wurde auf dem korrigierten Feature-Stand erfolgreich gebaut.
+- Ein separat benanntes Production-Pruefimage inklusive Asset-Precompile wurde auf dem korrigierten Feature-Stand erfolgreich gebaut; danach wurde derselbe freigegebene Stand als Merge-Commit `747c003` deployt.
+- Production-Verifikation nach Deployment: SMTP als Delivery-Methode aktiv, Port `587`, zwingendes STARTTLS und Peer-Verifikation aktiv; `db` healthy, `web` running und `/up` liefert `200`.
 - Es wurde noch keine echte Testmail, Passwort-Reset-Mail oder Einladung versendet.
 
 ## Laufende Container und Services
@@ -76,7 +75,7 @@ Production-Stack in `/docker/drei-review`:
 - `drei-review-db-1`: Service `db`, running, healthy
 - `drei-review-web-1`: Service `web`, running
 - Healthcheck: `https://drei.digitalbackup.cloud/up` liefert `200`
-- Zuletzt erneut verifiziert am 2026-07-31 nach Deployment von `f3c90d8`: `db` healthy, `web` running, Production-Healthcheck `200`.
+- Zuletzt erneut verifiziert am 2026-07-31 nach Deployment von `747c003`: `db` healthy, `web` running, Production-Healthcheck `200`.
 
 Test-Stack:
 - `docker-compose.test.yml` definiert `test-db` und `test`.
