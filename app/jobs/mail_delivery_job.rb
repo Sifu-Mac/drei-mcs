@@ -1,4 +1,6 @@
 class MailDeliveryJob < ActionMailer::MailDeliveryJob
+  RETRY_ATTEMPTS = 5
+
   queue_as :mailers
 
   retry_on Net::OpenTimeout,
@@ -7,7 +9,7 @@ class MailDeliveryJob < ActionMailer::MailDeliveryJob
     IOError,
     SocketError,
     wait: :polynomially_longer,
-    attempts: 5
+    attempts: RETRY_ATTEMPTS
 
   around_perform do |job, block|
     block.call

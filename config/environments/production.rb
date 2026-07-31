@@ -66,7 +66,7 @@ Rails.application.configure do
     user_name: ENV.fetch("SMTP_USERNAME", nil),
     password: ENV.fetch("SMTP_PASSWORD", nil),
     authentication: ENV.fetch("SMTP_AUTHENTICATION", "plain").to_sym,
-    enable_starttls_auto: ActiveModel::Type::Boolean.new.cast(ENV.fetch("SMTP_ENABLE_STARTTLS_AUTO", "true")),
+    enable_starttls: :always,
     openssl_verify_mode: "peer",
     open_timeout: 10,
     read_timeout: 10
