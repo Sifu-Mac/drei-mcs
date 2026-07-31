@@ -6,6 +6,14 @@ Stand: 2026-07-31
 
 ### UI-/UX-Navigations- und Board-Dichte-Kandidat (noch nicht gemergt)
 
+### Klickbare Kommentar-URLs (noch nicht gemergt)
+
+- Kandidat: `codex/comment-url-links` bei `46e0007`.
+- Kommentartexte erkennen ausschliesslich `http://`- und `https://`-URLs und rendern sie als externe Links mit `target="_blank"` sowie `rel="noopener noreferrer"`.
+- Der lokale Helper escaped alle Nicht-URL-Fragmente vor dem Rendern. `simple_format` laeuft fuer das bereits sichere Fragment ohne erneute Sanitisierung, damit die bewusst gesetzten Linkattribute erhalten bleiben. Ein Regressionstest deckt Link, Tab-Schutz und einen eingebetteten Script-String ab.
+- Verifiziert im frisch gebauten isolierten Testimage: Kommentar-Controller `10 runs, 53 assertions`; vollstaendige Suite `170 runs, 888 assertions, 0 failures, 0 errors`; RuboCop `177 files inspected, no offenses`; Brakeman `0 security warnings`; Bundler- und Importmap-Audit ohne bekannte Schwachstellen.
+- Vor Merge und Deployment steht das erneute unabhaengige `QA & Review`-Go aus.
+
 ### DB × DREI-Marke und Admin-Benutzernavigation (noch nicht gemergt)
 
 - Kandidat: `codex/brand-admin-navigation` bei `64a0264`.
