@@ -54,7 +54,8 @@ Verifikation auf dem vollstaendigen Integrationsstand:
 
 - `digitalbackup.at` ist in Postmark fuer DKIM und Return-Path verifiziert.
 - Der transaktionale Message Stream ist `outbound`; SMTP-Zugriff und ein eigener streamgebundener SMTP-Token wurden eingerichtet.
-- SMTP-Zugangsdaten und der verifizierte Absender sind ausschliesslich in der unversionierten `.env.production` hinterlegt; die Werte wurden weder ausgegeben noch dokumentiert.
+- SMTP-Zugangsdaten sind ausschliesslich in der unversionierten `.env.production` hinterlegt; ihre Werte wurden weder ausgegeben noch dokumentiert.
+- Der bewusst oeffentliche Mail-Absender wurde am 2026-07-31 auf `DREI Asset Review <noreply@digitalbackup.at>` gesetzt. Der laufende Container und `ApplicationMailer` verwenden exakt diesen Wert; fuer die Aktivierung wurde nur der Webservice neu erstellt, `/up` blieb `200`.
 - Ein waehrend der Einrichtung in einem Screenshot sichtbar gewordener Postmark Server API Token wurde unmittelbar erneuert und nicht fuer die Rails-Konfiguration verwendet.
 - Der Postmark-Account befindet sich noch im Testmodus und kann derzeit nur an Empfaenger auf verifizierten eigenen Domains senden.
 - Production nutzt `smtp.postmarkapp.com` auf Port `587` mit zwingendem STARTTLS (`enable_starttls: :always`), TLS-Zertifikatspruefung sowie begrenzten Verbindungs- und Lese-Timeouts. Ein Production-Konfigurationstest verhindert eine Rueckkehr zu opportunistischem STARTTLS.
