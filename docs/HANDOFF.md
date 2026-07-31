@@ -13,6 +13,7 @@ Stand: 2026-07-31
 - Der lokale Helper escaped alle Nicht-URL-Fragmente vor dem Rendern. `simple_format` laeuft fuer das bereits sichere Fragment ohne erneute Sanitisierung, damit die bewusst gesetzten Linkattribute erhalten bleiben. Ein Regressionstest deckt Link, Tab-Schutz und einen eingebetteten Script-String ab.
 - Verifiziert im frisch gebauten isolierten Testimage: Kommentar-Controller `10 runs, 53 assertions`; vollstaendige Suite `170 runs, 888 assertions, 0 failures, 0 errors`; RuboCop `177 files inspected, no offenses`; Brakeman `0 security warnings`; Bundler- und Importmap-Audit ohne bekannte Schwachstellen.
 - Vor Merge und Deployment steht das erneute unabhaengige `QA & Review`-Go aus.
+- Das unabhaengige Security-QA-Review erteilte fuer `531895a` Go. Der Stand wurde als Merge-Commit `82daf1c` nach `main` gemergt, gepusht und deployt; `db` ist healthy, `web` running und `/up` liefert `200`.
 
 ### DB × DREI-Marke und Admin-Benutzernavigation (noch nicht gemergt)
 
