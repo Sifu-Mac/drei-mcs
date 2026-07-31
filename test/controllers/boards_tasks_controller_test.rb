@@ -15,7 +15,6 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_equal task.color, copy.color
     assert_empty copy.comments
     assert_empty copy.activities
-    assert_not copy.cover_image.attached?
     assert_redirected_to board_path(boards(:one))
   end
 
@@ -56,14 +55,14 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, 'id="task_panel"'
     assert_includes response.body, tasks(:one).board_column.name
-    assert_equal 4, response.body.scan(/(?:input|change)-&gt;task-modal#scheduleAutoSave/).size
-    assert_includes response.body, "click->task-modal#cyclePriority"
+    assert_equal 3, response.body.scan(/(?:input|change)-&gt;task-modal#scheduleAutoSave/).size
+    assert_not_includes response.body, "click->task-modal#cyclePriority"
     assert_not_includes response.body, "scheduleAutoSpeichern"
     assert_includes response.body, 'role="status"'
-    assert_includes response.body, "Auto-Speichern aktiv"
+    assert_includes response.body, "Klicken zum Bearbeiten"
   end
 
-  test "auto-save update persists all editable task panel fields" do
+  test "auto-save update persists supported card panel fields" do
     sign_in_as users(:admin)
     task = tasks(:one)
 
@@ -84,8 +83,8 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     task.reload
     assert_equal "Auto-Save Titel", task.name
     assert_equal "Auto-Save Beschreibung", task.description
-    assert_equal "high", task.priority
-    assert_equal "codex", task.owner
+    assert_equal "none", task.priority
+    assert_equal "sifu", task.owner
     assert_equal "purple", task.color
   end
 
@@ -102,7 +101,7 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_equal "#{tasks(:one).name} Kopie", copy.name
   end
 
-  test "client board view exposes only permitted card actions" do
+  test "client board view exposes all card actions but not board administration" do
     sign_in_as users(:client)
 
     get board_path(boards(:one))
@@ -112,14 +111,14 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_match "Kartenaktionen", response.body
     assert_match "Karte hinzufügen", response.body
     assert_match 'data-sortable-disabled-value="true"', response.body
-    assert_no_match "Karte bearbeiten", response.body
-    assert_no_match "Karte archivieren", response.body
-    assert_no_match "Karte löschen", response.body
+    assert_match "Karte bearbeiten", response.body
+    assert_match "Karte archivieren", response.body
+    assert_match "Karte löschen", response.body
     assert_no_match "Spaltenaktionen", response.body
     assert_no_match "Spalte umbenennen", response.body
   end
 
-  test "client task panel is read only but keeps comments" do
+  test "client task panel includes all card controls except agent controls" do
     sign_in_as users(:client)
     task = tasks(:one)
     task.subtasks.create!(title: "Nur lesen")
@@ -131,37 +130,19 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Nur lesen"
     assert_includes response.body, "Kommentar"
     assert_includes response.body, board_task_comments_path(boards(:one), task)
-    assert_not_includes response.body, "data-task-modal-update-url-value"
+    assert_includes response.body, "data-task-modal-update-url-value"
     assert_not_includes response.body, "data-task-modal-assign-url-value"
     assert_not_includes response.body, "data-task-modal-unassign-url-value"
-    assert_not_includes response.body, "data-task-modal-delete-url-value"
-    assert_not_includes response.body, 'name="task[name]"'
-    assert_not_includes response.body, 'name="task[cover_image]"'
-    assert_not_includes response.body, 'name="task[board_column_id]"'
+    assert_includes response.body, "data-task-modal-delete-url-value"
+    assert_includes response.body, 'name="task[name]"'
+    assert_includes response.body, "Spalte"
     assert_not_includes response.body, 'name="task[priority]"'
-    assert_not_includes response.body, 'name="task[color]"'
+    assert_includes response.body, 'name="task[color]"'
     assert_not_includes response.body, 'name="task[owner]"'
-    assert_not_includes response.body, board_task_subtask_path(boards(:one), task, task.subtasks.first)
+    assert_includes response.body, board_task_subtask_path(boards(:one), task, task.subtasks.first)
     assert_not_includes response.body, "click-&gt;task-modal#toggleAgent"
-    assert_not_includes response.body, "click-&gt;task-modal#deleteTask"
-    assert_not_includes response.body, "Auto-Speichern aktiv"
+    assert_includes response.body, "click->task-modal#deleteTask"
+    assert_includes response.body, "Klicken zum Bearbeiten"
     assert_not_includes response.body, "Activity"
-  end
-
-  test "invalid cover upload is rejected without retaining a blob" do
-    sign_in_as users(:admin)
-    task = tasks(:one)
-
-    assert_no_difference [ "ActiveStorage::Blob.count", "ActiveStorage::Attachment.count" ] do
-      patch board_task_path(boards(:one), task),
-        params: {
-          task: {
-            cover_image: uploaded_png(filename: "cover.png", bytes: "not an image")
-          }
-        }
-    end
-
-    assert_response :unprocessable_entity
-    assert_not task.reload.cover_image.attached?
   end
 end

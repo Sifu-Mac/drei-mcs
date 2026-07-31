@@ -70,7 +70,7 @@ Rails.application.routes.draw do
         patch :restore
       end
       resources :subtasks, only: [ :create, :update, :destroy ], controller: "boards/subtasks"
-      resources :comments, only: [ :create ], controller: "boards/comments"
+      resources :comments, only: [ :create, :update, :destroy ], controller: "boards/comments"
     end
   end
 

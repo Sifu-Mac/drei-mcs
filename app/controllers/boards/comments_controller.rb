@@ -3,6 +3,7 @@ class Boards::CommentsController < ApplicationController
 
   before_action :set_board
   before_action :set_task
+  before_action :set_comment, only: [ :update, :destroy ]
 
   def create
     @comment = @task.comments.new(comment_params)
@@ -22,6 +23,28 @@ class Boards::CommentsController < ApplicationController
     end
   end
 
+  def update
+    if @comment.update(edit_comment_params)
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to board_task_path(@board, @task), notice: "Kommentar wurde bearbeitet." }
+      end
+    else
+      respond_to do |format|
+        format.turbo_stream { render :update, status: :unprocessable_entity }
+        format.html { redirect_to board_task_path(@board, @task), alert: @comment.errors.full_messages.join(", ") }
+      end
+    end
+  end
+
+  def destroy
+    @comment.destroy!
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to board_task_path(@board, @task), notice: "Kommentar wurde gelöscht." }
+    end
+  end
+
   private
 
   def set_board
@@ -32,7 +55,15 @@ class Boards::CommentsController < ApplicationController
     @task = @board.tasks.find(params[:task_id])
   end
 
+  def set_comment
+    @comment = @task.comments.where(user: current_user).find(params[:id])
+  end
+
   def comment_params
-    params.require(:task_comment).permit(:body, images: [])
+    params.require(:task_comment).permit(:body, :quoted_comment_id, images: [])
+  end
+
+  def edit_comment_params
+    params.require(:task_comment).permit(:body)
   end
 end

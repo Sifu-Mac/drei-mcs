@@ -34,7 +34,6 @@ class CampaignTest < ActiveSupport::TestCase
     assert_equal source.boards.first.tasks.count, copied_board.tasks.count
     assert_equal copied_board.id, copied_board.tasks.first.board_id
     assert_empty copied_board.tasks.first.comments
-    assert_not copied_board.tasks.first.cover_image.attached?
     assert_empty copied_board.tasks.first.activities
   end
 end

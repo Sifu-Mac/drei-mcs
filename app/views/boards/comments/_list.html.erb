@@ -1,5 +1,5 @@
 <div id="task-comments-<%= task.id %>">
-  <% comments = task.comments.includes(:user).chronological %>
+  <% comments = task.comments.includes(:user, quoted_comment: :user).chronological %>
   <% if comments.any? %>
     <div style="display:flex;flex-direction:column;gap:8px">
       <% comments.each do |comment| %>

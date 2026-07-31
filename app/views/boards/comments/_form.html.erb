@@ -1,6 +1,17 @@
 <div id="task-comment-form-<%= task.id %>">
-  <%= form_with model: task.comments.new, url: board_task_comments_path(board, task), data: { controller: "comment-form" }, html: { multipart: true } do |form| %>
+  <%= form_with model: task.comments.new,
+      url: board_task_comments_path(board, task),
+      data: { controller: "comment-form", action: "comment:quote@window->comment-form#selectQuote" },
+      html: { multipart: true } do |form| %>
     <div style="display:flex;flex-direction:column;gap:10px">
+      <%= form.hidden_field :quoted_comment_id, data: { comment_form_target: "quoteId" } %>
+      <div hidden data-comment-form-target="quotePreview" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:9px 10px;border-left:3px solid #8b5cf6;border-radius:8px;background:#f5f3ff;color:#4c1d95;font-size:12px">
+        <div style="min-width:0">
+          <strong data-comment-form-target="quoteAuthor"></strong>
+          <div data-comment-form-target="quoteBody" style="margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        </div>
+        <button type="button" aria-label="Zitat entfernen" data-action="comment-form#clearQuote" style="border:0;background:transparent;color:#6d28d9;font-size:16px;line-height:1;cursor:pointer">×</button>
+      </div>
       <%= form.text_area :body,
           rows: 3,
           placeholder: "Write a comment...",

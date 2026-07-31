@@ -61,7 +61,7 @@ class ClientPermissionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal original_column_name, @column.reload.name
   end
 
-  test "client can create and duplicate cards without changing protected attributes" do
+  test "client can create and duplicate cards with supported card attributes" do
     assert_difference "Task.count", 1 do
       post board_tasks_path(@board), params: {
         task: {
@@ -80,10 +80,10 @@ class ClientPermissionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @client, created_task.user
     assert_equal @column, created_task.board_column
     assert_equal "Client-Karte", created_task.name
-    assert_nil created_task.description
+    assert_equal "Nicht uebernehmen", created_task.description
     assert_equal "none", created_task.priority
     assert_equal "sifu", created_task.owner
-    assert_equal "none", created_task.color
+    assert_equal "red", created_task.color
 
     assert_difference "Task.count", 1 do
       post duplicate_board_task_path(@board, @task)
@@ -107,9 +107,9 @@ class ClientPermissionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "text/vnd.turbo-stream.html", response.media_type
   end
 
-  test "client cannot open the internal new card form or duplicate an archived card" do
+  test "client can open the card form but cannot duplicate an archived card" do
     get new_board_task_path(@board)
-    assert_response :not_found
+    assert_response :success
 
     @task.archive!
 
@@ -119,32 +119,45 @@ class ClientPermissionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "client cannot mutate existing cards subtasks or agent assignment" do
-    original_name = @task.name
+  test "client can fully manage cards and asset lists but cannot change agent state" do
+    patch board_task_path(@board, @task), params: {
+      task: { name: "Geändert", description: "Neue Beschreibung", board_column_id: @column.id, color: "purple", priority: "high", owner: "codex" }
+    }
+    assert_redirected_to board_task_path(@board, @task)
+    @task.reload
+    assert_equal "Geändert", @task.name
+    assert_equal "Neue Beschreibung", @task.description
+    assert_equal "purple", @task.color
+    assert_equal "none", @task.priority
+    assert_equal "sifu", @task.owner
 
-    patch board_task_path(@board, @task), params: { task: { name: "Geändert" } }
-    assert_response :not_found
     patch archive_board_task_path(@board, @task)
-    assert_response :not_found
+    assert_redirected_to board_path(@board)
+    assert @task.reload.archived_at.present?
     patch restore_board_task_path(@board, @task)
-    assert_response :not_found
+    assert_redirected_to archived_board_tasks_path(@board)
+    assert_nil @task.reload.archived_at
+
+    post board_task_subtasks_path(@board, @task), params: { subtask: { title: "Neu" } }
+    assert_redirected_to board_task_path(@board, @task)
+    subtask = @task.subtasks.find_by!(title: "Neu")
+    patch board_task_subtask_path(@board, @task, subtask), params: { subtask: { title: "Umbenannt", done: true } }
+    assert_redirected_to board_task_path(@board, @task)
+    assert_equal [ "Umbenannt", true ], [ subtask.reload.title, subtask.done? ]
+    delete board_task_subtask_path(@board, @task, subtask)
+    assert_redirected_to board_task_path(@board, @task)
+    assert_not Subtask.exists?(subtask.id)
+
     patch assign_board_task_path(@board, @task)
     assert_response :not_found
     patch unassign_board_task_path(@board, @task)
     assert_response :not_found
-    delete board_task_path(@board, @task)
-    assert_response :not_found
-
-    post board_task_subtasks_path(@board, @task), params: { subtask: { title: "Neu" } }
-    assert_response :not_found
-    patch board_task_subtask_path(@board, @task, @subtask), params: { subtask: { done: true } }
-    assert_response :not_found
-    delete board_task_subtask_path(@board, @task, @subtask)
-    assert_response :not_found
-
-    assert_equal original_name, @task.reload.name
     assert_not @task.assigned_to_agent?
-    assert_not @subtask.reload.done?
+
+    assert_difference "Task.count", -1 do
+      delete board_task_path(@board, @task)
+    end
+    assert_redirected_to board_path(@board)
   end
 
   test "client can create text comments" do
@@ -156,20 +169,23 @@ class ClientPermissionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @client, TaskComment.order(:created_at).last.user
   end
 
-  test "client can upload valid comment images but cannot upload task covers or avatars" do
+  test "client can upload valid comment images but cannot change avatars" do
     assert_difference [ "TaskComment.count", "ActiveStorage::Attachment.count" ], 1 do
       post board_task_comments_path(@board, @task),
         params: { task_comment: { body: "Bildfreigabe", images: [ uploaded_png ] } }
     end
     assert_redirected_to board_task_path(@board, @task)
 
-    patch board_task_path(@board, @task), params: { task: { cover_image: uploaded_png(filename: "cover.png") } }
-    assert_response :not_found
-    assert_not @task.reload.cover_image.attached?
-
     patch settings_path, params: { user: { avatar: uploaded_png(filename: "avatar.png") } }
     assert_response :not_found
     assert_not @client.reload.avatar.attached?
+  end
+
+  test "cover image is not a task feature" do
+    assert_nil Task.attachment_reflections["cover_image"]
+
+    patch board_task_path(@board, @task), params: { task: { cover_image: uploaded_png(filename: "cover.png") } }
+    assert_redirected_to board_task_path(@board, @task)
   end
 
   test "client cannot use internal agent web endpoint" do

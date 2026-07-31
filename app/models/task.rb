@@ -68,7 +68,6 @@ class Task < ApplicationRecord
   has_many :activities, class_name: "TaskActivity", dependent: :destroy
   has_many :comments, class_name: "TaskComment", dependent: :destroy
   has_many :subtasks, dependent: :destroy
-  has_one_attached :cover_image
 
   enum :priority, { none: 0, low: 1, medium: 2, high: 3 }, default: :none, prefix: true
   enum :status, STATUS_VALUES, default: :inbox
@@ -79,7 +78,6 @@ class Task < ApplicationRecord
   validates :status, inclusion: { in: statuses.keys }
   validates :owner, inclusion: { in: owners.keys }
   validates :color, inclusion: { in: COLOR_VALUES }
-  validate :cover_image_is_supported
   validate :board_column_belongs_to_board
 
   attr_accessor :activity_source, :actor_name, :actor_emoji, :activity_note
@@ -131,9 +129,15 @@ class Task < ApplicationRecord
     copy.name = "#{name} Kopie"
     copy.user = user
     copy.archived_at = nil
+    copy.assigned_to_agent = false
+    copy.assigned_at = nil
+    copy.agent_claimed_at = nil
     copy.activity_source = "web"
     copy.save!
     copy.activities.delete_all
+    subtasks.each do |subtask|
+      copy.subtasks.create!(title: subtask.title, position: subtask.position, done: false)
+    end
     copy
   end
 
@@ -234,10 +238,6 @@ class Task < ApplicationRecord
 
     tracked_changes = saved_changes.slice(*TaskActivity::TRACKED_FIELDS)
     TaskActivity.record_changes(self, tracked_changes, source: source, actor_name: actor_name, actor_emoji: actor_emoji, note: activity_note) if tracked_changes.any?
-  end
-
-  def cover_image_is_supported
-    MediaUploadValidator.validate_image(self, cover_image, attribute: :cover_image)
   end
 
   def broadcast_create

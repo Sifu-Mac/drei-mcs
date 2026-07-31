@@ -3,8 +3,7 @@ class Boards::TasksController < ApplicationController
 
   before_action :set_board
   before_action :set_task, only: [:show, :edit, :update, :destroy, :assign, :unassign, :duplicate, :archive, :restore]
-  before_action :require_internal_workspace_member, except: [:show, :archived, :create, :duplicate]
-  before_action :require_task_creation_or_duplication_permission, only: [:create, :duplicate]
+  before_action :require_internal_workspace_member, only: [:assign, :unassign]
 
   def show
     @api_token = current_user.api_token
@@ -40,7 +39,6 @@ class Boards::TasksController < ApplicationController
   end
 
   def update
-    previous_cover_blob_ids = attached_blob_ids(@task, :cover_image)
     @task.activity_source = "web"
     if @task.update(task_params)
       respond_to do |format|
@@ -48,7 +46,6 @@ class Boards::TasksController < ApplicationController
         format.html { redirect_to(request.referer.presence || board_task_path(@board, @task), notice: "Karte wurde aktualisiert.") }
       end
     else
-      purge_new_uploads(@task, :cover_image, previous_blob_ids: previous_cover_blob_ids)
       render :show, status: :unprocessable_entity, layout: false
     end
   end
@@ -77,7 +74,6 @@ class Boards::TasksController < ApplicationController
   end
 
   def archived
-    require_internal_workspace_member
     @tasks = @board.tasks.unscoped.where(board_id: @board.id).where.not(archived_at: nil).includes(:board_column).order(archived_at: :desc)
   end
 
@@ -127,21 +123,13 @@ class Boards::TasksController < ApplicationController
 
   def set_task
     @task = @board.tasks.unscoped.where(board_id: @board.id).includes(:activities, comments: :user).find(params[:id])
-    raise ActionController::RoutingError, "Not Found" if action_name == "duplicate" && client_workspace_member? && @task.archived_at.present?
+    raise ActionController::RoutingError, "Not Found" if action_name == "duplicate" && @task.archived_at.present?
   end
 
   def task_params
-    permitted = if client_workspace_member?
-      params.require(:task).permit(:name, :title, :board_column_id)
-    else
-      params.require(:task).permit(:name, :title, :description, :priority, :status, :owner, :blocked, :due_date, :completed, :agent_hint, :cover_image, :board_column_id, :color, tags: [])
-    end
+    permitted = params.require(:task).permit(:name, :title, :description, :board_column_id, :color, tags: [])
     permitted[:name] = permitted.delete(:title) if permitted[:title].present? && permitted[:name].blank?
     permitted[:board_column_id] = @board.board_columns.find(permitted[:board_column_id]).id if permitted[:board_column_id].present?
     permitted
-  end
-
-  def require_task_creation_or_duplication_permission
-    raise ActionController::RoutingError, "Not Found" unless internal_workspace_member? || client_workspace_member?
   end
 end

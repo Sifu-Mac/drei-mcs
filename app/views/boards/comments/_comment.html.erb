@@ -1,8 +1,14 @@
 <div id="task_comment_<%= comment.id %>" style="padding:12px 14px;border-radius:12px;background:#ffffff;border:1px solid #e5e7eb">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
     <span style="font-size:13px;font-weight:700;color:#1f2937"><%= comment.author_label %></span>
-    <span style="font-size:11px;font-weight:500;color:#6b7280"><%= time_ago_in_words(comment.created_at) %> ago</span>
+    <span style="font-size:11px;font-weight:500;color:#6b7280"><%= l(comment.created_at.in_time_zone, format: :long) %><% if comment.updated_at > comment.created_at %> · bearbeitet<% end %></span>
   </div>
+  <% if comment.quoted_body.present? %>
+    <blockquote style="margin:0 0 10px;padding:9px 10px;border-left:3px solid #8b5cf6;border-radius:8px;background:#f5f3ff;color:#4c1d95;font-size:12px;line-height:1.5">
+      <strong><%= comment.quoted_author_label %></strong>
+      <div style="margin-top:2px;white-space:pre-wrap"><%= comment.quoted_body %></div>
+    </blockquote>
+  <% end %>
   <div style="font-size:14px;font-weight:500;color:#374151;line-height:1.7;white-space:pre-wrap"><%= simple_format(h(comment.body), {}, wrapper_tag: "div") %></div>
   <% if comment.images.attached? %>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;margin-top:10px">
@@ -13,4 +19,24 @@
       <% end %>
     </div>
   <% end %>
+  <div style="display:flex;align-items:center;gap:12px;margin-top:10px">
+    <button type="button"
+        data-action="click->comment-reply#select"
+        data-controller="comment-reply"
+        data-comment-reply-comment-id-value="<%= comment.id %>"
+        data-comment-reply-author-value="<%= comment.author_label %>"
+        data-comment-reply-body-value="<%= comment.body %>"
+        style="padding:0;border:0;background:transparent;color:#6d28d9;font-size:12px;font-weight:700;cursor:pointer">Antworten</button>
+    <% if comment.user_id == current_user.id %>
+      <details style="font-size:12px">
+        <summary style="color:#1e5eff;font-weight:700;cursor:pointer">Bearbeiten</summary>
+        <%= form_with model: comment, url: board_task_comment_path(comment.task.board, comment.task, comment), method: :patch, style: "margin-top:8px" do |form| %>
+          <%= form.text_area :body, rows: 3, maxlength: 5000, aria: { label: "Kommentar bearbeiten" }, style: "width:100%;min-height:64px;padding:9px 10px;border-radius:8px;border:1px solid #bfdbfe;font:inherit;line-height:1.5;resize:vertical" %>
+          <% if comment.errors[:body].any? %><div style="margin-top:4px;color:#dc2626;font-size:11px"><%= comment.errors[:body].join(', ') %></div><% end %>
+          <%= form.submit "Speichern", style: "margin-top:6px;padding:7px 10px;border:0;border-radius:7px;background:#1e5eff;color:#fff;font-size:12px;font-weight:700;cursor:pointer" %>
+        <% end %>
+      </details>
+      <%= button_to "Löschen", board_task_comment_path(comment.task.board, comment.task, comment), method: :delete, data: { turbo_confirm: "Kommentar wirklich löschen?" }, form: { style: "display:inline" }, style: "padding:0;border:0;background:transparent;color:#dc2626;font-size:12px;font-weight:700;cursor:pointer" %>
+    <% end %>
+  </div>
 </div>

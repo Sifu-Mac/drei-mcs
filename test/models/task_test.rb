@@ -4,47 +4,22 @@ class TaskTest < ActiveSupport::TestCase
     @task = tasks(:one)
   end
 
-  test "task without cover image is valid" do
-    assert @task.valid?
-    assert_not @task.cover_image.attached?
+  test "task has no cover image attachment" do
+    assert_nil Task.attachment_reflections["cover_image"]
   end
 
-  test "task accepts a valid cover image" do
-    attach_png(@task.cover_image)
+  test "duplicate copies asset list titles but resets completion" do
+    @task.subtasks.create!(title: "1:1", done: true)
+    @task.subtasks.create!(title: "9:16", done: false)
+    @task.update!(assigned_to_agent: true, assigned_at: Time.current, agent_claimed_at: Time.current)
 
-    assert @task.valid?, @task.errors.full_messages.join(", ")
-  end
+    copy = @task.duplicate_for!(user: users(:admin))
 
-  test "task rejects invalid cover image type" do
-    @task.cover_image.attach(io: StringIO.new("<svg><script /></svg>"), filename: "script.svg", content_type: "image/svg+xml")
-
-    assert_not @task.valid?
-    assert @task.errors[:cover_image].any? { |message| message.include?("must be a valid JPEG") }
-  end
-
-  test "task rejects cover image over five megabytes" do
-    attach_png(@task.cover_image, filename: "large.png", bytes: png_bytes.ljust(5.megabytes + 1, "\0"))
-
-    assert_not @task.valid?
-    assert @task.errors[:cover_image].any? { |message| message.include?("5 MB or smaller") }
-  end
-
-  test "task rejects empty and MIME-spoofed cover images" do
-    @task.cover_image.attach(io: StringIO.new(""), filename: "empty.png", content_type: "image/png")
-    assert_not @task.valid?
-    assert @task.errors[:cover_image].any? { |message| message.include?("must not be empty") }
-
-    @task.cover_image.purge
-    attach_png(@task.cover_image, filename: "payload.jpg", content_type: "image/jpeg")
-    assert_not @task.valid?
-    assert @task.errors[:cover_image].any? { |message| message.include?("does not match") }
-  end
-
-  test "task rejects corrupt data declared as an image" do
-    @task.cover_image.attach(io: StringIO.new("not an image"), filename: "fake.png", content_type: "image/png")
-
-    assert_not @task.valid?
-    assert @task.errors[:cover_image].any? { |message| message.include?("must be a valid JPEG") }
+    assert_equal [ "1:1", "9:16" ], copy.subtasks.pluck(:title)
+    assert_equal [ false, false ], copy.subtasks.pluck(:done)
+    assert_not copy.assigned_to_agent?
+    assert_nil copy.assigned_at
+    assert_nil copy.agent_claimed_at
   end
 
   test "completion and blocked state follow board column kind" do
