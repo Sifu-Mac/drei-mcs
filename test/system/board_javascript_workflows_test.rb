@@ -7,8 +7,10 @@ class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
     open_task_panel(task)
 
     title = "Automatisch gespeichert #{SecureRandom.hex(4)}"
-    find("#task_name").click
-    fill_in "task_name", with: title
+    title_field = find("#task_name")
+    title_field.click
+    assert_not title_field[:readonly]
+    title_field.send_keys([ :control, "a" ], title)
 
     assert_selector "[data-task-modal-target='saveStatus']", text: "Gespeichert"
     assert_equal title, task.reload.name
@@ -27,8 +29,10 @@ class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
     assert_selector "[data-action='click->task-modal#deleteTask']"
 
     title = "Client-Titel #{SecureRandom.hex(4)}"
-    find("#task_name").click
-    fill_in "task_name", with: title
+    title_field = find("#task_name")
+    title_field.click
+    assert_not title_field[:readonly]
+    title_field.send_keys([ :control, "a" ], title)
     assert_selector "[data-task-modal-target='saveStatus']", text: "Gespeichert"
     assert_equal title, task.reload.name
 
