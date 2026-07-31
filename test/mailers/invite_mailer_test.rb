@@ -7,6 +7,7 @@ class InviteMailerTest < ActionMailer::TestCase
 
     assert_equal "You're invited to DREI Asset Review", mail.subject
     assert_equal [ invite.email ], mail.to
-    assert_match invite.token, mail.body.encoded
+    assert_equal [ "hello@digitalbackup.at" ], mail.from
+    assert_match "https://example.com/invites/#{invite.token}", mail.body.encoded
   end
 end

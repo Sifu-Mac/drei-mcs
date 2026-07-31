@@ -15,6 +15,7 @@ class Admin::InvitesControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to admin_invites_path
     assert_predicate Invite.find_by!(email: "new-client@example.com"), :client?
+    assert_equal "Einladung an new-client@example.com wurde zum Versand eingereiht.", flash[:notice]
   end
 
   test "non-admin cannot access invites admin area" do

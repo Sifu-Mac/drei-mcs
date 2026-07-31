@@ -22,7 +22,7 @@ module Admin
         @new_invite.errors.add(:email, "hat bereits eine offene Einladung")
       elsif @new_invite.save
         InviteMailer.invitation(@new_invite).deliver_later
-        redirect_to admin_invites_path, notice: "Einladung an #{@new_invite.email} wurde versendet." and return
+        redirect_to admin_invites_path, notice: "Einladung an #{@new_invite.email} wurde zum Versand eingereiht." and return
       end
 
       @invites = Invite.includes(:invited_by).order(created_at: :desc)
