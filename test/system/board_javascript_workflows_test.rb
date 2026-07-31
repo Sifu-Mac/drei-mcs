@@ -33,6 +33,29 @@ class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
     assert_equal comment, task.comments.order(:created_at).last.body
   end
 
+  test "client can add and duplicate cards but cannot drag them" do
+    task = tasks(:one)
+    sign_in_through_browser(users(:client))
+    visit board_path(task.board)
+
+    title = "Client-Karte #{SecureRandom.hex(4)}"
+    click_button "Karte hinzufügen", match: :first
+    find("textarea[data-inline-add-target='input']").fill_in with: title
+    find("button[data-inline-add-target='submit']").click
+
+    assert_text title
+    created_task = Task.unscoped.order(:created_at).last
+    assert_equal users(:client), created_task.user
+
+    find("#task_#{task.id} [aria-label='Kartenaktionen']").click
+    click_button "Karte duplizieren"
+
+    assert_text "#{task.name} Kopie"
+    copy = Task.unscoped.order(:created_at).last
+    assert_equal users(:client), copy.user
+    assert page.evaluate_script("document.getElementById('column-#{task.board_column_id}').sortableController.sortable.option('disabled')")
+  end
+
   test "drag and drop restores the board and shows an alert after a fetch failure" do
     task = tasks(:one)
     source_column = board_columns(:one_backlog)

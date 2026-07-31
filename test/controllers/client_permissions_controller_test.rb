@@ -61,14 +61,68 @@ class ClientPermissionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal original_column_name, @column.reload.name
   end
 
-  test "client cannot mutate tasks subtasks or agent assignment" do
+  test "client can create and duplicate cards without changing protected attributes" do
+    assert_difference "Task.count", 1 do
+      post board_tasks_path(@board), params: {
+        task: {
+          name: "Client-Karte",
+          board_column_id: @column.id,
+          description: "Nicht uebernehmen",
+          priority: "high",
+          owner: "codex",
+          color: "red"
+        }
+      }
+    end
+
+    created_task = Task.unscoped.order(:created_at).last
+    assert_redirected_to board_path(@board)
+    assert_equal @client, created_task.user
+    assert_equal @column, created_task.board_column
+    assert_equal "Client-Karte", created_task.name
+    assert_nil created_task.description
+    assert_equal "none", created_task.priority
+    assert_equal "sifu", created_task.owner
+    assert_equal "none", created_task.color
+
+    assert_difference "Task.count", 1 do
+      post duplicate_board_task_path(@board, @task)
+    end
+
+    copy = Task.unscoped.order(:created_at).last
+    assert_redirected_to board_path(@board)
+    assert_equal @client, copy.user
+    assert_equal "#{@task.name} Kopie", copy.name
+    assert_equal @task.board_column, copy.board_column
+  end
+
+  test "client can create a card through the inline JSON request" do
+    assert_difference "Task.count", 1 do
+      post board_tasks_path(@board),
+        params: { task: { title: "JSON Client-Karte", board_column_id: @column.id } }.to_json,
+        headers: { "CONTENT_TYPE" => "application/json", "ACCEPT" => "text/vnd.turbo-stream.html" }
+    end
+
+    assert_response :success
+    assert_equal "text/vnd.turbo-stream.html", response.media_type
+  end
+
+  test "client cannot open the internal new card form or duplicate an archived card" do
+    get new_board_task_path(@board)
+    assert_response :not_found
+
+    @task.archive!
+
+    assert_no_difference "Task.count" do
+      post duplicate_board_task_path(@board, @task)
+    end
+    assert_response :not_found
+  end
+
+  test "client cannot mutate existing cards subtasks or agent assignment" do
     original_name = @task.name
 
-    post board_tasks_path(@board), params: { task: { name: "Neu" } }
-    assert_response :not_found
     patch board_task_path(@board, @task), params: { task: { name: "Geändert" } }
-    assert_response :not_found
-    post duplicate_board_task_path(@board, @task)
     assert_response :not_found
     patch archive_board_task_path(@board, @task)
     assert_response :not_found

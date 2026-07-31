@@ -89,24 +89,32 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_equal "purple", task.color
   end
 
-  test "client cannot mutate card" do
+  test "client can duplicate card" do
     sign_in_as users(:client)
 
-    assert_no_difference "Task.count" do
+    assert_difference "Task.count", 1 do
       post duplicate_board_task_path(boards(:one), tasks(:one))
     end
 
-    assert_response :not_found
+    copy = Task.unscoped.order(:created_at).last
+    assert_redirected_to board_path(boards(:one))
+    assert_equal users(:client), copy.user
+    assert_equal "#{tasks(:one).name} Kopie", copy.name
   end
 
-  test "client board view hides internal card and column menus" do
+  test "client board view exposes only permitted card actions" do
     sign_in_as users(:client)
 
     get board_path(boards(:one))
 
     assert_response :success
-    assert_no_match "Karte duplizieren", response.body
-    assert_no_match "Kartenaktionen", response.body
+    assert_match "Karte duplizieren", response.body
+    assert_match "Kartenaktionen", response.body
+    assert_match "Karte hinzufügen", response.body
+    assert_match 'data-sortable-disabled-value="true"', response.body
+    assert_no_match "Karte bearbeiten", response.body
+    assert_no_match "Karte archivieren", response.body
+    assert_no_match "Karte löschen", response.body
     assert_no_match "Spaltenaktionen", response.body
     assert_no_match "Spalte umbenennen", response.body
   end
