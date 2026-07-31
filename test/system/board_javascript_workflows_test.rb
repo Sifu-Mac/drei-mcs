@@ -3,7 +3,7 @@ require "application_system_test_case"
 class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
   test "task panel auto-save persists typed changes" do
     task = tasks(:one)
-    sign_in_through_browser(users(:one))
+    sign_in_through_browser(users(:admin))
     open_task_panel(task)
 
     title = "Automatisch gespeichert #{SecureRandom.hex(4)}"
@@ -71,7 +71,7 @@ class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
     task = tasks(:one)
     source_column = board_columns(:one_backlog)
     target_column = board_columns(:one_active)
-    sign_in_through_browser(users(:one))
+    sign_in_through_browser(users(:admin))
     visit board_path(task.board)
 
     assert_selector "#column-#{source_column.id} #task_#{task.id}"
@@ -109,7 +109,7 @@ class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
   test "active tag filter disables drag and drop and explains why" do
     task = tasks(:one)
     task.update!(tags: ["review"])
-    sign_in_through_browser(users(:one))
+    sign_in_through_browser(users(:admin))
 
     visit board_path(task.board, tag: "review")
 
@@ -126,7 +126,7 @@ class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
 
   test "unfiltered board keeps drag and drop enabled" do
     task = tasks(:one)
-    sign_in_through_browser(users(:one))
+    sign_in_through_browser(users(:admin))
 
     visit board_path(task.board)
 
@@ -142,7 +142,7 @@ class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
 
   test "card creation action follows the cards instead of the viewport bottom" do
     task = tasks(:one)
-    sign_in_through_browser(users(:one))
+    sign_in_through_browser(users(:admin))
 
     visit board_path(task.board)
 
