@@ -73,6 +73,8 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "md:w-[304px]"
     assert_includes response.body, "overflow-y-auto rounded-b-xl"
     assert_includes response.body, "m-0 flex min-h-[2rem] flex-col list-none gap-3 overflow-x-hidden"
+    assert_includes response.body, "inline-flex min-h-11 cursor-pointer items-center gap-2"
+    assert_not_includes response.body, "border-dashed border-border bg-bg-surface"
     assert_includes response.body, "padding:16px"
     assert_includes response.body, "font-size:15px"
     assert_includes response.body, "-webkit-line-clamp:3"
