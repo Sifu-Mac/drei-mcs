@@ -50,4 +50,26 @@ class TaskCommentTest < ActiveSupport::TestCase
     assert_not @comment.valid?
     assert @comment.errors[:images].any? { |message| message.include?("does not match") }
   end
+
+  test "stores a durable quote snapshot when the original comment is deleted" do
+    original = task_comments(:one)
+    reply = TaskComment.create!(task: original.task, user: users(:admin), body: "Meine Antwort", quoted_comment: original)
+
+    assert_equal original.body, reply.quoted_comment_body
+    assert_equal original.author_label, reply.quoted_comment_author_label
+
+    original.destroy!
+    reply.reload
+
+    assert_nil reply.quoted_comment_id
+    assert_equal "Test comment one", reply.quoted_body
+    assert_equal users(:one).email_address.split("@").first.titleize, reply.quoted_author_label
+  end
+
+  test "rejects quotes from another task" do
+    @comment.quoted_comment = task_comments(:two)
+
+    assert_not @comment.valid?
+    assert_includes @comment.errors[:quoted_comment], "must belong to the same task"
+  end
 end

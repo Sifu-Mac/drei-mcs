@@ -44,4 +44,64 @@ class BoardsCommentsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to board_task_path(@board, @task)
     assert_includes flash[:alert], "no more than 5 images"
   end
+
+  test "author edits text without removing existing images" do
+    comment = task_comments(:one)
+    attach_png(comment.images, filename: "existing.png")
+    sign_in_as comment.user
+
+    patch board_task_comment_path(@board, @task, comment), params: { task_comment: { body: "Aktualisierter Kommentar" } }
+
+    assert_redirected_to board_task_path(@board, @task)
+    assert_equal "Aktualisierter Kommentar", comment.reload.body
+    assert comment.images.attached?
+  end
+
+  test "author can delete their own comment" do
+    comment = task_comments(:one)
+    sign_in_as comment.user
+
+    assert_difference "TaskComment.count", -1 do
+      delete board_task_comment_path(@board, @task, comment)
+    end
+
+    assert_redirected_to board_task_path(@board, @task)
+  end
+
+  test "creates a reply with a quote snapshot" do
+    original = task_comments(:one)
+    sign_in_as users(:client)
+
+    assert_difference "TaskComment.count", 1 do
+      post board_task_comments_path(@board, @task), params: {
+        task_comment: { body: "Antwort", quoted_comment_id: original.id }
+      }
+    end
+
+    reply = TaskComment.order(:created_at).last
+    assert_equal original.id, reply.quoted_comment_id
+    assert_equal original.body, reply.quoted_comment_body
+    assert_equal original.author_label, reply.quoted_comment_author_label
+  end
+
+  test "even an admin receives not found when editing another author's comment" do
+    comment = task_comments(:one)
+    sign_in_as users(:admin)
+
+    patch board_task_comment_path(@board, @task, comment), params: { task_comment: { body: "Nicht erlaubt" } }
+
+    assert_response :not_found
+    assert_equal "Test comment one", comment.reload.body
+  end
+
+  test "even an admin receives not found when deleting another author's comment" do
+    comment = task_comments(:one)
+    sign_in_as users(:admin)
+
+    assert_no_difference "TaskComment.count" do
+      delete board_task_comment_path(@board, @task, comment)
+    end
+
+    assert_response :not_found
+  end
 end
