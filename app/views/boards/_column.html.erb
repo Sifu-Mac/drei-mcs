@@ -1,16 +1,16 @@
 <div id="board-column-<%= column.id %>"
-     class="w-[calc(100vw-32px)] shrink-0 snap-start md:w-[320px] md:flex-none flex flex-col h-auto md:h-full overflow-visible"
+     class="flex h-auto w-[calc(100vw-32px)] shrink-0 snap-start flex-col overflow-visible md:h-full md:w-[304px] md:flex-none"
      data-controller="inline-add"
      data-board-target="column"
      data-inline-add-column-id-value="<%= column.id %>"
      data-inline-add-url-value="<%= board_tasks_path(@board) %>"
      data-column-id="<%= column.id %>">
-  <div class="flex min-h-14 items-center gap-3 rounded-t-2xl border border-border bg-bg-surface px-4 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+  <div class="flex min-h-12 items-center gap-2.5 rounded-t-xl border border-border bg-bg-surface px-3.5 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
     <div class="shrink-0 rounded-full" style="width:8px;height:8px;background:<%= Task::STATUS_COLORS[Task.legacy_status_for_kind(column.kind)] %>"></div>
     <div class="min-w-0 flex-1">
-      <div class="truncate" title="<%= column.name %>" style="font-size:18px;font-weight:750;line-height:1.25;color:#1f2937"><%= column.name %></div>
+      <div class="truncate" title="<%= column.name %>" style="font-size:15px;font-weight:750;line-height:1.25;color:#1f2937"><%= column.name %></div>
     </div>
-    <span id="column-<%= column.id %>-count" class="shrink-0" style="font-size:12px;font-weight:700;color:#4b5563;background:#eaf1ff;padding:0 8px;border-radius:7px;line-height:24px"><%= tasks.count %></span>
+    <span id="column-<%= column.id %>-count" class="shrink-0" style="font-size:11px;font-weight:700;color:#4b5563;background:#eaf1ff;padding:0 7px;border-radius:6px;line-height:22px"><%= tasks.count %></span>
 
     <% if internal_workspace_member? %>
       <div class="relative shrink-0" data-controller="dropdown" data-dropdown-portal-value="true">
@@ -19,7 +19,7 @@
                 data-action="click->dropdown#toggle"
                 aria-expanded="false"
                 aria-label="Spaltenaktionen"
-                class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border border-transparent text-content-muted transition-colors hover:border-border hover:bg-bg-hover hover:text-content">
+                class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-transparent text-content-muted transition-colors hover:border-border hover:bg-bg-hover hover:text-content focus:outline-none focus:ring-2 focus:ring-accent">
           <span class="text-xl leading-none" aria-hidden="true">...</span>
         </button>
         <div data-dropdown-target="menu"
@@ -54,9 +54,9 @@
     <% end %>
   </div>
 
-  <div class="flex min-h-0 flex-1 flex-col rounded-b-2xl border-x border-b border-border bg-[#eef1f6] px-3 pb-3 pt-3 shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
+  <div class="flex min-h-0 flex-1 flex-col overflow-y-auto rounded-b-xl border-x border-b border-border bg-[#eef1f6] px-3 pb-3 pt-3 shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
     <ul id="column-<%= column.id %>"
-        class="flex min-h-[2rem] flex-1 flex-col gap-3 overflow-x-hidden overflow-y-auto list-none m-0 pr-1"
+        class="m-0 flex min-h-[2rem] flex-col list-none gap-3 overflow-x-hidden pr-1"
         data-controller="sortable"
         data-sortable-group-value="board"
         data-sortable-column-id-value="<%= column.id %>"
@@ -90,7 +90,7 @@
       <div data-inline-add-target="button" class="pt-3">
         <button type="button"
                 data-action="click->inline-add#show"
-                class="w-full flex items-center justify-center gap-2 rounded-xl cursor-pointer border border-dashed border-border bg-bg-surface transition-colors hover:border-border-active hover:bg-bg-hover hover:text-accent"
+                class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-bg-surface transition-colors hover:border-border-active hover:bg-bg-hover hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent"
                 style="padding:11px 10px;font-size:14px;font-weight:700;color:#4b5563">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14 8H2M8 2V14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
           Karte hinzufügen
