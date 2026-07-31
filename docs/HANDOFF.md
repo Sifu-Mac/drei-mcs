@@ -16,6 +16,7 @@ Stand: 2026-07-31
 - QA hat beim vorherigen Kandidaten `0baaee8` einen testseitigen No-Go-Befund festgestellt: Capybara liefert `readonly="false"` als String. Der aktuelle Kandidat prüft nun die boolesche DOM-Eigenschaft `readOnly`. Zusätzlich kompiliert `Dockerfile.test` die Assets, weil ein frisch gebautes Testimage zuvor CSS ohne Tailwind-Regeln auslieferte und damit die Selenium-Login-Ansicht unbrauchbar machte. Das erneute unabhängige QA-Review steht aus.
 - Nicht-browserbasierte Tests auf dem Kandidaten: `157 runs, 808 assertions, 0 failures, 0 errors`.
 - Der unabhängige QA-Thread hat am 2026-07-31 für `43ce873` ausdrücklich Go erteilt: cachefreier Image-Build mit Asset-Kompilierung erfolgreich, gezielte Inline-Edit-Selenium-Tests `2 runs, 18 assertions`, vollständige Selenium-Suite `6 runs, 37 assertions`, vollständige Suite `158 runs, 809 assertions`, RuboCop ohne Befund, Brakeman ohne Warnungen und Dependency-/Importmap-Audits ohne bekannte Schwachstellen.
+- Nach dem Go wurde der Stand als Merge-Commit `ec1c849` nach `main` gemergt, zu GitHub gepusht und in Production ausgerollt. `db` war healthy, `web` aktiv, die Quote-Snapshot-Migration `20260731100000` ist `up` und `https://drei.digitalbackup.cloud/up` lieferte `200`.
 - Das unabhaengige Re-Review des SMTP-Kandidaten `a316ccc` hat ausdruecklich Go erteilt.
 - SMTP-Haertung wurde am 2026-07-31 nach `main` gemergt, zu GitHub gepusht und in Production deployt.
 - `backup-postgres.sh` bleibt bewusst unversioniert und wurde nicht beruehrt.
