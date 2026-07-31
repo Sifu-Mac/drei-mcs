@@ -71,7 +71,8 @@ Verifikation auf dem vollstaendigen Integrationsstand:
 - Eine einmalige neutrale Production-Testmail an die ausdruecklich freigegebene eigene Adresse `hello@digitalbackup.at` wurde am 2026-07-31 erfolgreich ueber den echten SMTP-Kanal versendet. Postmark Activity zeigt `Processed` und anschliessend `Delivered`; der Benutzer hat den Eingang im Postfach bestaetigt.
 - Nach der Absenderumstellung wurde eine zweite, ausdruecklich angeforderte Testmail mit dem Betreff `DREI Asset Review – Absender-Test` an `hello@digitalbackup.at` versendet. Der aktive Mailer-Absender wurde unmittelbar davor als `DREI Asset Review <noreply@digitalbackup.at>` verifiziert; Postmark hat die Nachricht angenommen, `/up` blieb `200` und der Benutzer bestaetigte Name, Adresse und Eingang im echten Postfach.
 - Ein vorheriger Queue-Versuch mit einer nur im Rails-Runner existierenden anonymen Testmailer-Klasse scheiterte erwartungsgemaess vor dem SMTP-Aufruf an der erneuten Klassenaufloesung im Worker; der eindeutig identifizierte fehlgeschlagene Testjob wurde vollstaendig aus Solid Queue entfernt. Regulare Invite- und Passwortmailer waren davon nicht betroffen.
-- Es wurde noch keine echte Passwort-Reset-Mail oder Einladung versendet.
+- Am 2026-07-31 wurde nach ausdruecklicher Freigabe genau ein temporaerer Client-Invite an die eigene Adresse `hello@digitalbackup.at` angelegt und ueber den regulaeren `InviteMailer` sowie `MailDeliveryJob` versendet. Der Queue-Job wurde ohne Fehler abgeschlossen, der Invite ist offen und verwendbar, `/up` blieb `200`. Annahme, Client-Login, Rechtepruefung und anschliessende gezielte Bereinigung stehen noch aus; der Invite-Token wurde weder ausgegeben noch dokumentiert.
+- Eine echte Passwort-Reset-Mail wurde noch nicht versendet.
 
 ## Laufende Container und Services
 
