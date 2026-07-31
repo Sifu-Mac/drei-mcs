@@ -67,7 +67,9 @@ Verifikation auf dem vollstaendigen Integrationsstand:
 - Vollstaendige kombinierte Rails-Suite: `152 runs, 735 assertions, 0 failures, 0 errors, 0 skips`; RuboCop: `171 files inspected, no offenses`.
 - Ein separat benanntes Production-Pruefimage inklusive Asset-Precompile wurde auf dem korrigierten Feature-Stand erfolgreich gebaut; danach wurde derselbe freigegebene Stand als Merge-Commit `747c003` deployt.
 - Production-Verifikation nach Deployment: SMTP als Delivery-Methode aktiv, Port `587`, zwingendes STARTTLS und Peer-Verifikation aktiv; `db` healthy, `web` running und `/up` liefert `200`.
-- Es wurde noch keine echte Testmail, Passwort-Reset-Mail oder Einladung versendet.
+- Eine einmalige neutrale Production-Testmail an die ausdruecklich freigegebene eigene Adresse `hello@digitalbackup.at` wurde am 2026-07-31 erfolgreich ueber den echten SMTP-Kanal an Postmark uebergeben. Die finale Anzeige `Delivered` in Postmark Activity und der Posteingang muessen noch durch den Benutzer bestaetigt werden.
+- Ein vorheriger Queue-Versuch mit einer nur im Rails-Runner existierenden anonymen Testmailer-Klasse scheiterte erwartungsgemaess vor dem SMTP-Aufruf an der erneuten Klassenaufloesung im Worker; der eindeutig identifizierte fehlgeschlagene Testjob wurde vollstaendig aus Solid Queue entfernt. Regulare Invite- und Passwortmailer waren davon nicht betroffen.
+- Es wurde noch keine echte Passwort-Reset-Mail oder Einladung versendet.
 
 ## Laufende Container und Services
 
