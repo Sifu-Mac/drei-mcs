@@ -49,6 +49,7 @@ Rails.application.routes.draw do
   # Boards (multi-board kanban views)
   resources :boards, only: [ :index, :show, :create, :update, :destroy ] do
     member do
+      get :export, to: "boards/exports#show"
       patch :update_task_status
       post :duplicate
       patch :archive
