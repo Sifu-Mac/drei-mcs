@@ -43,6 +43,10 @@ module ApplicationHelper
     ENV.fetch("APP_URL", "https://#{app_host}")
   end
 
+  def release_version
+    Rails.configuration.x.release_version
+  end
+
   def activity_icon_bg(activity)
     case activity.action
     when "created"

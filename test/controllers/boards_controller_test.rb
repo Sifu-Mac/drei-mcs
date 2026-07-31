@@ -76,6 +76,7 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "font-size:15.5px"
     assert_includes response.body, "-webkit-line-clamp:3"
     assert_includes response.body, %(title="#{ERB::Util.html_escape(long_name)}")
+    assert_includes response.body, "DREI Asset Review · GoLive v1.0.0"
   end
 
   test "client can see board but cannot mutate board structure" do
