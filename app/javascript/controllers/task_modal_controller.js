@@ -165,6 +165,34 @@ export default class extends Controller {
     }, 500)
   }
 
+  editField(event) {
+    const field = event.currentTarget
+    if (field.readOnly) {
+      field.dataset.originalValue = field.value
+      field.readOnly = false
+      field.select()
+      this.setSaveState("pending")
+    }
+  }
+
+  finishInlineEdit(event) {
+    event.currentTarget.readOnly = true
+  }
+
+  handleInlineKeydown(event) {
+    if (event.key === "Escape") {
+      event.preventDefault()
+      event.currentTarget.value = event.currentTarget.dataset.originalValue || event.currentTarget.value
+      event.currentTarget.readOnly = true
+      event.currentTarget.blur()
+    }
+
+    if (event.key === "Enter" && event.currentTarget.tagName === "INPUT") {
+      event.preventDefault()
+      event.currentTarget.blur()
+    }
+  }
+
   handleKeydown(event) {
     if (event.key === "Escape") {
       event.preventDefault()

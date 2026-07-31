@@ -13,17 +13,23 @@ class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
     assert_equal title, task.reload.name
   end
 
-  test "client panel hides mutation controls and still allows comments" do
+  test "client panel allows card edits and comments but hides agent controls" do
     task = tasks(:one)
     sign_in_through_browser(users(:client))
     open_task_panel(task)
 
-    assert_no_field "task_name"
-    assert_no_field "task_description"
+    assert_field "task_name"
+    assert_field "task_description"
     assert_no_selector "input[type='file'][name='task[cover_image]']"
     assert_no_selector "[data-action='click->task-modal#cyclePriority']"
     assert_no_selector "[data-action='click->task-modal#toggleAgent']"
-    assert_no_selector "[data-action='click->task-modal#deleteTask']"
+    assert_selector "[data-action='click->task-modal#deleteTask']"
+
+    title = "Client-Titel #{SecureRandom.hex(4)}"
+    find("#task_name").click
+    fill_in "task_name", with: title
+    assert_selector "[data-task-modal-target='saveStatus']", text: "Gespeichert"
+    assert_equal title, task.reload.name
 
     comment = "Client-Kommentar #{SecureRandom.hex(4)}"
     fill_in "Write a comment...", with: comment

@@ -1,6 +1,6 @@
 <% has_current_user = defined?(current_user) && current_user %>
 <% internal_user = has_current_user && internal_workspace_member? %>
-<% client_user = has_current_user && client_workspace_member? %>
+<% can_manage_card = has_current_user && current_workspace_membership.present? %>
 <% is_done = task.completed? %>
 <% board_color = task.board.color || "red" %>
 <% accent_color = task.color_hex %>
@@ -36,7 +36,7 @@
       </div>
     </div>
 
-    <% if internal_user || client_user %>
+    <% if can_manage_card %>
       <div class="relative shrink-0" data-controller="dropdown" data-dropdown-portal-value="true" data-no-card-open="true">
         <button type="button"
                 data-dropdown-target="button"
@@ -48,15 +48,11 @@
         </button>
         <div data-dropdown-target="menu"
              class="hidden z-[220] min-w-[210px] rounded-xl border border-border bg-bg-card p-1.5 shadow-[0_18px_45px_rgba(15,23,42,0.16)]">
-          <% if internal_user %>
-            <%= link_to "Karte bearbeiten", board_task_path(task.board, task), class: "block rounded-lg px-3 py-2.5 text-sm font-semibold text-content-secondary hover:bg-bg-hover", data: { turbo_frame: "task_panel" } %>
-          <% end %>
+          <%= link_to "Karte bearbeiten", board_task_path(task.board, task), class: "block rounded-lg px-3 py-2.5 text-sm font-semibold text-content-secondary hover:bg-bg-hover", data: { turbo_frame: "task_panel" } %>
           <%= button_to "Karte duplizieren", duplicate_board_task_path(task.board, task), method: :post, class: "w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer" %>
-          <% if internal_user %>
-            <%= button_to "Karte archivieren", archive_board_task_path(task.board, task), method: :patch, class: "w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer" %>
-            <div class="my-1 h-px bg-border"></div>
-            <%= button_to "Karte löschen", board_task_path(task.board, task), method: :delete, data: { turbo_confirm: "Möchtest du diese Karte wirklich löschen?" }, class: "w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold text-status-error hover:bg-red-50 cursor-pointer" %>
-          <% end %>
+          <%= button_to "Karte archivieren", archive_board_task_path(task.board, task), method: :patch, class: "w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer" %>
+          <div class="my-1 h-px bg-border"></div>
+          <%= button_to "Karte löschen", board_task_path(task.board, task), method: :delete, data: { turbo_confirm: "Möchtest du diese Karte wirklich löschen?" }, class: "w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold text-status-error hover:bg-red-50 cursor-pointer" %>
         </div>
       </div>
     <% end %>
@@ -64,19 +60,12 @@
 
   <% subtask_total = task.respond_to?(:subtasks) ? task.subtasks.size : 0 %>
   <% subtask_done = subtask_total > 0 ? task.subtasks.count(&:done?) : 0 %>
-  <% if task.priority != "none" || subtask_total > 0 %>
+  <% if subtask_total > 0 %>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px">
-      <% if task.priority != "none" %>
-        <span style="font-size:12px;font-weight:650;color:#6b7280"><%= task.priority.humanize %></span>
-      <% end %>
-      <% if subtask_total > 0 %>
-        <div style="display:flex;align-items:center;gap:6px">
-          <span style="font-size:12px;font-weight:600;color:#6b7280">☐ <%= subtask_done %>/<%= subtask_total %></span>
-          <div style="width:38px;height:4px;border-radius:2px;background:#e5e7eb;overflow:hidden">
-            <div style="height:100%;border-radius:2px;width:<%= subtask_total > 0 ? (subtask_done.to_f / subtask_total * 100).round : 0 %>%;opacity:0.7" class="bg-<%= board_color %>-500"></div>
-          </div>
-        </div>
-      <% end %>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span aria-label="<%= subtask_done %> von <%= subtask_total %> Assets erledigt" style="font-size:12px;font-weight:700;color:<%= subtask_done == subtask_total ? '#15803d' : '#6b7280' %>">✓ <%= subtask_done %>/<%= subtask_total %></span>
+        <div style="width:38px;height:4px;border-radius:2px;background:#e5e7eb;overflow:hidden"><div style="height:100%;border-radius:2px;width:<%= (subtask_done.to_f / subtask_total * 100).round %>%;opacity:.75;background:<%= accent_color || board_hex_color(task.board) %>"></div></div>
+      </div>
     </div>
   <% end %>
 </li>

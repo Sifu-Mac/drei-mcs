@@ -55,8 +55,8 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, 'id="task_panel"'
     assert_includes response.body, tasks(:one).board_column.name
-    assert_equal 4, response.body.scan(/(?:input|change)-&gt;task-modal#scheduleAutoSave/).size
-    assert_includes response.body, "click->task-modal#cyclePriority"
+    assert_equal 3, response.body.scan(/(?:input|change)-&gt;task-modal#scheduleAutoSave/).size
+    assert_not_includes response.body, "click->task-modal#cyclePriority"
     assert_not_includes response.body, "scheduleAutoSpeichern"
     assert_includes response.body, 'role="status"'
     assert_includes response.body, "Auto-Speichern aktiv"
@@ -101,7 +101,7 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_equal "#{tasks(:one).name} Kopie", copy.name
   end
 
-  test "client board view exposes only permitted card actions" do
+  test "client board view exposes all card actions but not board administration" do
     sign_in_as users(:client)
 
     get board_path(boards(:one))
@@ -111,14 +111,14 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_match "Kartenaktionen", response.body
     assert_match "Karte hinzufügen", response.body
     assert_match 'data-sortable-disabled-value="true"', response.body
-    assert_no_match "Karte bearbeiten", response.body
-    assert_no_match "Karte archivieren", response.body
-    assert_no_match "Karte löschen", response.body
+    assert_match "Karte bearbeiten", response.body
+    assert_match "Karte archivieren", response.body
+    assert_match "Karte löschen", response.body
     assert_no_match "Spaltenaktionen", response.body
     assert_no_match "Spalte umbenennen", response.body
   end
 
-  test "client task panel is read only but keeps comments" do
+  test "client task panel includes all card controls except agent controls" do
     sign_in_as users(:client)
     task = tasks(:one)
     task.subtasks.create!(title: "Nur lesen")
@@ -130,19 +130,19 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Nur lesen"
     assert_includes response.body, "Kommentar"
     assert_includes response.body, board_task_comments_path(boards(:one), task)
-    assert_not_includes response.body, "data-task-modal-update-url-value"
+    assert_includes response.body, "data-task-modal-update-url-value"
     assert_not_includes response.body, "data-task-modal-assign-url-value"
     assert_not_includes response.body, "data-task-modal-unassign-url-value"
-    assert_not_includes response.body, "data-task-modal-delete-url-value"
-    assert_not_includes response.body, 'name="task[name]"'
-    assert_not_includes response.body, 'name="task[board_column_id]"'
+    assert_includes response.body, "data-task-modal-delete-url-value"
+    assert_includes response.body, 'name="task[name]"'
+    assert_includes response.body, 'name="task[board_column_id]"'
     assert_not_includes response.body, 'name="task[priority]"'
-    assert_not_includes response.body, 'name="task[color]"'
+    assert_includes response.body, 'name="task[color]"'
     assert_not_includes response.body, 'name="task[owner]"'
-    assert_not_includes response.body, board_task_subtask_path(boards(:one), task, task.subtasks.first)
+    assert_includes response.body, board_task_subtask_path(boards(:one), task, task.subtasks.first)
     assert_not_includes response.body, "click-&gt;task-modal#toggleAgent"
-    assert_not_includes response.body, "click-&gt;task-modal#deleteTask"
-    assert_not_includes response.body, "Auto-Speichern aktiv"
+    assert_includes response.body, "click-&gt;task-modal#deleteTask"
+    assert_includes response.body, "Klicken zum Bearbeiten"
     assert_not_includes response.body, "Activity"
   end
 
