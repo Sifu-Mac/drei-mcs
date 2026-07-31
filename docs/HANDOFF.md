@@ -7,10 +7,13 @@ Stand: 2026-07-31
 - Repository: `Sifu-Mac/drei-mcs`
 - VPS-Projektpfad: `/docker/drei-review`
 - Live-URL: `https://drei.digitalbackup.cloud`
-- Aktueller Branch: `main`
+- Aktueller Branch: `codex/postmark-transactional-email`
+- Verbindliche Basis: `main` / `origin/main` auf `abd3e4a Document QA remediation deployment`
 - Deployter Runtime-/Merge-Commit: `f3c90d8 Merge QA remediation`
-- Die abschliessende Handoff-Aktualisierung folgt als reiner Dokumentationscommit auf `main`; sie erfordert keinen weiteren Production-Rebuild.
-- Der Hauptcheckout `/docker/drei-review` bleibt wegen der getrennten, uncommitteten SMTP-Arbeit auf `codex/postmark-transactional-email`; diese Aenderungen und `backup-postgres.sh` wurden beim Release nicht beruehrt.
+- SMTP-Feature-Commit auf dem aktuellen `main`: `b6f031a Harden Postmark transactional email delivery`.
+- SMTP-Job-Test und Handoff-Aktualisierung liegen in einem separaten zweiten Feature-Commit.
+- Die SMTP-Aenderungen sind noch nicht nach `main` gemergt, nicht zu GitHub gepusht und nicht deployt.
+- `backup-postgres.sh` bleibt bewusst unversioniert und wurde nicht beruehrt.
 
 ## QA-Sanierungsstand (gemergt und deployt)
 
@@ -48,6 +51,21 @@ Verifikation auf dem vollstaendigen Integrationsstand:
 - Diff-/Secret-Pruefung: keine versehentlich aufgenommenen Secret-, Dump- oder ENV-Dateien.
 - Production nach dem Deployment: `db` healthy, `web` running, `/up` liefert `200`; alle aktuellen Repository-Migrationen sind `up`.
 - Der Production-Migrationsstatus enthaelt weiterhin den historischen Eintrag `20260222000001 NO FILE` aus der frueheren separaten Cache-Datenbankkonfiguration. Die abloesende Primary-Migration `20260222100002` ist `up`; der Alt-Eintrag war bereits vorhanden und blockiert weder Start noch Migration.
+
+## SMTP-/Postmark-Kandidat (noch nicht gemergt oder deployt)
+
+- `digitalbackup.at` ist in Postmark fuer DKIM und Return-Path verifiziert.
+- Der transaktionale Message Stream ist `outbound`; SMTP-Zugriff und ein eigener streamgebundener SMTP-Token wurden eingerichtet.
+- SMTP-Zugangsdaten und der verifizierte Absender sind ausschliesslich in der unversionierten `.env.production` hinterlegt; die Werte wurden weder ausgegeben noch dokumentiert.
+- Ein waehrend der Einrichtung in einem Screenshot sichtbar gewordener Postmark Server API Token wurde unmittelbar erneuert und nicht fuer die Rails-Konfiguration verwendet.
+- Der Postmark-Account befindet sich noch im Testmodus und kann derzeit nur an Empfaenger auf verifizierten eigenen Domains senden.
+- Production nutzt nach dem Merge `smtp.postmarkapp.com` auf Port `587`, STARTTLS, TLS-Zertifikatspruefung sowie begrenzte Verbindungs- und Lese-Timeouts.
+- Transaktionale Mails laufen ueber die dedizierte Solid-Queue-Queue `mailers`. Temporaere Verbindungs-/SMTP-Fehler werden begrenzt wiederholt; Fehlerlogs enthalten nur Job-ID und Fehlerklasse, weder Empfaenger noch Mailinhalt.
+- Invite- und Passwort-Reset-Links werden in Production explizit mit `https` erzeugt.
+- Die Invite-UI meldet korrekt, dass eine Mail zum Versand eingereiht wurde, statt eine bereits erfolgte Zustellung zu behaupten.
+- Mailer-Tests decken Absender, Empfaenger und HTTPS-Links fuer Invite und Passwort-Reset ab.
+- Ein separat benanntes, nicht deploytes Production-Pruefimage inklusive Asset-Precompile wurde auf dem kombinierten SMTP-/QA-Stand erfolgreich gebaut.
+- Es wurde noch keine echte Testmail, Passwort-Reset-Mail oder Einladung versendet.
 
 ## Laufende Container und Services
 
@@ -137,8 +155,10 @@ Production-Migrationsstatus:
 Letzte vollstaendige Suite im isolierten Test-Stack:
 - Befehl: `docker compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from test test`
 - Ergebnis nach allen QA-Fixes mit frisch und ohne Cache gebautem Test-Image: `144 runs, 702 assertions, 0 failures, 0 errors, 0 skips`
+- Ergebnis auf dem rebasierten SMTP-/Postmark-Kandidaten mit eigenem isoliertem Compose-Projekt: `147 runs, 712 assertions, 0 failures, 0 errors, 0 skips`
 
 Fokussierte QA-Regressionslaeufe:
+- Invite-, Passwort-Mailer-, Delivery-Job- und Admin-Invite-Tests auf dem SMTP-Kandidaten: `9 runs, 34 assertions, 0 failures, 0 errors, 0 skips`
 - Selenium-Systemtests fuer Auto-Save, Client-Berechtigungen sowie gefiltertes und ungefiltertes Drag-and-drop: `5 runs, 27 assertions, 0 failures, 0 errors, 0 skips`
 - Board-, Task-, Profil- und Admin-Lokalisierungstests: `23 runs, 151 assertions, 0 failures, 0 errors, 0 skips`
 - PWA-Manifest: `2 runs, 8 assertions, 0 failures, 0 errors, 0 skips`
@@ -232,7 +252,7 @@ Kampagnen, Boards, Spalten und Karten:
 
 Qualitaet:
 - Isolierte Docker-Testumgebung eingerichtet.
-- Vollstaendige Rails-Test-Suite lauffaehig; letzter Stand auf dem noch nicht gemergten QA-Integrationsbranch: `144 runs, 702 assertions, 0 failures, 0 errors, 0 skips`.
+- Vollstaendige Rails-Test-Suite lauffaehig; deployter QA-Stand: `144 runs, 702 assertions, 0 failures, 0 errors, 0 skips`.
 - Production-QA mit echtem Headless Chromium abgeschlossen; alle 21 finalen Pruefpunkte bestanden.
 
 ## 2. Aktuell offen
@@ -241,7 +261,9 @@ Qualitaet:
 
 - Postmark-Account ist eingerichtet.
 - `digitalbackup.at` ist DKIM-verifiziert; der Return-Path ist verifiziert.
-- SMTP-Zugangsdaten sind noch nicht in `.env.production` hinterlegt; alle erwarteten SMTP-Variablen fehlen aktuell.
+- SMTP-Zugangsdaten sind sicher in `.env.production` hinterlegt; keine Werte befinden sich im Repository oder in der Dokumentation.
+- Der SMTP-Code ist auf `codex/postmark-transactional-email` review-bereit, aber noch nicht gemergt oder deployt.
+- Der Postmark-Account ist noch im Testmodus; externe, nicht verifizierte Empfaengerdomains sind noch gesperrt.
 - Action Mailer wurde noch nicht mit echtem Versand getestet.
 - Test-Einladung an eine eigene interne E-Mail-Adresse ist noch offen.
 - Keine echten DREI-Kunden einladen, bevor Testmail und Testeinladung erfolgreich waren.
@@ -266,7 +288,7 @@ Qualitaet:
 
 - Der taegliche Backup-Timer ist aktiv; der letzte verifizierte Lauf war erfolgreich.
 - Zwei lokale Backup-Dateien waren am 2026-07-30 vorhanden; die konfigurierte Aufbewahrung behaelt maximal 14.
-- Einen projektspezifischen PostgreSQL-Restore-Ablauf dokumentieren und mit einem isolierten Test-Stack verifizieren. Dieser Punkt ist entgegen einer frueheren Annahme noch nicht abgeschlossen.
+- Der projektspezifische PostgreSQL-Restore-Ablauf ist dokumentiert und wurde im isolierten Restore-Stack erfolgreich verifiziert.
 - Automatisierte Offsite-Backups sind noch nicht eingerichtet.
 
 ### Unversionierte Serverdateien
@@ -281,16 +303,16 @@ Qualitaet:
 
 Empfohlene Reihenfolge:
 
-1. SMTP/Postmark produktiv konfigurieren.
-2. Testmail und Testeinladung an eine eigene interne Adresse senden.
-3. Temporaeren Client-Benutzer ueber den Invite-Flow anlegen.
-4. Vollstaendigen Admin- und Client-Smoke-Test durchfuehren.
-5. Temporaeren Test-Client anschliessend vollstaendig entfernen.
-6. UI-/UX-Fehler aus dem manuellen Test sammeln.
-7. Einen gebuendelten UI-/UX-Feinschliff umsetzen.
-8. Rollout-Checkliste fuer echte DREI-Nutzer durchfuehren.
-9. Erste echte interne Einladungen senden.
-10. Danach kontrolliert DREI-Kunden einladen.
+1. SMTP-Feature-Branch reviewen und nach Freigabe in `main` mergen.
+2. `main` zu GitHub pushen und den Runtime-Code deployen.
+3. Production-Healthcheck, Solid Queue und Mailer-Konfiguration ohne Versand pruefen.
+4. Testmail, Passwort-Reset und Testeinladung ausschliesslich an eigene Adressen auf der verifizierten Domain senden.
+5. Links, Postmark Activity und Rails-/Queue-Logs pruefen; temporaere Testeinladung gezielt entfernen.
+6. Postmark-Accountfreigabe fuer externe Empfaengerdomains abschliessen.
+7. Temporaeren Client-Benutzer ueber den Invite-Flow anlegen.
+8. Vollstaendigen Admin- und Client-Smoke-Test durchfuehren.
+9. Temporaeren Test-Client anschliessend vollstaendig entfernen.
+10. Erst danach kontrolliert echte DREI-Nutzer und DREI-Kunden einladen.
 
 ## 4. Spaeter geplant
 
@@ -365,10 +387,12 @@ Folgende Erweiterungen sind spaeter oder optional:
 
 ## Postmark-/SMTP-Status
 
-- SMTP-Konfiguration ist ENV-basiert in Production.
-- Aktuell sind SMTP-ENV-Werte im Compose-Kontext nicht gesetzt; Docker Compose gibt entsprechende Warnungen aus.
-- Keine SMTP-Zugangsdaten wurden dokumentiert oder veraendert.
-- Keine echten Einladungen wurden versendet.
+- SMTP-Konfiguration bleibt vollstaendig ENV-basiert; `.env.production` ist unversioniert.
+- Alle erwarteten SMTP-ENV-Werte sind gesetzt, wurden aber nicht ausgegeben oder dokumentiert.
+- SMTP-Haertung, HTTPS-Mail-Links, dedizierte Mail-Queue, Retry und datensparsames Fehlerlogging liegen review-bereit auf `codex/postmark-transactional-email`.
+- Vollstaendige kombinierte Rails-Suite: `147 runs, 712 assertions, 0 failures, 0 errors, 0 skips`; fokussierte Mailer-/Job-/Invite-Tests: `9 runs, 34 assertions, 0 failures, 0 errors, 0 skips`; RuboCop: `170 files inspected, no offenses`.
+- Der Code ist noch nicht gemergt oder deployt.
+- Keine echte Testmail und keine echte Einladung wurden versendet.
 
 ## Backup-Status
 
@@ -376,6 +400,6 @@ Folgende Erweiterungen sind spaeter oder optional:
 - `drei-review-backup.timer` ist aktiviert und wartet auf den naechsten taeglichen Lauf um `03:30 UTC`.
 - Der letzte verifizierte automatische Lauf am 2026-07-30 um `03:30 UTC` endete erfolgreich.
 - Das Skript behaelt die letzten 14 Backups; am 2026-07-30 waren zwei komprimierte Dumps vorhanden.
-- Ein projektspezifischer Restore-Ablauf ist noch zu dokumentieren und isoliert zu testen.
+- Der projektspezifische Restore-Ablauf ist dokumentiert und isoliert erfolgreich getestet.
 - Bestehende Production-Daten wurden nicht exportiert.
 - Production-Daten wurden nur durch die notwendigen Kampagnen-/Board- und dynamische-Spalten-Migrationen veraendert.
