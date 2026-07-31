@@ -16,6 +16,17 @@ class BoardColumnTest < ActiveSupport::TestCase
     assert_includes column.errors[:name], "can't be blank"
   end
 
+  test "standard review template keeps approval separate from completion" do
+    assert_equal [
+      ["Eingang", "backlog"],
+      ["In Bearbeitung", "active"],
+      ["Kunden-Review", "review"],
+      ["Änderungen angefordert", "blocked"],
+      ["Freigegeben", "review"],
+      ["Fertig", "done"]
+    ], BoardColumn.standard_review_template
+  end
+
   test "moves left and right" do
     column = board_columns(:one_active)
     original_position = column.position

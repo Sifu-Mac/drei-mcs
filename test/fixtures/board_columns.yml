@@ -22,11 +22,17 @@ one_blocked:
   kind: blocked
   position: 4
 
-one_done:
+one_approved:
   board: one
   name: Freigegeben
-  kind: done
+  kind: review
   position: 5
+
+one_done:
+  board: one
+  name: Fertig
+  kind: done
+  position: 6
 
 two_backlog:
   board: two

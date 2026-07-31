@@ -1,11 +1,10 @@
 <% has_current_user = defined?(current_user) && current_user %>
 <% internal_user = has_current_user && internal_workspace_member? %>
 <% can_manage_card = has_current_user && current_workspace_membership.present? %>
-<% is_done = task.completed? %>
 <% board_color = task.board.color || "red" %>
 <% accent_color = task.color_hex %>
 <li id="task_<%= task.id %>"
-    class="group cursor-pointer transition-all duration-150 <%= 'opacity-55' if is_done %>"
+    class="group cursor-pointer transition-all duration-150"
     style="position:relative;padding:16px 16px 15px <%= accent_color ? '20px' : '16px' %>;background:#ffffff;border-radius:12px;border:1px solid #e5e7eb;box-shadow:0 1px 2px rgba(15,23,42,0.05)"
     onmouseenter="this.style.borderColor='#bfdbfe';this.style.boxShadow='0 10px 26px rgba(15,23,42,0.08)'"
     onmouseleave="this.style.borderColor='#e5e7eb';this.style.boxShadow='0 1px 2px rgba(15,23,42,0.05)'"
@@ -31,7 +30,7 @@
 
   <div class="flex items-start gap-3">
     <div class="min-w-0 flex-1 pr-1">
-      <div class="task-card-title" style="font-size:15.5px;font-weight:650;color:<%= is_done ? '#9ca3af' : '#1f2937' %>;line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">
+      <div class="task-card-title" style="font-size:15.5px;font-weight:650;color:#1f2937;line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">
         <%= task.name %>
       </div>
     </div>
