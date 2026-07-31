@@ -4,7 +4,6 @@ class ProfilesController < ApplicationController
 
   def show
     @user = current_user
-    @api_token = current_user.api_token
   end
 
   def update
@@ -20,7 +19,6 @@ class ProfilesController < ApplicationController
       redirect_to settings_path, notice: "Profil wurde gespeichert."
     else
       purge_new_uploads(@user, :avatar, previous_blob_ids: previous_avatar_blob_ids)
-      @api_token = current_user.api_token
       render :show, status: :unprocessable_entity
     end
   end
