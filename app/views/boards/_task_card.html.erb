@@ -1,5 +1,6 @@
 <% has_current_user = defined?(current_user) && current_user %>
 <% internal_user = has_current_user && internal_workspace_member? %>
+<% client_user = has_current_user && client_workspace_member? %>
 <% is_done = task.completed? %>
 <% board_color = task.board.color || "red" %>
 <% accent_color = task.color_hex %>
@@ -19,12 +20,14 @@
     <div aria-hidden="true" style="position:absolute;left:0;top:12px;bottom:12px;width:4px;border-radius:0 999px 999px 0;background:<%= accent_color %>"></div>
   <% end %>
 
-  <div class="task-drag-handle"
-       data-no-card-open="true"
-       title="Karte ziehen"
-       style="display:flex;align-items:center;justify-content:center;width:100%;height:16px;margin:-6px 0 8px;cursor:grab;color:#9ca3af;border-radius:8px">
-    <div style="width:42px;height:4px;border-radius:999px;background:#e5e7eb"></div>
-  </div>
+  <% if internal_user %>
+    <div class="task-drag-handle"
+         data-no-card-open="true"
+         title="Karte ziehen"
+         style="display:flex;align-items:center;justify-content:center;width:100%;height:16px;margin:-6px 0 8px;cursor:grab;color:#9ca3af;border-radius:8px">
+      <div style="width:42px;height:4px;border-radius:999px;background:#e5e7eb"></div>
+    </div>
+  <% end %>
 
   <div class="flex items-start gap-3">
     <div class="min-w-0 flex-1 pr-1">
@@ -33,7 +36,7 @@
       </div>
     </div>
 
-    <% if internal_user %>
+    <% if internal_user || client_user %>
       <div class="relative shrink-0" data-controller="dropdown" data-dropdown-portal-value="true" data-no-card-open="true">
         <button type="button"
                 data-dropdown-target="button"
@@ -45,11 +48,15 @@
         </button>
         <div data-dropdown-target="menu"
              class="hidden z-[220] min-w-[210px] rounded-xl border border-border bg-bg-card p-1.5 shadow-[0_18px_45px_rgba(15,23,42,0.16)]">
-          <%= link_to "Karte bearbeiten", board_task_path(task.board, task), class: "block rounded-lg px-3 py-2.5 text-sm font-semibold text-content-secondary hover:bg-bg-hover", data: { turbo_frame: "task_panel" } %>
+          <% if internal_user %>
+            <%= link_to "Karte bearbeiten", board_task_path(task.board, task), class: "block rounded-lg px-3 py-2.5 text-sm font-semibold text-content-secondary hover:bg-bg-hover", data: { turbo_frame: "task_panel" } %>
+          <% end %>
           <%= button_to "Karte duplizieren", duplicate_board_task_path(task.board, task), method: :post, class: "w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer" %>
-          <%= button_to "Karte archivieren", archive_board_task_path(task.board, task), method: :patch, class: "w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer" %>
-          <div class="my-1 h-px bg-border"></div>
-          <%= button_to "Karte löschen", board_task_path(task.board, task), method: :delete, data: { turbo_confirm: "Möchtest du diese Karte wirklich löschen?" }, class: "w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold text-status-error hover:bg-red-50 cursor-pointer" %>
+          <% if internal_user %>
+            <%= button_to "Karte archivieren", archive_board_task_path(task.board, task), method: :patch, class: "w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer" %>
+            <div class="my-1 h-px bg-border"></div>
+            <%= button_to "Karte löschen", board_task_path(task.board, task), method: :delete, data: { turbo_confirm: "Möchtest du diese Karte wirklich löschen?" }, class: "w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold text-status-error hover:bg-red-50 cursor-pointer" %>
+          <% end %>
         </div>
       </div>
     <% end %>

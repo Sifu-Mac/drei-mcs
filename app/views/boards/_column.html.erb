@@ -60,14 +60,14 @@
         data-controller="sortable"
         data-sortable-group-value="board"
         data-sortable-column-id-value="<%= column.id %>"
-        data-sortable-disabled-value="<%= @current_tag.present? %>"
+        data-sortable-disabled-value="<%= @current_tag.present? || !internal_workspace_member? %>"
         data-sortable-url-value="<%= update_task_status_board_path(@board, tag: @current_tag.presence) %>">
       <% tasks.each do |task| %>
         <%= render "boards/task_card", task: task %>
       <% end %>
     </ul>
 
-    <% if internal_workspace_member? %>
+    <% if internal_workspace_member? || client_workspace_member? %>
       <div data-inline-add-target="form" class="hidden pt-3">
         <div class="rounded-xl border border-border bg-bg-card p-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
           <textarea data-inline-add-target="input"

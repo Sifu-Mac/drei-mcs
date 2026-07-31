@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { Turbo } from "@hotwired/turbo-rails"
 
 // Connects to data-controller="inline-add"
 // Handles Trello-style inline card creation
@@ -112,6 +113,6 @@ export default class extends Controller {
   }
 
   get csrfToken() {
-    return document.querySelector("[name='csrf-token']").content
+    return document.querySelector('meta[name="csrf-token"]')?.content || ""
   }
 }

@@ -35,6 +35,17 @@ Auf dem Integrationsbranch umgesetzt:
 - Chromium/ChromeDriver und echte JavaScript-Systemtests fuer Auto-Save, Client-Panel/Kommentar und Drag-and-drop-Fehlerrollback hinzugefuegt.
 - Isoliertes PostgreSQL-Restore-Runbook, Restore-Compose und Verifikationsskript hinzugefuegt.
 
+## Client-Karten-Erweiterung (noch nicht gemergt oder deployt)
+
+- Branch: `codex/client-task-create-duplicate`.
+- Clients duerfen damit Karten in sichtbaren Spalten anlegen und sichtbare Karten duplizieren. Neue Karten und Kopien gehoeren jeweils dem Client; Kommentare, Aktivitaeten und Uploads werden nicht kopiert.
+- Der Server akzeptiert bei Client-Kartenanlage ausschliesslich Titel und Board-Spalte. Eingeschleuste Felder fuer Beschreibung, Prioritaet, Owner, Farbe, Status, Agent oder Uploads werden nicht uebernommen.
+- Bestehende Karten bleiben fuer Clients read-only: Bearbeiten, Verschieben, Archivieren, Loeschen, Agent-Zuweisungen, Subtasks, Board-/Spalten-/Kampagnenmutationen und API-Mutationen bleiben serverseitig gesperrt. Drag-and-drop bleibt im Client-Browser deaktiviert.
+- Die Client-UI zeigt nur `Karte hinzufügen` und `Karte duplizieren`; interne Kartenaktionen bleiben verborgen.
+- Der Inline-Add-Controller verwendet jetzt den robusten `meta[name="csrf-token"]`-Selektor, damit Kartenanlage auch im echten Browser mit CSRF-Schutz funktioniert.
+- Verifiziert im isolierten Teststack: fokussierte Controller-Tests `17 runs, 191 assertions`; Selenium-Systemtests `6 runs, 33 assertions`; vollständige Suite `154 runs, 771 assertions`; RuboCop `171 files inspected, no offenses`.
+- Vor Merge und Deployment ist noch ein unabhängiges QA-Review erforderlich.
+
 Verifikation auf dem vollstaendigen Integrationsstand:
 - Frisch gebautes Testimage: erfolgreich.
 - Vollstaendige Rails-Suite: `144 runs, 702 assertions, 0 failures, 0 errors, 0 skips`.
