@@ -4,6 +4,17 @@ Stand: 2026-07-31
 
 ## Aktueller Stand
 
+### UI-/UX-Navigations- und Board-Dichte-Kandidat (noch nicht gemergt)
+
+- Arbeitsstand: `codex/board-sidebar-density` auf Basis von `codex/ui-foundation-navigation`.
+- Der Kandidat aktiviert fuer Subseiten die vorhandene, aber zuvor ungenutzte Kontextnavigation. Einstellungen und weitere Nicht-Board-Seiten zeigen nun einen sichtbaren deutschen Rueckweg zum zuletzt geoeffneten, berechtigten Board oder zur Board-Uebersicht.
+- Primaere blaue Buttons verwenden konsistent `text-content-inverse`; der bisherige schwarze Text auf Blau bei Profil-, Login-, Invite- und Passwortformularen ist behoben. Fokus- und gedrueckte Zustaende sind sichtbar.
+- Sidebar und Spalten sind kompakter: Kampagnen werden flacher gruppiert, die aktive Auswahl bleibt eindeutig, Desktop-Spalten sind 304 px breit und ihre Titel 15 px statt 18 px.
+- Die Kartenliste streckt die Spalte nicht mehr. `Karte hinzufuegen` folgt direkt auf die letzte Karte und scrollt bei langen Spalten mit dem Inhalt.
+- Neue Regressionen: Rueckweg aus Einstellungen zum zuletzt geoeffneten Board sowie Browser-Pruefung der natuerlichen Position der sichtbaren Kartenaktion.
+- Verifiziert im frisch gebauten isolierten Testimage: gezielter Profiltest `6 runs, 33 assertions`; Board-Controller `11 runs, 85 assertions`; JavaScript-Systemtests `7 runs, 40 assertions`; vollstaendige Suite `169 runs, 868 assertions, 0 failures, 0 errors`; RuboCop `176 files inspected, no offenses`; Brakeman `0 security warnings`; Bundler- und Importmap-Audit ohne bekannte Schwachstellen.
+- Vor einem Merge nach `main` oder einem Deployment ist das unabhaengige `QA & Review`-Go erforderlich.
+
 - Repository: `Sifu-Mac/drei-mcs`
 - VPS-Projektpfad: `/docker/drei-review`
 - Live-URL: `https://drei.digitalbackup.cloud`

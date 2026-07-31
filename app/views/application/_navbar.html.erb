@@ -1,14 +1,15 @@
-<%# Navbar for non-board pages (settings, etc.) - matches board header style %>
-<header class="relative flex-shrink-0 flex items-center justify-between px-6 py-4 bg-bg-base border-b border-border">
+<%# Navbar for non-board pages with an explicit, reliable return route. %>
+<header class="relative flex h-[56px] shrink-0 items-center justify-between border-b border-border bg-bg-surface px-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] sm:px-6">
   <%# Left section: Back to board %>
   <div class="flex items-center gap-4">
     <% if authenticated? %>
       <% last_board = session[:last_board_id] && current_user.current_workspace_boards.find_by(id: session[:last_board_id]) %>
-      <%= link_to last_board ? board_path(last_board) : boards_path, class: "flex items-center gap-2 text-sm text-content-secondary hover:text-content transition-colors" do %>
+      <%= link_to last_board ? board_path(last_board) : boards_path, class: "inline-flex min-h-11 items-center gap-2 rounded-lg px-2 text-sm font-semibold text-content-secondary transition-colors hover:bg-bg-hover hover:text-content focus:outline-none focus:ring-2 focus:ring-accent" do %>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
           <path fill-rule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clip-rule="evenodd" />
         </svg>
-        <span class="hidden sm:inline">Back to Board</span>
+        <span class="hidden sm:inline"><%= last_board ? "Zurück zu #{last_board.name}" : "Zurück zu den Boards" %></span>
+        <span class="sm:hidden">Zurück</span>
       <% end %>
     <% else %>
       <%= link_to root_path, class: "flex items-center" do %>
@@ -18,7 +19,7 @@
   </div>
 
   <%# Center section: Page title (absolutely centered) %>
-  <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2">
+  <div class="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2">
     <% if content_for?(:breadcrumb_standalone) %>
       <span class="text-sm font-semibold text-content font-display"><%= yield :breadcrumb_standalone %></span>
     <% end %>
@@ -58,7 +59,7 @@
           class="flex items-center cursor-pointer"
           aria-expanded="false"
           aria-haspopup="true">
-          <div class="w-7 h-7 rounded-md overflow-hidden bg-bg-surface flex items-center justify-center">
+          <div class="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg border border-border bg-bg-elevated transition-colors hover:bg-bg-hover">
             <% if current_user.has_avatar? %>
               <%= image_tag current_user.avatar_source, class: "w-full h-full object-cover", alt: "Your avatar" %>
             <% else %>

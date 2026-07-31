@@ -14,6 +14,20 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "https://discord.gg/bJQrNasMC6"
   end
 
+  test "settings keeps a visible route back to the last opened board" do
+    user = users(:admin)
+    board = boards(:one)
+    sign_in_as user
+
+    get board_path(board)
+    assert_response :success
+
+    get settings_path
+
+    assert_response :success
+    assert_select "a[href='#{board_path(board)}']", text: /Zurück zu/
+  end
+
   test "profile update uses German success message" do
     sign_in_as users(:admin)
 
