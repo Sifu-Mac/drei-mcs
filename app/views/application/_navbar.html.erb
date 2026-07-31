@@ -76,7 +76,7 @@
           <%# User info %>
           <div class="px-3 py-2.5 bg-bg-elevated border-b border-border">
             <p class="text-xs font-medium text-content truncate">
-              <%= current_user.email_address.split('@').first %>
+              <%= current_user.display_label %>
             </p>
             <p class="text-xs text-content-muted truncate">
               <%= current_user.email_address %>

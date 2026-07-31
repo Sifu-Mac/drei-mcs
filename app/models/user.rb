@@ -19,6 +19,7 @@ class User < ApplicationRecord
   end
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
+  normalizes :display_name, with: ->(name) { name.to_s.squish.presence }
 
   validate :acceptable_avatar, if: :avatar_changed?
   validates :password, length: { minimum: 8 }, if: :password_required?
@@ -30,6 +31,10 @@ class User < ApplicationRecord
   validates :email_address, presence: true,
                            uniqueness: { case_sensitive: false },
                            format: { with: URI::MailTo::EMAIL_REGEXP, message: "must be a valid email address" }
+  validates :display_name,
+            length: { in: 2..40 },
+            uniqueness: { case_sensitive: false },
+            allow_nil: true
 
   # Check if GitHub OAuth is configured
   def self.github_oauth_enabled?
@@ -72,6 +77,14 @@ class User < ApplicationRecord
 
   def has_avatar?
     avatar.attached? || avatar_url.present?
+  end
+
+  def display_label
+    return display_name if display_name.present?
+    return email_address.to_s.split("@").first.tr("._-", " ").titleize if email_address.present?
+    return agent_name if agent_name.present?
+
+    "Unbekannt"
   end
 
   # Check if user signed up via OAuth

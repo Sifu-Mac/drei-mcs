@@ -109,7 +109,7 @@
             <% if current_user.has_avatar? %>
               <%= image_tag current_user.avatar_source, class: "w-full h-full object-cover", alt: "Your avatar" %>
             <% else %>
-              <span class="text-[13px] font-bold text-content"><%= current_user.email_address.first.upcase %></span>
+              <span class="text-[13px] font-bold text-content"><%= current_user.display_label.first.upcase %></span>
             <% end %>
           </div>
         </button>
@@ -125,11 +125,11 @@
                 <% if current_user.has_avatar? %>
                   <%= image_tag current_user.avatar_source, class: "w-full h-full object-cover", alt: "" %>
                 <% else %>
-                  <%= current_user.email_address.first.upcase %>
+                  <%= current_user.display_label.first.upcase %>
                 <% end %>
               </div>
               <div class="min-w-0">
-                <div class="text-[13px] font-bold text-content truncate"><%= current_user.email_address.split('@').first %></div>
+                <div class="text-[13px] font-bold text-content truncate"><%= current_user.display_label %></div>
                 <div class="text-[11px] font-medium text-content-muted truncate"><%= current_user.email_address %></div>
               </div>
             </div>
