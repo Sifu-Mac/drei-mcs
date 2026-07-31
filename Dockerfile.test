@@ -24,5 +24,6 @@ RUN bundle install
 
 COPY . .
 RUN mkdir -p tmp/pids log storage
+RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
 
 CMD ["bin/rails", "test"]

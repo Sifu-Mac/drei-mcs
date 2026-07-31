@@ -10,11 +10,11 @@ Stand: 2026-07-31
 - Aktueller Release-Branch: `main`
 - Deployter Runtime-/Merge-Commit: `747c003 Merge Postmark transactional email hardening`
 - Aktueller, noch nicht gemergter Integrationsbranch: `codex/card-panel-inline-editing`.
-- Letzter Kandidaten-Commit: `ff36017 Check inline edit DOM property in browser tests`.
+- Letzter Kandidaten-Commit enthält die DOM-Property-Korrektur der Inline-Edit-Tests und die Asset-Kompilierung im Testimage.
 - Der Integrationsstand erweitert Karten für alle Workspace-Mitglieder, entfernt Task-Coverbilder, führt Inline-Titel/-Beschreibung, Details nur mit Spalte/Farbe, eine Assetliste mit Fortschritt sowie editierbare/zitierbare Kommentare ein und entfernt GitHub-/Discord-Navigation sowie die OpenClaw-Einstellungen.
 - Vor Merge/Deployment dieses Stands: vollständige Tests, Security-Audits und ein unabhängiges `QA & Review`-Go.
-- QA hat beim vorherigen Kandidaten `0baaee8` einen testseitigen No-Go-Befund festgestellt: Capybara liefert `readonly="false"` als String. `ff36017` prüft nun die boolesche DOM-Eigenschaft `readOnly`; das erneute unabhängige QA-Review steht aus.
-- Nicht-browserbasierte Tests auf `ff36017`: `157 runs, 808 assertions, 0 failures, 0 errors`. Der lokale Selenium-Container zeigt vor dem Login derzeit nur die übergroße Startgrafik und erreicht daher die Test-Assertion nicht; QA hatte den Browserlauf auf einem frischen Stack vor dem Assertion-Fix mit `6 runs, 35 assertions` erfolgreich ausgeführt und wiederholt ihn nun unabhängig.
+- QA hat beim vorherigen Kandidaten `0baaee8` einen testseitigen No-Go-Befund festgestellt: Capybara liefert `readonly="false"` als String. Der aktuelle Kandidat prüft nun die boolesche DOM-Eigenschaft `readOnly`. Zusätzlich kompiliert `Dockerfile.test` die Assets, weil ein frisch gebautes Testimage zuvor CSS ohne Tailwind-Regeln auslieferte und damit die Selenium-Login-Ansicht unbrauchbar machte. Das erneute unabhängige QA-Review steht aus.
+- Nicht-browserbasierte Tests auf dem Kandidaten: `157 runs, 808 assertions, 0 failures, 0 errors`.
 - Das unabhaengige Re-Review des SMTP-Kandidaten `a316ccc` hat ausdruecklich Go erteilt.
 - SMTP-Haertung wurde am 2026-07-31 nach `main` gemergt, zu GitHub gepusht und in Production deployt.
 - `backup-postgres.sh` bleibt bewusst unversioniert und wurde nicht beruehrt.
