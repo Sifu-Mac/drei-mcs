@@ -14,6 +14,8 @@ Stand: 2026-07-31
 - Neue Regressionen: Rueckweg aus Einstellungen zum zuletzt geoeffneten Board sowie Browser-Pruefung der natuerlichen Position der sichtbaren Kartenaktion.
 - Verifiziert im frisch gebauten isolierten Testimage: gezielter Profiltest `6 runs, 33 assertions`; Board-Controller `11 runs, 85 assertions`; JavaScript-Systemtests `7 runs, 40 assertions`; vollstaendige Suite `169 runs, 868 assertions, 0 failures, 0 errors`; RuboCop `176 files inspected, no offenses`; Brakeman `0 security warnings`; Bundler- und Importmap-Audit ohne bekannte Schwachstellen.
 - Vor einem Merge nach `main` oder einem Deployment ist das unabhaengige `QA & Review`-Go erforderlich.
+- Das unabhaengige QA-Review erteilte am 2026-07-31 fuer `ab666bd` Go: cachefreier Kandidaten-Build im richtigen Worktree, vollstaendige Suite `169 runs, 868 assertions`, JavaScript-Systemtests `7 runs, 39 assertions`, RuboCop, Brakeman, Dependency-, Diff- und Secret-Pruefung sind gruen.
+- Der Stand wurde als Merge-Commit `2838bb3` nach `main` gemergt, zu GitHub gepusht und als Runtime-Deployment ausgerollt. Production: `db` healthy, `web` running, `https://drei.digitalbackup.cloud/up` liefert `200`.
 
 - Repository: `Sifu-Mac/drei-mcs`
 - VPS-Projektpfad: `/docker/drei-review`
