@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_31_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_31_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -420,6 +420,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_31_100000) do
     t.string "avatar_url"
     t.datetime "created_at", null: false
     t.datetime "current_period_ends_at"
+    t.string "display_name"
     t.string "email_address", null: false
     t.string "password_digest"
     t.string "plan", default: "free", null: false
@@ -431,6 +432,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_31_100000) do
     t.string "uid"
     t.datetime "updated_at", null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
+    t.index "lower((display_name)::text)", name: "index_users_on_lower_display_name", unique: true, where: "(display_name IS NOT NULL)"
     t.index ["plan"], name: "index_users_on_plan"
     t.index ["polar_customer_id"], name: "index_users_on_polar_customer_id"
     t.index ["polar_subscription_id"], name: "index_users_on_polar_subscription_id"

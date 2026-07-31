@@ -44,6 +44,19 @@
 
       <!-- E-Mail -->
       <div class="pt-4 border-t border-border">
+        <label class="block text-xs font-medium text-content-secondary mb-1.5">Nickname</label>
+        <%= form.text_field :display_name, maxlength: 40, autocomplete: "nickname", placeholder: "z. B. Lisa Design", class: "block w-full bg-bg-elevated border-0 rounded-md px-3 py-2 text-sm text-content placeholder:text-content-muted focus:ring-1 focus:ring-accent focus:outline-none" %>
+        <p class="mt-1 text-xs text-content-muted">Dieser Name wird bei Kommentaren angezeigt.</p>
+        <% if @user.errors[:display_name].any? %>
+          <div class="mt-1">
+            <% @user.errors[:display_name].each do |error| %>
+              <p class="text-status-error text-xs">Nickname <%= error %></p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="pt-4 border-t border-border">
         <label class="block text-xs font-medium text-content-secondary mb-1.5">E-Mail-Adresse</label>
         <%= form.email_field :email_address, placeholder: "name@domain.de", class: "block w-full bg-bg-elevated border-0 rounded-md px-3 py-2 text-sm text-content placeholder:text-content-muted focus:ring-1 focus:ring-accent focus:outline-none" %>
         <% if @user.errors[:email_address].any? %>

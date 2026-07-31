@@ -17,10 +17,21 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
   test "profile update uses German success message" do
     sign_in_as users(:admin)
 
-    patch settings_path, params: { user: { email_address: users(:admin).email_address } }
+    patch settings_path, params: { user: { display_name: "Admin Team", email_address: users(:admin).email_address } }
 
     assert_redirected_to settings_path
     assert_equal "Profil wurde gespeichert.", flash[:notice]
+    assert_equal "Admin Team", users(:admin).reload.display_name
+  end
+
+  test "client can update their own nickname" do
+    client = users(:client)
+    sign_in_as client
+
+    patch settings_path, params: { user: { display_name: "Kunde Nord" } }
+
+    assert_redirected_to settings_path
+    assert_equal "Kunde Nord", client.reload.display_name
   end
 
   test "profile accepts a valid avatar" do

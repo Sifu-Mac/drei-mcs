@@ -18,6 +18,16 @@ class BoardsCommentsControllerTest < ActionDispatch::IntegrationTest
     assert TaskComment.order(:created_at).last.images.attached?
   end
 
+  test "task view displays the comment author's nickname" do
+    task_comments(:one).user.update!(display_name: "Sifu Review")
+    sign_in_as users(:client)
+
+    get board_task_path(@board, @task)
+
+    assert_response :success
+    assert_includes response.body, "Sifu Review"
+  end
+
   test "rejects corrupt image without retaining attachment or blob" do
     assert_no_difference [ "TaskComment.count", "ActiveStorage::Attachment.count", "ActiveStorage::Blob.count" ] do
       post board_task_comments_path(@board, @task),
