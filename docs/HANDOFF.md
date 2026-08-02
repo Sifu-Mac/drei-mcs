@@ -1,8 +1,17 @@
 # HANDOFF.md
 
-Stand: 2026-07-31
+Stand: 2026-08-02
 
 ## Aktueller Stand
+
+### API-Nutzungsprotokoll: Migrations-/Schema-Reparatur (noch nicht gemergt)
+
+- Kandidat: `codex/api-usage-schema-repair`.
+- Unabhaengiges QA hat einen historischen Drift festgestellt: `api_usage_records` samt eindeutigem Index auf `user_id, month` war in `db/schema.rb` vorhanden, wurde aber durch keine versionierte Migration erzeugt. Ein echter `db:migrate:reset` brach deshalb anschliessend bei API-`upsert`-Aufrufen ab.
+- Migration `20260802190000` stellt Tabelle, User-FK, einfachen User-Index und den fuer `upsert` erforderlichen eindeutigen Monatsindex nur bei Fehlen wieder her. Sie ist absichtlich nicht rueckrollbar, damit keine moeglicherweise bereits vorhandenen Nutzungsdaten entfernt werden.
+- Regressionstest prueft das Anlegen und wiederholte Inkrementieren der Monatsnutzung.
+- Verifiziert: frisch gebauter Teststack, echter `db:migrate:reset`, vollstaendige Suite `177 runs, 929 assertions, 0 failures, 0 errors`; RuboCop `185 files inspected, no offenses`; Brakeman `0 warnings`; Bundler- und Importmap-Audit ohne bekannte Schwachstellen.
+- Vor Merge oder Deployment steht das erneute ausdrueckliche Go von `QA & Review` aus. Erst danach wird der weiterhin separate Userloesch-Kandidat erneut dagegen geprueft.
 
 ### Admin-/Client-Verwaltung, Passwortwechsel, Audit-Protokoll und Kampagnenlöschung (noch nicht gemergt)
 
