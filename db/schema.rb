@@ -495,7 +495,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_190000) do
   add_foreign_key "tags", "projects"
   add_foreign_key "tags", "users"
   add_foreign_key "task_activities", "tasks"
-  add_foreign_key "task_activities", "users"
+  add_foreign_key "task_activities", "users", on_delete: :nullify
   add_foreign_key "task_comments", "tasks"
   add_foreign_key "task_comments", "task_comments", column: "quoted_comment_id", on_delete: :nullify
   add_foreign_key "task_comments", "users"
