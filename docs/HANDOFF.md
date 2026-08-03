@@ -26,7 +26,7 @@ Stand: 2026-08-02
 - Beim Loeschen eines Clients scheiterte die Datenbank an `task_activities.user_id`. Die neue Migration `20260802180000` setzt diese Fremdschluesselreferenz bei Userloeschung auf `NULL`; Aktivitaet und zugehoerige Karte bleiben unveraendert erhalten.
 - Ein Admin-Controller-Regressionstest legt eine Aktivitaet eines Clients an, loescht den Client und prueft die erhaltene Karte sowie die anonymisierte Aktivitaet.
 - `QA & Review` erteilte fuer `44d8181` / `533f9b8` ausdruecklich Go: echter Reset, FK `ON DELETE SET NULL`, vollstaendige Suite `178 runs, 930 assertions`, RuboCop `186 files` ohne Befund, Brakeman sowie Bundler- und Importmap-Audit gruen.
-- Der Stand wurde als Merge-Commit `c5f5a0a` nach `main` gemergt und zu GitHub gepusht. Das Production-Deployment folgt nach Uebernahme dieses Handoff-Updates.
+- Der Stand wurde als Merge-Commit `c5f5a0a` nach `main` gemergt, zu GitHub gepusht und als Runtime-Deployment ausgerollt. Production: Migration `20260802180000` erfolgreich, `db` healthy, `web` running, `/up` liefert `200`.
 
 ### Admin-/Client-Verwaltung, Passwortwechsel, Audit-Protokoll und Kampagnenlöschung (noch nicht gemergt)
 
