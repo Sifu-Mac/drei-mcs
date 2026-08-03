@@ -28,7 +28,7 @@ Stand: 2026-08-02
 - `QA & Review` erteilte fuer `44d8181` / `533f9b8` ausdruecklich Go: echter Reset, FK `ON DELETE SET NULL`, vollstaendige Suite `178 runs, 930 assertions`, RuboCop `186 files` ohne Befund, Brakeman sowie Bundler- und Importmap-Audit gruen.
 - Der Stand wurde als Merge-Commit `c5f5a0a` nach `main` gemergt, zu GitHub gepusht und als Runtime-Deployment ausgerollt. Production: Migration `20260802180000` erfolgreich, `db` healthy, `web` running, `/up` liefert `200`.
 
-### Produkt-/Vorlagenbereinigung (noch nicht gemergt)
+### Produkt-/Vorlagenbereinigung (gemergt und deployt)
 
 - Kandidat: `codex/product-template-cleanup`.
 - GitHub-OAuth ist vollstaendig entfernt: Abhaengigkeiten, Callback-Routen, Controller, Initializer, Login-Schaltflaeche, Konfigurationswerte und Tests existieren nicht mehr. Invite-only E-Mail-/Passwort-Zugang bleibt der einzige Loginweg.
@@ -37,7 +37,7 @@ Stand: 2026-08-02
 - Lokale Entwicklungsdatenbanknamen, Beispiel-ENV und Deploy-/Projekt-Dokumentation sind auf DREI Asset Review neutralisiert. Die MIT-Lizenz mit dem ClawDeck-Copyright bleibt unveraendert erhalten.
 - Historische Migrationen, bestehende Datenbanktabellen und die produktive Datenbankkennung werden in diesem nicht-destruktiven Schritt bewusst nicht entfernt. Sie erfordern eine spaetere Abhaengigkeits- und Datenmigrationspruefung.
 - Verifiziert im frisch gebauten isolierten Teststack: fokussiert `36 runs, 292 assertions`; vollstaendig `174 runs, 911 assertions`; RuboCop `181 files` ohne Befund; Brakeman `0 warnings`; Bundler- und Importmap-Audit ohne bekannte Schwachstellen.
-- Vor Merge und Deployment ist ein ausdrueckliches unabhaengiges Go von `QA & Review` erforderlich.
+- `QA & Review` erteilte fuer `bd8818d`, `73b26cf` und `70c23d2` ausdruecklich Go. Der Stand wurde als Merge-Commit `7b5a548` nach `main` gemergt, zu GitHub gepusht und als Runtime-Deployment ausgerollt. Production: `db` healthy, `web` running, `/up` liefert `200`.
 
 ### Admin-/Client-Verwaltung, Passwortwechsel, Audit-Protokoll und Kampagnenlöschung (noch nicht gemergt)
 
