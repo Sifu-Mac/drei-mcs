@@ -87,7 +87,7 @@ Bekannte Rollen und Modelle:
 - `BoardColumn.kind`: `backlog`, `active`, `review`, `blocked`, `done`; sichtbare Spaltennamen sind frei editierbar.
 - `Task.board_column_id` ist die Source of Truth fuer Board-Position und Completion-State.
 - `Task.status` bleibt als Legacy-Spiegel fuer API-Kompatibilitaet erhalten.
-- `Task.owner`: `sifu`, `james`, `codex`.
+- `Task.owner`: `unassigned`, `internal`, `integration`; ein neutraler Legacy-/API-Wert ohne Berechtigungslogik.
 - `Task.completed`, `Task.completed_at`, `Task.blocked` und Legacy-`status` werden aus `Task.board_column.kind` synchronisiert.
 - `Task.color`: `none`, `blue`, `green`, `yellow`, `orange`, `red`, `purple`, `gray`; nur visueller Akzent ohne Business-Logik.
 - Task-Coverbilder und Kommentar-Bilder laufen ueber Active Storage.

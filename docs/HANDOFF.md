@@ -36,7 +36,7 @@ Stand: 2026-08-02
 - Konkrete Alt-Namen aus dem Karten-Owner-Feld sind durch neutrale, abwaertskompatible Werte `Nicht zugeordnet`, `Intern` und `Integration` ersetzt. Die Kartenformulare zeigen kein Owner-Feld mehr; die Agentenbasis bleibt als neutral benannte Integration erhalten und kann spaeter Hermes anbinden.
 - Lokale Entwicklungsdatenbanknamen, Beispiel-ENV und Deploy-/Projekt-Dokumentation sind auf DREI Asset Review neutralisiert. Die MIT-Lizenz mit dem ClawDeck-Copyright bleibt unveraendert erhalten.
 - Historische Migrationen, bestehende Datenbanktabellen und die produktive Datenbankkennung werden in diesem nicht-destruktiven Schritt bewusst nicht entfernt. Sie erfordern eine spaetere Abhaengigkeits- und Datenmigrationspruefung.
-- Verifiziert im frisch gebauten isolierten Teststack: fokussiert `36 runs, 292 assertions`; vollstaendig `178 runs, 930 assertions`; RuboCop `181 files` ohne Befund; Brakeman `0 warnings`; Bundler- und Importmap-Audit ohne bekannte Schwachstellen.
+- Verifiziert im frisch gebauten isolierten Teststack: fokussiert `36 runs, 292 assertions`; vollstaendig `174 runs, 911 assertions`; RuboCop `181 files` ohne Befund; Brakeman `0 warnings`; Bundler- und Importmap-Audit ohne bekannte Schwachstellen.
 - Vor Merge und Deployment ist ein ausdrueckliches unabhaengiges Go von `QA & Review` erforderlich.
 
 ### Admin-/Client-Verwaltung, Passwortwechsel, Audit-Protokoll und Kampagnenlöschung (noch nicht gemergt)
