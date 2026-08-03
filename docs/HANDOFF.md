@@ -4,14 +4,21 @@ Stand: 2026-08-02
 
 ## Aktueller Stand
 
-### API-Nutzungsprotokoll: Migrations-/Schema-Reparatur (noch nicht gemergt)
+### API-Nutzungsprotokoll: Migrations-/Schema-Reparatur (gemergt und deployt)
 
 - Kandidat: `codex/api-usage-schema-repair`.
 - Unabhaengiges QA hat einen historischen Drift festgestellt: `api_usage_records` samt eindeutigem Index auf `user_id, month` war in `db/schema.rb` vorhanden, wurde aber durch keine versionierte Migration erzeugt. Ein echter `db:migrate:reset` brach deshalb anschliessend bei API-`upsert`-Aufrufen ab.
 - Migration `20260802190000` stellt Tabelle, User-FK, einfachen User-Index und den fuer `upsert` erforderlichen eindeutigen Monatsindex nur bei Fehlen wieder her. Sie ist absichtlich nicht rueckrollbar, damit keine moeglicherweise bereits vorhandenen Nutzungsdaten entfernt werden.
 - Regressionstest prueft das Anlegen und wiederholte Inkrementieren der Monatsnutzung.
 - Verifiziert: frisch gebauter Teststack, echter `db:migrate:reset`, vollstaendige Suite `177 runs, 929 assertions, 0 failures, 0 errors`; RuboCop `185 files inspected, no offenses`; Brakeman `0 warnings`; Bundler- und Importmap-Audit ohne bekannte Schwachstellen.
-- Vor Merge oder Deployment steht das erneute ausdrueckliche Go von `QA & Review` aus. Erst danach wird der weiterhin separate Userloesch-Kandidat erneut dagegen geprueft.
+- `QA & Review` erteilte fuer `7afff99` ausdruecklich Go. Der Stand wurde als Merge-Commit `e82e629` nach `main` gemergt, zu GitHub gepusht und deployt. Production: Migration erfolgreich, `db` healthy, `web` running, `/up` liefert `200`.
+
+### Benutzerloeschung bei erhaltener Kartenhistorie (noch nicht gemergt)
+
+- Kandidat: `codex/user-deletion-activity-history`.
+- Beim Loeschen eines Clients scheiterte die Datenbank an `task_activities.user_id`. Die neue Migration `20260802180000` setzt diese Fremdschluesselreferenz bei Userloeschung auf `NULL`; Aktivitaet und zugehoerige Karte bleiben unveraendert erhalten.
+- Ein Admin-Controller-Regressionstest legt eine Aktivitaet eines Clients an, loescht den Client und prueft die erhaltene Karte sowie die anonymisierte Aktivitaet.
+- Der Kandidat wurde nach dem nun gemergten API-Migrationsfix auf `main` rebasiert. Vor Merge oder Deployment steht erneut das ausdrueckliche Go von `QA & Review` aus.
 
 ### Admin-/Client-Verwaltung, Passwortwechsel, Audit-Protokoll und Kampagnenlöschung (noch nicht gemergt)
 

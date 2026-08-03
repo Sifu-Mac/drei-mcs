@@ -30,4 +30,19 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     patch promote_admin_user_path(users(:one))
     assert_response :not_found
   end
+
+  test "admin can delete a client with card history while preserving the activity" do
+    admin = users(:admin)
+    client = users(:client)
+    activity = TaskActivity.create!(task: tasks(:one), user: client, action: "updated")
+    sign_in_as admin
+
+    assert_difference "User.count", -1 do
+      delete admin_user_path(client)
+    end
+
+    assert_redirected_to admin_users_path
+    assert_nil activity.reload.user_id
+    assert_equal tasks(:one), activity.task
+  end
 end
