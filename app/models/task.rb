@@ -55,11 +55,11 @@ class Task < ApplicationRecord
     "purple" => "#7c3aed",
     "gray" => "#6b7280"
   }.freeze
-  OWNER_VALUES = { sifu: 0, james: 1, codex: 2 }.freeze
+  OWNER_VALUES = { unassigned: 0, internal: 1, integration: 2 }.freeze
   OWNER_LABELS = {
-    "sifu" => "Sifu",
-    "james" => "James",
-    "codex" => "Codex"
+    "unassigned" => "Nicht zugeordnet",
+    "internal" => "Intern",
+    "integration" => "Integration"
   }.freeze
 
   belongs_to :user
@@ -71,7 +71,7 @@ class Task < ApplicationRecord
 
   enum :priority, { none: 0, low: 1, medium: 2, high: 3 }, default: :none, prefix: true
   enum :status, STATUS_VALUES, default: :inbox
-  enum :owner, OWNER_VALUES, default: :sifu, prefix: true
+  enum :owner, OWNER_VALUES, default: :unassigned, prefix: true
 
   validates :name, presence: true
   validates :priority, inclusion: { in: priorities.keys }

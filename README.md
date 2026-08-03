@@ -1,13 +1,11 @@
 # DREI Asset Review
 
-Technischer Projektname: `drei-mcs`
-
 DREI Asset Review ist eine selbst gehostete Rails-Anwendung fuer Projekt-, Task- und Asset-Review-Workflows mit Agent-Integration.
 
 ## Aktueller Stand
 
 - Produktbranding ist auf `DREI Asset Review` ausgerichtet.
-- Deployment ist fuer `mission.digitalbackup.cloud` mit Docker, PostgreSQL und Traefik vorbereitet.
+- Deployment verwendet Docker, PostgreSQL und einen vorgeschalteten HTTPS-Proxy.
 - Planungsdokumente liegen unter `docs/planning/`.
 
 ## Schnellstart
@@ -49,8 +47,8 @@ Solid Cache, Solid Queue und Solid Cable.
 ### Setup
 
 ```bash
-git clone https://github.com/Sifu-Mac/drei-mcs.git
-cd drei-mcs
+git clone <repository-url>
+cd drei-asset-review
 bundle install
 bin/rails db:prepare
 bin/dev
@@ -68,25 +66,7 @@ Die lokale App laeuft standardmaessig unter `http://localhost:3000`.
 
 ## Authentifizierung
 
-DREI Asset Review unterstuetzt zwei Authentifizierungsarten:
-
-1. Email/Passwort
-2. GitHub OAuth optional fuer Production
-
-### GitHub OAuth
-
-1. GitHub Developer Settings oeffnen
-2. Eine neue OAuth App anlegen
-3. Werte setzen:
-   - Application name: `DREI Asset Review`
-   - Homepage URL: eigene Domain
-   - Authorization callback URL: `https://yourdomain.com/auth/github/callback`
-4. Credentials in der Umgebung setzen:
-
-```bash
-GITHUB_CLIENT_ID=your_client_id
-GITHUB_CLIENT_SECRET=your_client_secret
-```
+DREI Asset Review verwendet Invite-only E-Mail-/Passwort-Zugänge. Neue Personen werden ausschliesslich durch Admins eingeladen.
 
 ## API
 
@@ -96,8 +76,8 @@ DREI Asset Review stellt eine REST API fuer Agent-Integrationen bereit. Den API 
 
 ```http
 Authorization: Bearer YOUR_TOKEN
-X-Agent-Name: Maxie
-X-Agent-Emoji: fox
+X-Agent-Name: Integration
+X-Agent-Emoji: gear
 ```
 
 ### Boards

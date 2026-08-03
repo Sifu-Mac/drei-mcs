@@ -36,36 +36,6 @@ class User < ApplicationRecord
             uniqueness: { case_sensitive: false },
             allow_nil: true
 
-  # Check if GitHub OAuth is configured
-  def self.github_oauth_enabled?
-    ENV["GITHUB_CLIENT_ID"].present? && ENV["GITHUB_CLIENT_SECRET"].present?
-  end
-
-  # Find or create a user from GitHub OAuth data
-  def self.find_or_create_from_github(auth)
-    email = auth.info.email
-    github_avatar_url = auth.info.image
-    user = find_by(email_address: email)
-
-    if user
-      # Link existing user to GitHub if not already linked
-      if user.provider.nil?
-        user.update(provider: "github", uid: auth.uid)
-      end
-      # Update avatar URL if user doesn't have one
-      user.update(avatar_url: github_avatar_url) if github_avatar_url.present? && user.avatar_url.blank?
-      user
-    else
-      # Create new user from GitHub with avatar URL
-      create(
-        email_address: email,
-        provider: "github",
-        uid: auth.uid,
-        avatar_url: github_avatar_url
-      )
-    end
-  end
-
   # Returns avatar source - Active Storage attachment takes priority over URL
   def avatar_source
     if avatar.attached?
@@ -87,19 +57,9 @@ class User < ApplicationRecord
     "Unbekannt"
   end
 
-  # Check if user signed up via OAuth
-  def oauth_user?
-    provider.present?
-  end
-
   # Check if user has a password set
   def password_user?
     password_digest.present?
-  end
-
-  # Check if user needs to set a password (OAuth user without password)
-  def needs_password?
-    oauth_user? && !password_user?
   end
 
   def accessible_boards
@@ -149,8 +109,7 @@ class User < ApplicationRecord
   private
 
   def password_required?
-    # Password is required for new non-OAuth users or when password is being set
-    !oauth_user? && (new_record? || password.present?)
+    new_record? || password.present?
   end
 
   def ensure_workspace_setup

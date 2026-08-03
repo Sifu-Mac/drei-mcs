@@ -96,14 +96,6 @@
                   class: "bg-bg-elevated border border-border rounded-md px-3 py-1.5 text-sm text-content focus:outline-none focus:ring-0" %>
             </div>
 
-            <div class="flex items-center justify-between">
-              <span class="text-sm text-content-muted">Owner</span>
-              <%= form.select :owner,
-                  Task::OWNER_LABELS.map { |key, label| [label, key] },
-                  {},
-                  class: "bg-bg-elevated border border-border rounded-md px-3 py-1.5 text-sm text-content focus:outline-none focus:ring-0" %>
-            </div>
-
           </div>
         </div>
 

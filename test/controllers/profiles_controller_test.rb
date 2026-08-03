@@ -8,10 +8,9 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "Profil speichern"
-    assert_not_includes response.body, "OpenClaw"
     assert_not_includes response.body, "Agent-Prompt"
-    assert_not_includes response.body, "https://github.com/Sifu-Mac/drei-mcs"
-    assert_not_includes response.body, "https://discord.gg/bJQrNasMC6"
+    assert_not_includes response.body, "github.com/"
+    assert_not_includes response.body, "discord.gg/"
   end
 
   test "settings keeps a visible route back to the last opened board" do

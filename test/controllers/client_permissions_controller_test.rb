@@ -69,7 +69,7 @@ class ClientPermissionsControllerTest < ActionDispatch::IntegrationTest
           board_column_id: @column.id,
           description: "Nicht uebernehmen",
           priority: "high",
-          owner: "codex",
+          owner: "integration",
           color: "red"
         }
       }
@@ -82,7 +82,7 @@ class ClientPermissionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Client-Karte", created_task.name
     assert_equal "Nicht uebernehmen", created_task.description
     assert_equal "none", created_task.priority
-    assert_equal "sifu", created_task.owner
+    assert_equal "unassigned", created_task.owner
     assert_equal "red", created_task.color
 
     assert_difference "Task.count", 1 do
@@ -121,7 +121,7 @@ class ClientPermissionsControllerTest < ActionDispatch::IntegrationTest
 
   test "client can fully manage cards and asset lists but cannot change agent state" do
     patch board_task_path(@board, @task), params: {
-      task: { name: "Geändert", description: "Neue Beschreibung", board_column_id: @column.id, color: "purple", priority: "high", owner: "codex" }
+      task: { name: "Geändert", description: "Neue Beschreibung", board_column_id: @column.id, color: "purple", priority: "high", owner: "integration" }
     }
     assert_redirected_to board_task_path(@board, @task)
     @task.reload
@@ -129,7 +129,7 @@ class ClientPermissionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Neue Beschreibung", @task.description
     assert_equal "purple", @task.color
     assert_equal "none", @task.priority
-    assert_equal "sifu", @task.owner
+    assert_equal "unassigned", @task.owner
 
     patch archive_board_task_path(@board, @task)
     assert_redirected_to board_path(@board)
