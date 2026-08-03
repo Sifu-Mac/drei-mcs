@@ -61,6 +61,8 @@ class BoardsControllerTest < ActionDispatch::IntegrationTest
     get board_path(boards(:one))
 
     assert_response :success
+    assert_select "title", "DB × DREI"
+    assert_select 'link[rel="icon"][href="/icon.svg"][type="image/svg+xml"]', count: 1
     assert_includes response.body, 'data-controller="task-card"'
     assert_includes response.body, %(data-task-card-url-value="#{board_task_path(boards(:one), tasks(:one))}")
     assert_includes response.body, 'data-dropdown-portal-value="true"'

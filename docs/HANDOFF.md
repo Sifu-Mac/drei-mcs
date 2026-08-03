@@ -21,6 +21,7 @@ Stand: 2026-08-03
 - Kartenfunktionen für Admins und Clients: Anlegen, Duplizieren, Löschen, Inline-Titel/-Beschreibung, Farbe, Asset-Checkliste, Kommentare mit Zeitstempel, Bearbeiten/Löschen des eigenen Kommentars, Zitate und sichere klickbare HTTP(S)-Links. Agentensteuerung bleibt intern.
 - `Freigegeben` bleibt eine sichtbare Review-Stufe, `Fertig` ist die finale Spalte; Karten werden in keinem Status ausgegraut.
 - UI-Navigation, mobile Rückwege, Board-Dichte, textuelle Kartenaktion und die Wortmarke `DB × DREI` sind umgesetzt.
+- Browser-Titel aller Rails-Layouts lautet `DB × DREI`; das bereitgestellte DB-Symbol wird als sicheres, lokales SVG-Favicon ausgeliefert.
 - SMTP über Postmark ist gehärtet: STARTTLS, Zertifikatsprüfung, HTTPS-Links, dedizierte Mail-Queue, begrenzte Retries und datensparsame Fehlerlogs. Absender: `DREI Asset Review <noreply@digitalbackup.at>`.
 - Tägliches lokales PostgreSQL-Backup per `drei-review-backup.timer` um 03:30 UTC; Aufbewahrung maximal 14 Dumps. Ein isolierter Restore-Ablauf ist dokumentiert und getestet.
 - Historischer Migrationsdrift für `api_usage_records` wurde mit `20260802190000` behoben; ein echter Reset erzeugt wieder den für `upsert` notwendigen eindeutigen Monatsindex.
@@ -34,6 +35,7 @@ Stand: 2026-08-03
 - Production: `drei-review-db-1` healthy, `drei-review-web-1` running, Healthcheck `200`.
 - Backup-Timer aktiv; letzter Lauf am 2026-08-03 03:30:05 UTC erfolgreich, Dump erstellt.
 - Aggregierter Produktionscheck: ein Admin, ein Client, keine offenen Einladungen und keine wartenden Mail-Jobs. Keine personenbezogenen Werte, Tokens oder Mailinhalte wurden ausgegeben.
+- Favicon-/Titel-Kandidat: volle Suite `174 runs, 916 assertions, 0 failures, 0 errors`; RuboCop für die geänderten Ruby-Tests ohne Befund; unabhängiges `QA & Review`-Go.
 
 ## Inhaltsreset vom 2026-08-03
 
