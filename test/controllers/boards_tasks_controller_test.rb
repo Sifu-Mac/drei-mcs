@@ -72,7 +72,7 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
               name: "Auto-Save Titel",
               description: "Auto-Save Beschreibung",
               priority: "high",
-              owner: "codex",
+              owner: "integration",
               color: "purple"
             }
           },
@@ -84,7 +84,7 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Auto-Save Titel", task.name
     assert_equal "Auto-Save Beschreibung", task.description
     assert_equal "none", task.priority
-    assert_equal "sifu", task.owner
+    assert_equal "unassigned", task.owner
     assert_equal "purple", task.color
   end
 

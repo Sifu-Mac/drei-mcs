@@ -25,8 +25,8 @@ module Api
 
       def settings_json
         {
-          agent_name: current_user.agent_name || "OpenClaw",
-          agent_emoji: current_user.agent_emoji || "🦞",
+          agent_name: current_user.agent_name || "Integration",
+          agent_emoji: current_user.agent_emoji || "⚙️",
           agent_auto_mode: current_user.agent_auto_mode,
           agent_status: agent_status,
           email: current_user.email_address

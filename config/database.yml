@@ -16,12 +16,12 @@ default: &default
 
 development:
   <<: *default
-  database: clawdeck_development
+  database: drei_asset_review_development
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
   # When left blank, PostgreSQL will use the default role. This is
   # the same name as the operating system user running Rails.
-  #username: clawdeck
+  #username: drei_asset_review
 
   # The password associated with the PostgreSQL role (username).
   #password:
@@ -40,7 +40,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: clawdeck_test
+  database: drei_asset_review_test
 
 # Production database configuration
 # Uses DATABASE_URL from environment (Render, Railway, etc.)

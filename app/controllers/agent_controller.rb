@@ -169,7 +169,7 @@ class AgentController < ApplicationController
         "No blocked tasks right now."
       end
 
-    elsif q.match?(/agent|openclaw/)
+    elsif q.match?(/agent|integration/)
       if current_user.agent_last_active_at.present?
         name = current_user.agent_name || "Agent"
         emoji = current_user.agent_emoji || "🦞"
@@ -177,7 +177,7 @@ class AgentController < ApplicationController
         assigned = tasks.where(assigned_to_agent: true, completed: false).count
         "#{emoji} #{name} was last active #{ago} ago. #{assigned} tasks currently assigned to your agent."
       else
-        "Noch kein Agent verbunden. Öffne die Einstellungen, um die OpenClaw-Integration einzurichten."
+        "Noch keine Integration verbunden. Richte eine passende Integration ein, wenn sie benötigt wird."
       end
 
     elsif q.match?(/how many|count|total|stat/)

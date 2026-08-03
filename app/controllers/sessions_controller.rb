@@ -15,14 +15,7 @@ class SessionsController < ApplicationController
       return
     end
 
-    if user.needs_password?
-      # OAuth user without password - suggest they use GitHub or reset password
-      redirect_to new_session_path, alert: "This account uses GitHub login. Please sign in with GitHub or reset your password."
-      return
-    end
-
     if !user.password_user?
-      # Existing user from before password auth - needs to set password via reset
       redirect_to new_password_path, alert: "Please set a password using the password reset flow."
       return
     end

@@ -35,8 +35,6 @@ Rails.application.routes.draw do
   end
 
   resource :session, only: [:new, :create, :destroy]
-  get "/auth/:provider/callback", to: "omniauth_callbacks#github", as: :omniauth_callback
-  get "/auth/failure", to: "omniauth_callbacks#failure"
   resources :passwords, param: :token
   resources :invites, only: [ :show, :update ], param: :token
   resource :settings, only: [ :show, :update ], controller: "profiles" do
@@ -93,8 +91,6 @@ Rails.application.routes.draw do
 
   # Home dashboard (authenticated users)
   get "home", to: "home#show", as: :home
-
-  get "pages/home"
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

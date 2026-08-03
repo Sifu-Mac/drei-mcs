@@ -53,7 +53,7 @@ class TaskCommentTest < ActiveSupport::TestCase
 
   test "stores a durable quote snapshot when the original comment is deleted" do
     original = task_comments(:one)
-    original.user.update!(display_name: "Sifu")
+    original.user.update!(display_name: "Alex")
     reply = TaskComment.create!(task: original.task, user: users(:admin), body: "Meine Antwort", quoted_comment: original)
 
     assert_equal original.body, reply.quoted_comment_body
@@ -64,7 +64,7 @@ class TaskCommentTest < ActiveSupport::TestCase
 
     assert_nil reply.quoted_comment_id
     assert_equal "Test comment one", reply.quoted_body
-    assert_equal "Sifu", reply.quoted_author_label
+    assert_equal "Alex", reply.quoted_author_label
   end
 
   test "rejects quotes from another task" do

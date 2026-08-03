@@ -19,13 +19,13 @@ class BoardsCommentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "task view displays the comment author's nickname" do
-    task_comments(:one).user.update!(display_name: "Sifu Review")
+    task_comments(:one).user.update!(display_name: "Alex Review")
     sign_in_as users(:client)
 
     get board_task_path(@board, @task)
 
     assert_response :success
-    assert_includes response.body, "Sifu Review"
+    assert_includes response.body, "Alex Review"
   end
 
   test "task view renders https urls in comments as safe external links" do

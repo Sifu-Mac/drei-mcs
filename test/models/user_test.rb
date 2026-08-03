@@ -8,17 +8,17 @@ class UserTest < ActiveSupport::TestCase
 
   test "normalizes, validates and uses a nickname as the display label" do
     user = users(:one)
-    user.display_name = "  Sifu   Design  "
+    user.display_name = "  Alex   Design  "
 
     assert user.valid?
-    assert_equal "Sifu Design", user.display_name
-    assert_equal "Sifu Design", user.display_label
+    assert_equal "Alex Design", user.display_name
+    assert_equal "Alex Design", user.display_label
   end
 
   test "nickname is unique without case sensitivity and falls back to the email alias" do
-    users(:one).update!(display_name: "Sifu")
+    users(:one).update!(display_name: "Alex")
     duplicate = users(:client)
-    duplicate.display_name = "sIFu"
+    duplicate.display_name = "aLEX"
 
     assert_not duplicate.valid?
     assert_includes duplicate.errors[:display_name], "has already been taken"

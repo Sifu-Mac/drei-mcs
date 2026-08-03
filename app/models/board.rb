@@ -45,14 +45,14 @@ class Board < ApplicationRecord
         position: 0
       },
       {
-        name: "Agent verbinden",
-        description: "Öffne Einstellungen, kopiere den Integrations-Prompt und füge ihn in der Agent-Konfiguration ein.",
+        name: "Integration vorbereiten",
+        description: "Verbinde eine passende Integration, wenn sie für den Arbeitsablauf benötigt wird.",
         board_column: backlog_column,
         position: 0
       },
       {
-        name: "Erste Karte zuweisen",
-        description: "Erstelle eine Karte, setze den Owner und weise sie zu, wenn ein Agent daran arbeiten soll.",
+        name: "Erste Karte erstellen",
+        description: "Erstelle eine Karte und verschiebe sie durch den gemeinsamen Workflow.",
         board_column: backlog_column,
         position: 1
       }

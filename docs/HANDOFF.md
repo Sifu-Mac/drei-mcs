@@ -28,6 +28,17 @@ Stand: 2026-08-02
 - `QA & Review` erteilte fuer `44d8181` / `533f9b8` ausdruecklich Go: echter Reset, FK `ON DELETE SET NULL`, vollstaendige Suite `178 runs, 930 assertions`, RuboCop `186 files` ohne Befund, Brakeman sowie Bundler- und Importmap-Audit gruen.
 - Der Stand wurde als Merge-Commit `c5f5a0a` nach `main` gemergt, zu GitHub gepusht und als Runtime-Deployment ausgerollt. Production: Migration `20260802180000` erfolgreich, `db` healthy, `web` running, `/up` liefert `200`.
 
+### Produkt-/Vorlagenbereinigung (noch nicht gemergt)
+
+- Kandidat: `codex/product-template-cleanup`.
+- GitHub-OAuth ist vollstaendig entfernt: Abhaengigkeiten, Callback-Routen, Controller, Initializer, Login-Schaltflaeche, Konfigurationswerte und Tests existieren nicht mehr. Invite-only E-Mail-/Passwort-Zugang bleibt der einzige Loginweg.
+- Die unbenutzte oeffentliche Vorlagen-Landingpage mit GitHub-, Discord-, Demo- und OpenClaw-Texten ist entfernt; die Root-Route bleibt der Login.
+- Konkrete Alt-Namen aus dem Karten-Owner-Feld sind durch neutrale, abwaertskompatible Werte `Nicht zugeordnet`, `Intern` und `Integration` ersetzt. Die Kartenformulare zeigen kein Owner-Feld mehr; die Agentenbasis bleibt als neutral benannte Integration erhalten und kann spaeter Hermes anbinden.
+- Lokale Entwicklungsdatenbanknamen, Beispiel-ENV und Deploy-/Projekt-Dokumentation sind auf DREI Asset Review neutralisiert. Die MIT-Lizenz mit dem ClawDeck-Copyright bleibt unveraendert erhalten.
+- Historische Migrationen, bestehende Datenbanktabellen und die produktive Datenbankkennung werden in diesem nicht-destruktiven Schritt bewusst nicht entfernt. Sie erfordern eine spaetere Abhaengigkeits- und Datenmigrationspruefung.
+- Verifiziert im frisch gebauten isolierten Teststack: fokussiert `36 runs, 292 assertions`; vollstaendig `178 runs, 930 assertions`; RuboCop `181 files` ohne Befund; Brakeman `0 warnings`; Bundler- und Importmap-Audit ohne bekannte Schwachstellen.
+- Vor Merge und Deployment ist ein ausdrueckliches unabhaengiges Go von `QA & Review` erforderlich.
+
 ### Admin-/Client-Verwaltung, Passwortwechsel, Audit-Protokoll und Kampagnenlöschung (noch nicht gemergt)
 
 - Kandidat: `codex/admin-client-governance`.

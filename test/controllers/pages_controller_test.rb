@@ -1,11 +1,6 @@
 require "test_helper"
 
-class PagesControllerTest < ActionDispatch::IntegrationTest
-  test "should get home" do
-    get pages_home_url
-    assert_response :success
-  end
-
+class PwaManifestTest < ActionDispatch::IntegrationTest
   test "pwa manifest references existing icon assets" do
     get "/manifest.json"
 
