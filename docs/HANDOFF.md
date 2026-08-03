@@ -2,6 +2,13 @@
 
 Stand: 2026-08-02
 
+## Go/No-Go-Check vor erstem echten Client-Test (2026-08-03)
+
+- Rein lesender Production-Check: `drei-review-db-1` laeuft und ist healthy, `drei-review-web-1` laeuft; `https://drei.digitalbackup.cloud/up` liefert `200`.
+- Vollstaendige Suite auf dem aktuellen Release-Checkout im isolierten Test-Compose-Stack: `178 runs, 930 assertions, 0 failures, 0 errors, 0 skips`.
+- Der bereits mit ausdruecklicher Freigabe angelegte temporaere Client hat den Invite angenommen; Client-Login, Browser-Rechtepruefung und anschliessende gezielte Bereinigung sind weiterhin offen.
+- Der lokale Checkout war beim Check auf einem losgeloesten `HEAD` bei `e82e629`; dies aendert nicht den bereits laufenden Production-Container. Vor weiteren Git-Arbeiten Branch/Commit bewusst verifizieren.
+
 ## Aktueller Stand
 
 ### API-Nutzungsprotokoll: Migrations-/Schema-Reparatur (gemergt und deployt)
@@ -13,12 +20,13 @@ Stand: 2026-08-02
 - Verifiziert: frisch gebauter Teststack, echter `db:migrate:reset`, vollstaendige Suite `177 runs, 929 assertions, 0 failures, 0 errors`; RuboCop `185 files inspected, no offenses`; Brakeman `0 warnings`; Bundler- und Importmap-Audit ohne bekannte Schwachstellen.
 - `QA & Review` erteilte fuer `7afff99` ausdruecklich Go. Der Stand wurde als Merge-Commit `e82e629` nach `main` gemergt, zu GitHub gepusht und deployt. Production: Migration erfolgreich, `db` healthy, `web` running, `/up` liefert `200`.
 
-### Benutzerloeschung bei erhaltener Kartenhistorie (noch nicht gemergt)
+### Benutzerloeschung bei erhaltener Kartenhistorie (gemergt und deployt)
 
 - Kandidat: `codex/user-deletion-activity-history`.
 - Beim Loeschen eines Clients scheiterte die Datenbank an `task_activities.user_id`. Die neue Migration `20260802180000` setzt diese Fremdschluesselreferenz bei Userloeschung auf `NULL`; Aktivitaet und zugehoerige Karte bleiben unveraendert erhalten.
 - Ein Admin-Controller-Regressionstest legt eine Aktivitaet eines Clients an, loescht den Client und prueft die erhaltene Karte sowie die anonymisierte Aktivitaet.
-- Der Kandidat wurde nach dem nun gemergten API-Migrationsfix auf `main` rebasiert. Vor Merge oder Deployment steht erneut das ausdrueckliche Go von `QA & Review` aus.
+- `QA & Review` erteilte fuer `44d8181` / `533f9b8` ausdruecklich Go: echter Reset, FK `ON DELETE SET NULL`, vollstaendige Suite `178 runs, 930 assertions`, RuboCop `186 files` ohne Befund, Brakeman sowie Bundler- und Importmap-Audit gruen.
+- Der Stand wurde als Merge-Commit `c5f5a0a` nach `main` gemergt und zu GitHub gepusht. Das Production-Deployment folgt nach Uebernahme dieses Handoff-Updates.
 
 ### Admin-/Client-Verwaltung, Passwortwechsel, Audit-Protokoll und Kampagnenlöschung (noch nicht gemergt)
 
