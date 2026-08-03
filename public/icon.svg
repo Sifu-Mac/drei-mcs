@@ -1,7 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="16" fill="#161619"/>
-  <rect x="14" y="16" width="36" height="32" rx="8" fill="#2563EB" fill-opacity="0.18" stroke="#60A5FA" stroke-width="3"/>
-  <path d="M22 28H42" stroke="#E5E7EB" stroke-width="4" stroke-linecap="round"/>
-  <path d="M22 38H34" stroke="#E5E7EB" stroke-width="4" stroke-linecap="round"/>
-  <circle cx="44" cy="44" r="8" fill="#34D399"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Ebene_2" data-name="Ebene 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 86.91 99.96">
+  <g id="Layer_1" data-name="Layer 1">
+    <g>
+      <path d="m61.93,84.45c5.2,0,9.46-4.27,9.46-9.46V24.98c0-5.21-4.25-9.46-9.46-9.46l-60.07-.05c-1.04,0-1.86-.84-1.86-1.86V1.86C0,.84.82,0,1.86,0h60.07c13.79,0,24.98,11.19,24.98,24.98v50c0,13.79-11.19,24.98-24.98,24.98h-3.36v-15.51h3.36Z"/>
+      <path d="m55.87,99.96H21.94c-12.12,0-21.94-9.82-21.94-21.92V20.04c0-1.02.82-1.86,1.86-1.86h11.79c1.02,0,1.86.84,1.86,1.86v22.19h18.62c12.01,0,21.74,9.73,21.74,21.74v35.99Zm-15.51-15.51v-20.48c0-3.43-2.79-6.22-6.22-6.22H15.51v20.29c0,3.54,2.89,6.41,6.42,6.41h18.42Z"/>
+    </g>
+  </g>
 </svg>
