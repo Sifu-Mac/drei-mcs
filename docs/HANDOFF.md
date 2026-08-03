@@ -4,7 +4,7 @@ Stand: 2026-08-03
 
 ## Aktueller Release-Stand
 
-- `main` steht bei `606f70c` (`Record template cleanup deployment`); die Production-Arbeitskopie ist absichtlich detached auf demselben Commit.
+- `main` enthält zusätzlich zum Runtime-Commit `606f70c` den reinen Dokumentations-Merge `9645629`. Die Production-Arbeitskopie bleibt absichtlich detached bei `606f70c`; ein Deployment ist für Dokumentation nicht erforderlich.
 - Production unter `https://drei.digitalbackup.cloud` ist gesund: `web` läuft, `db` ist healthy und `/up` liefert `200`.
 - Der aktuelle Stand ist für den ersten GoLive als gemeinsamer Workspace ausgelegt: ein Admin verwaltet technische Einstellungen und Einladungen, Clients arbeiten auf allen aktiven Kampagnen, Boards und Karten desselben Workspaces.
 - Der sichtbare Rollenvertrag besteht nur aus `Admin` und `Client`. Interne historische Mitgliedschaftswerte werden nicht in der UI angeboten.
