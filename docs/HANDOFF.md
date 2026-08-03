@@ -35,6 +35,13 @@ Stand: 2026-08-03
 - Backup-Timer aktiv; letzter Lauf am 2026-08-03 03:30:05 UTC erfolgreich, Dump erstellt.
 - Aggregierter Produktionscheck: ein Admin, ein Client, keine offenen Einladungen und keine wartenden Mail-Jobs. Keine personenbezogenen Werte, Tokens oder Mailinhalte wurden ausgegeben.
 
+## Inhaltsreset vom 2026-08-03
+
+- Auf ausdrückliche Benutzerfreigabe wurde um 15:07 UTC zuerst ein frischer lokaler PostgreSQL-Dump erstellt.
+- Danach wurden alle Arbeitsinhalte in Production transaktional gelöscht: aktive und archivierte Kampagnen, Boards, Spalten, Karten, Kommentare, Unteraufgaben, Kartenaktivitäten und Karten-Tag-Zuordnungen.
+- Nachprüfung: Kampagnen, Boards, Spalten, Karten, Kommentare, Unteraufgaben, Aktivitäten und Karten-Tag-Zuordnungen jeweils `0`; keine archivierten Kampagnen, Boards oder Karten verbleiben.
+- Die zwei Benutzerkonten, der gemeinsame Workspace, Rollen, Zugänge, Einstellungen, Postmark-Konfiguration und der Backup-Timer blieben unverändert. `/up` liefert anschließend `200`.
+
 ## Bewusst offen / externe Entscheidungen
 
 1. **Postmark aus Testmodus freischalten.** Technisch ist die App bereit; die Accountfreigabe erfolgt im Postmark-Konto und kann nicht sicher automatisiert werden. Erst danach Einladungen an beliebige Kundendomains senden.
