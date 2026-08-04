@@ -116,11 +116,11 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
       post copy_to_board_board_task_path(boards(:one), task), params: { transfer: { destination: "#{target.id}:#{target_column.id}" } }
     end
     copy = Task.unscoped.order(:created_at).last
-    assert_redirected_to board_task_path(target, copy)
+    assert_redirected_to board_path(target)
     assert_equal [ [ "16:9", true ] ], copy.subtasks.pluck(:title, :done)
 
     patch move_to_board_board_task_path(boards(:one), task), params: { transfer: { destination: "#{target.id}:#{target_column.id}" } }
-    assert_redirected_to board_task_path(target, task)
+    assert_redirected_to board_path(target)
     assert_equal [ target.id, target_column.id ], task.reload.attributes.values_at("board_id", "board_column_id")
   end
 

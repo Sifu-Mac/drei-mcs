@@ -69,7 +69,7 @@ class Boards::TasksController < ApplicationController
   def copy_to_board
     destination_board, destination_column = transfer_destination
     copy = @task.copy_to_board!(board: destination_board, board_column: destination_column, user: current_user)
-    redirect_to board_task_path(destination_board, copy), notice: "Karte wurde vollständig in #{destination_board.name} kopiert."
+    redirect_to board_path(destination_board), notice: "Karte wurde vollständig in #{destination_board.name} kopiert."
   rescue ArgumentError, ActionController::ParameterMissing => error
     redirect_to transfer_board_task_path(@board, @task, mode: "copy"), alert: error.message
   end
@@ -77,7 +77,7 @@ class Boards::TasksController < ApplicationController
   def move_to_board
     destination_board, destination_column = transfer_destination
     @task.move_to_board!(board: destination_board, board_column: destination_column, user: current_user)
-    redirect_to board_task_path(destination_board, @task), notice: "Karte wurde nach #{destination_board.name} verschoben."
+    redirect_to board_path(destination_board), notice: "Karte wurde nach #{destination_board.name} verschoben."
   rescue ArgumentError, ActionController::ParameterMissing => error
     redirect_to transfer_board_task_path(@board, @task, mode: "move"), alert: error.message
   end
