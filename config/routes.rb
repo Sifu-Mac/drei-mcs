@@ -73,6 +73,9 @@ Rails.application.routes.draw do
         patch :assign
         patch :unassign
         post :duplicate
+        get :transfer
+        post :copy_to_board
+        patch :move_to_board
         patch :archive
         patch :restore
       end

@@ -141,6 +141,75 @@ class Task < ApplicationRecord
     copy
   end
 
+  def copy_to_board!(board:, board_column:, user:)
+    validate_transfer_destination!(board, board_column)
+
+    self.class.transaction do
+      copy = dup
+      copy.name = "#{name} Kopie"
+      copy.board = board
+      copy.board_column = board_column
+      copy.user = user
+      copy.archived_at = nil
+      copy.assigned_to_agent = false
+      copy.assigned_at = nil
+      copy.agent_claimed_at = nil
+      copy.activity_source = "web"
+      copy.activity_note = "Kopie aus Board „#{self.board.name}“."
+      copy.save!
+
+      subtasks.order(:position).each do |subtask|
+        copy.subtasks.create!(title: subtask.title, position: subtask.position, done: subtask.done?)
+      end
+
+      comment_map = {}
+      comments.includes(images_attachments: :blob).chronological.each do |comment|
+        copied_comment = copy.comments.create!(
+          body: comment.body,
+          user: comment.user,
+          quoted_comment_body: comment.quoted_comment_body,
+          quoted_comment_author_label: comment.quoted_comment_author_label,
+          quoted_comment_created_at: comment.quoted_comment_created_at
+        )
+        copied_comment.images.attach(comment.images.blobs) if comment.images.attached?
+        copied_comment.update_columns(created_at: comment.created_at, updated_at: comment.updated_at)
+        comment_map[comment.id] = copied_comment
+      end
+
+      comments.where.not(quoted_comment_id: nil).find_each do |comment|
+        comment_map.fetch(comment.id).update_columns(quoted_comment_id: comment_map[comment.quoted_comment_id]&.id)
+      end
+
+      copy
+    end
+  end
+
+  def move_to_board!(board:, board_column:, user:)
+    validate_transfer_destination!(board, board_column)
+
+    self.class.transaction do
+      lock!
+      previous_board = self.board
+      self.board = board
+      self.board_column = board_column
+      self.position = (board.tasks.unscoped.where(board_column_id: board_column.id, archived_at: nil).maximum(:position) || 0) + 1
+      self.activity_source = "web"
+      self.activity_note = "Von Board „#{previous_board.name}“ nach „#{board.name}“ verschoben."
+      save!
+      activities.create!(
+        user: user,
+        action: "moved",
+        field_name: "board",
+        old_value: previous_board.name,
+        new_value: board.name,
+        source: "web",
+        actor_type: "user",
+        note: activity_note
+      )
+      self
+    end
+  end
+
   def assign_to_agent!
     update!(assigned_to_agent: true, assigned_at: Time.current)
   end
@@ -166,6 +235,13 @@ class Task < ApplicationRecord
   end
 
   private
+
+  def validate_transfer_destination!(board, board_column)
+    raise ArgumentError, "Zielboard muss aktiv sein" if board.archived?
+    raise ArgumentError, "Zielspalte gehört nicht zum Zielboard" unless board_column.board_id == board.id
+    raise ArgumentError, "Karte muss in ein anderes Board übertragen werden" if board.id == board_id
+    raise ArgumentError, "Archivierte Karten können nicht übertragen werden" if archived_at.present?
+  end
 
   def ensure_board_column
     return if board.blank?

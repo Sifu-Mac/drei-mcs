@@ -2,7 +2,7 @@ class Boards::TasksController < ApplicationController
   include UploadCleanup
 
   before_action :set_board
-  before_action :set_task, only: [:show, :edit, :update, :destroy, :assign, :unassign, :duplicate, :archive, :restore]
+  before_action :set_task, only: [:show, :edit, :update, :destroy, :assign, :unassign, :duplicate, :transfer, :copy_to_board, :move_to_board, :archive, :restore]
   before_action :require_internal_workspace_member, only: [:assign, :unassign]
 
   def show
@@ -57,6 +57,29 @@ class Boards::TasksController < ApplicationController
       format.turbo_stream
       format.html { redirect_to board_path(@board), notice: "Karte wurde dupliziert." }
     end
+  end
+
+  def transfer
+    @transfer_mode = params[:mode].to_s
+    raise ActionController::RoutingError, "Not Found" unless %w[copy move].include?(@transfer_mode)
+
+    @transfer_boards = current_user.current_workspace_boards.where.not(id: @board.id).includes(:board_columns).ordered
+  end
+
+  def copy_to_board
+    destination_board, destination_column = transfer_destination
+    copy = @task.copy_to_board!(board: destination_board, board_column: destination_column, user: current_user)
+    redirect_to board_task_path(destination_board, copy), notice: "Karte wurde vollständig in #{destination_board.name} kopiert."
+  rescue ArgumentError, ActionController::ParameterMissing => error
+    redirect_to transfer_board_task_path(@board, @task, mode: "copy"), alert: error.message
+  end
+
+  def move_to_board
+    destination_board, destination_column = transfer_destination
+    @task.move_to_board!(board: destination_board, board_column: destination_column, user: current_user)
+    redirect_to board_task_path(destination_board, @task), notice: "Karte wurde nach #{destination_board.name} verschoben."
+  rescue ArgumentError, ActionController::ParameterMissing => error
+    redirect_to transfer_board_task_path(@board, @task, mode: "move"), alert: error.message
   end
 
   def archive
@@ -123,7 +146,14 @@ class Boards::TasksController < ApplicationController
 
   def set_task
     @task = @board.tasks.unscoped.where(board_id: @board.id).includes(:activities, comments: :user).find(params[:id])
-    raise ActionController::RoutingError, "Not Found" if action_name == "duplicate" && @task.archived_at.present?
+    raise ActionController::RoutingError, "Not Found" if %w[duplicate transfer copy_to_board move_to_board].include?(action_name) && @task.archived_at.present?
+  end
+
+  def transfer_destination
+    board_id, column_id = params.require(:transfer).fetch(:destination).to_s.split(":", 2)
+    raise ArgumentError, "Bitte Zielboard und Zielspalte auswählen" if board_id.blank? || column_id.blank?
+    destination_board = current_user.current_workspace_boards.find(board_id)
+    [ destination_board, destination_board.board_columns.find(column_id) ]
   end
 
   def task_params
