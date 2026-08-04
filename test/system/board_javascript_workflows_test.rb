@@ -156,4 +156,34 @@ class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
       })()
     JS
   end
+
+  test "sidebar menus close each other and can be dismissed with Escape" do
+    task = tasks(:one)
+    sign_in_through_browser(users(:admin))
+    visit board_path(task.board)
+
+    find("button[aria-label='Kampagnenaktionen']").click
+    assert_equal 1, visible_dropdown_menu_count
+
+    find("button[aria-label='Boardaktionen']").click
+    assert_equal 1, visible_dropdown_menu_count
+
+    page.execute_script("document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))")
+    assert_equal 0, visible_dropdown_menu_count
+
+    click_button "Board hinzufügen"
+    assert_selector "input[placeholder='Boardname']"
+
+    page.execute_script("document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))")
+    assert_no_selector "input[placeholder='Boardname']", visible: true
+  end
+
+  private
+
+  def visible_dropdown_menu_count
+    page.evaluate_script(<<~JS)
+      Array.from(document.querySelectorAll("[data-dropdown-target='menu']"))
+        .filter((menu) => !menu.classList.contains("hidden")).length
+    JS
+  end
 end

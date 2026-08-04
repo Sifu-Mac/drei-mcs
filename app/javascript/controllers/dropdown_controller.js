@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 // Connects to data-controller="dropdown"
 export default class extends Controller {
   static targets = ["button", "menu", "container", "trigger", "input", "display", "actionList", "editPanel"]
-  static values = { portal: Boolean }
+  static values = { portal: Boolean, side: String }
 
   connect() {
     this.menuElement = this.hasMenuTarget ? this.menuTarget : null
@@ -193,7 +193,7 @@ export default class extends Controller {
     const viewportWidth = window.innerWidth
     const viewportHeight = window.innerHeight
 
-    let left = triggerRect.right - menuRect.width
+    let left = this.sideValue === "right" ? triggerRect.right + 8 : triggerRect.right - menuRect.width
     left = Math.min(Math.max(left, margin), viewportWidth - menuRect.width - margin)
 
     const spaceBelow = viewportHeight - triggerRect.bottom
