@@ -109,6 +109,9 @@ class Board < ApplicationRecord
         new_task.activity_source = "web"
         new_task.save!
         new_task.activities.delete_all
+        task.subtasks.order(:position).each do |subtask|
+          new_task.subtasks.create!(title: subtask.title, position: subtask.position, done: false)
+        end
       end
 
       copy
