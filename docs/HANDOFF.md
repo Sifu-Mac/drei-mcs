@@ -38,7 +38,7 @@ Stand: 2026-08-04
 - Aggregierter Produktionscheck: ein Admin, ein Client, keine offenen Einladungen und keine wartenden Mail-Jobs. Keine personenbezogenen Werte, Tokens oder Mailinhalte wurden ausgegeben.
 - Favicon-/Titel-Kandidat: volle Suite `174 runs, 916 assertions, 0 failures, 0 errors`; RuboCop für die geänderten Ruby-Tests ohne Befund; unabhängiges `QA & Review`-Go.
 - Favicon-/Titel-Deployment mit Merge-Commit `e442b18` erfolgreich: `web` läuft, `db` ist healthy, Startseite liefert `DB × DREI` sowie `/icon.svg`; SVG und `/up` liefern jeweils `200`.
-- Sidebar-Menü-Kandidat: volle Rails-Suite `174 runs, 916 assertions, 0 failures, 0 errors`; frischer unabhängiger Selenium-Lauf mit dem neuen fokussierten Test grün (`1 run, 6 assertions`); unabhängiges `QA & Review`-Go. Deployment folgt dem Merge, weil Views und JavaScript geändert wurden.
+- Sidebar-Menü-Deployment mit Merge-Commit `9f432f9` erfolgreich: volle Rails-Suite `174 runs, 916 assertions, 0 failures, 0 errors`; frischer unabhängiger Selenium-Lauf mit dem neuen fokussierten Test grün (`1 run, 6 assertions`); unabhängiges `QA & Review`-Go. `web` läuft neu, `db` ist healthy und `/up` liefert `200`.
 
 ## Inhaltsreset vom 2026-08-03
 
