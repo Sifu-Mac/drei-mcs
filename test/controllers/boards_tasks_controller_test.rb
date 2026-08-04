@@ -101,6 +101,29 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_equal "#{tasks(:one).name} Kopie", copy.name
   end
 
+  test "client can copy and move a card to another active board in the workspace" do
+    sign_in_as users(:client)
+    target = Board.create!(user: users(:admin), workspace: workspaces(:primary), campaign: campaigns(:general), name: "Transferziel", icon: "📋", color: "blue", column_template: "simple")
+    target_column = target.board_columns.first
+    task = tasks(:one)
+    task.subtasks.create!(title: "16:9", done: true)
+
+    get transfer_board_task_path(boards(:one), task, mode: "copy")
+    assert_response :success
+    assert_includes response.body, "Zielboard und Zielspalte"
+
+    assert_difference "Task.count", 1 do
+      post copy_to_board_board_task_path(boards(:one), task), params: { transfer: { destination: "#{target.id}:#{target_column.id}" } }
+    end
+    copy = Task.unscoped.order(:created_at).last
+    assert_redirected_to board_task_path(target, copy)
+    assert_equal [ [ "16:9", true ] ], copy.subtasks.pluck(:title, :done)
+
+    patch move_to_board_board_task_path(boards(:one), task), params: { transfer: { destination: "#{target.id}:#{target_column.id}" } }
+    assert_redirected_to board_task_path(target, task)
+    assert_equal [ target.id, target_column.id ], task.reload.attributes.values_at("board_id", "board_column_id")
+  end
+
   test "client board view exposes all card actions but not board administration" do
     sign_in_as users(:client)
 
@@ -112,10 +135,34 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_match "Karte hinzufügen", response.body
     assert_match 'data-sortable-disabled-value="true"', response.body
     assert_match "Karte bearbeiten", response.body
+    assert_match "In anderes Board kopieren", response.body
+    assert_match "In anderes Board verschieben", response.body
     assert_match "Karte archivieren", response.body
     assert_match "Karte löschen", response.body
     assert_no_match "Spaltenaktionen", response.body
     assert_no_match "Spalte umbenennen", response.body
+  end
+
+  test "card transfer rejects a board outside the current workspace" do
+    sign_in_as users(:client)
+    task = tasks(:one)
+
+    assert_no_difference "Task.count" do
+      post copy_to_board_board_task_path(boards(:one), task), params: { transfer: { destination: "#{boards(:two).id}:#{board_columns(:two_backlog).id}" } }
+    end
+
+    assert_response :not_found
+  end
+
+  test "card transfer asks for a destination instead of mutating when none was selected" do
+    sign_in_as users(:client)
+
+    assert_no_difference "Task.count" do
+      post copy_to_board_board_task_path(boards(:one), tasks(:one)), params: { transfer: { destination: "" } }
+    end
+
+    assert_redirected_to transfer_board_task_path(boards(:one), tasks(:one), mode: "copy")
+    assert_includes flash[:alert], "Zielboard und Zielspalte"
   end
 
   test "client task panel includes all card controls except agent controls" do

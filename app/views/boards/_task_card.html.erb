@@ -49,6 +49,8 @@
              class="hidden z-[220] min-w-[210px] rounded-xl border border-border bg-bg-card p-1.5 shadow-[0_18px_45px_rgba(15,23,42,0.16)]">
           <%= link_to "Karte bearbeiten", board_task_path(task.board, task), class: "block rounded-lg px-3 py-2.5 text-sm font-semibold text-content-secondary hover:bg-bg-hover", data: { turbo_frame: "task_panel" } %>
           <%= button_to "Karte duplizieren", duplicate_board_task_path(task.board, task), method: :post, class: "w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer" %>
+          <%= link_to "In anderes Board kopieren", transfer_board_task_path(task.board, task, mode: "copy"), class: "block rounded-lg px-3 py-2.5 text-sm font-semibold text-content-secondary hover:bg-bg-hover" %>
+          <%= link_to "In anderes Board verschieben", transfer_board_task_path(task.board, task, mode: "move"), class: "block rounded-lg px-3 py-2.5 text-sm font-semibold text-content-secondary hover:bg-bg-hover" %>
           <%= button_to "Karte archivieren", archive_board_task_path(task.board, task), method: :patch, class: "w-full rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-content-secondary hover:bg-bg-hover cursor-pointer" %>
           <div class="my-1 h-px bg-border"></div>
           <%= button_to "Karte löschen", board_task_path(task.board, task), method: :delete, data: { turbo_confirm: "Möchtest du diese Karte wirklich löschen?" }, class: "w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold text-status-error hover:bg-red-50 cursor-pointer" %>
