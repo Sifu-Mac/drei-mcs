@@ -1,5 +1,6 @@
 require "test_helper"
 require Rails.root.join("db/migrate/20260731110000_make_finished_the_final_board_column")
+require Rails.root.join("db/migrate/20260805000000_rename_standard_board_columns")
 
 class BoardColumnTest < ActiveSupport::TestCase
   test "creates with name kind and position" do
@@ -19,13 +20,29 @@ class BoardColumnTest < ActiveSupport::TestCase
 
   test "standard review template keeps approval separate from completion" do
     assert_equal [
-      ["Eingang", "backlog"],
+      ["Produktionsplan", "backlog"],
       ["In Bearbeitung", "active"],
-      ["Kunden-Review", "review"],
-      ["Änderungen angefordert", "blocked"],
+      ["DREI-Review", "review"],
+      ["Korrekturen", "blocked"],
       ["Freigegeben", "review"],
       ["Fertig", "done"]
     ], BoardColumn.standard_review_template
+  end
+
+  test "column name migration renames only the standard workflow columns" do
+    board = boards(:one)
+    board.board_columns.create!(name: "Eingang", kind: :review)
+    board.board_columns.create!(name: "Kunden-Review", kind: :active)
+    board.board_columns.create!(name: "Änderungen angefordert", kind: :backlog)
+
+    RenameStandardBoardColumns.new.up
+
+    assert_equal "Produktionsplan", board_columns(:one_backlog).reload.name
+    assert_equal "DREI-Review", board_columns(:one_review).reload.name
+    assert_equal "Korrekturen", board_columns(:one_blocked).reload.name
+    assert_equal "Eingang", board.board_columns.find_by!(kind: :review, name: "Eingang").name
+    assert_equal "Kunden-Review", board.board_columns.find_by!(kind: :active, name: "Kunden-Review").name
+    assert_equal "Änderungen angefordert", board.board_columns.find_by!(kind: :backlog, name: "Änderungen angefordert").name
   end
 
   test "workflow migration converts an existing finished column into the final state" do

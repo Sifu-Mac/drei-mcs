@@ -1,6 +1,6 @@
 one_backlog:
   board: one
-  name: Eingang
+  name: Produktionsplan
   kind: backlog
   position: 1
 
@@ -12,13 +12,13 @@ one_active:
 
 one_review:
   board: one
-  name: Kunden-Review
+  name: DREI-Review
   kind: review
   position: 3
 
 one_blocked:
   board: one
-  name: Änderungen angefordert
+  name: Korrekturen
   kind: blocked
   position: 4
 
@@ -36,7 +36,7 @@ one_done:
 
 two_backlog:
   board: two
-  name: Eingang
+  name: Produktionsplan
   kind: backlog
   position: 1
 

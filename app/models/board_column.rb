@@ -24,10 +24,10 @@ class BoardColumn < ApplicationRecord
 
   def self.standard_review_template
     [
-      ["Eingang", "backlog"],
+      ["Produktionsplan", "backlog"],
       ["In Bearbeitung", "active"],
-      ["Kunden-Review", "review"],
-      ["Änderungen angefordert", "blocked"],
+      ["DREI-Review", "review"],
+      ["Korrekturen", "blocked"],
       ["Freigegeben", "review"],
       ["Fertig", "done"]
     ]
