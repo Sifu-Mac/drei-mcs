@@ -38,7 +38,7 @@ class BoardColumnsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to board_path(boards(:one))
     assert_match "Kartenstatus konnte nicht synchronisiert werden", flash[:alert]
     column.reload
-    assert_equal "Eingang", column.name
+    assert_equal "Produktionsplan", column.name
     assert column.kind_backlog?
     task.reload
     assert_equal "inbox", task.status
