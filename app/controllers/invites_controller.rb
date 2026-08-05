@@ -32,6 +32,7 @@ class InvitesController < ApplicationController
     end
 
     if accepted
+      enqueue_acceptance_notification
       start_new_session_for(@user)
       redirect_to after_authentication_url, notice: "Account created. Welcome!"
     elsif @invite.reload.usable?
@@ -46,5 +47,14 @@ class InvitesController < ApplicationController
 
   def set_invite
     @invite = Invite.find_by(token: params[:token])
+  end
+
+  def enqueue_acceptance_notification
+    return true if InviteAcceptanceMailer.accepted(@invite, @user).deliver_later
+
+    raise ActiveJob::EnqueueError, "Invite acceptance notification was not enqueued"
+  rescue StandardError => error
+    Rails.logger.error("Invite acceptance notification enqueue failed error_class=#{error.class.name}")
+    false
   end
 end
