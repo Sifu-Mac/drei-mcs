@@ -1,0 +1,32 @@
+<h1 style="margin:0 0 8px;font-size:24px;line-height:32px;color:#101828;">Tagesübersicht</h1>
+<p style="margin:0 0 24px;color:#667085;font-size:14px;line-height:22px;">Änderungen vom <%= @period_start.in_time_zone(DailyAdminActivityReportJob::REPORT_TIME_ZONE).strftime("%d.%m., %H:%M") %> bis <%= @period_end.in_time_zone(DailyAdminActivityReportJob::REPORT_TIME_ZONE).strftime("%d.%m.%Y, %H:%M") %> Uhr.</p>
+
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 28px;"><tr>
+  <td width="50%" style="padding-right:6px;"><div style="padding:16px;border-radius:12px;background:#eff4ff;"><div style="font-size:24px;font-weight:700;color:#175cd3;"><%= @report.movements.size %></div><div style="margin-top:4px;color:#475467;font-size:13px;">Karten bewegt</div></div></td>
+  <td width="50%" style="padding-left:6px;"><div style="padding:16px;border-radius:12px;background:#ecfdf3;"><div style="font-size:24px;font-weight:700;color:#027a48;"><%= @report.comments.size %></div><div style="margin-top:4px;color:#475467;font-size:13px;">Neue Kommentare</div></div></td>
+</tr></table>
+
+<% if @report.movements.any? %>
+  <h2 style="margin:0 0 12px;font-size:17px;color:#101828;">Kartenbewegungen</h2>
+  <% @report.movements.each do |movement| %>
+    <div style="margin:0 0 10px;padding:16px;border:1px solid #e6eaf0;border-radius:12px;">
+      <div style="font-weight:700;color:#101828;font-size:15px;"><%= movement.task.name %></div>
+      <div style="margin-top:5px;color:#475467;font-size:13px;"><%= movement.task.board.campaign.name %> · <%= movement.task.board.name %></div>
+      <div style="margin-top:10px;color:#344054;font-size:14px;"><strong><%= movement.from_label %></strong> <span style="color:#98a2b3;">→</span> <strong><%= movement.to_label %></strong></div>
+      <div style="margin-top:8px;color:#667085;font-size:12px;"><%= movement.actor_label %> · <%= l(movement.occurred_at.in_time_zone(DailyAdminActivityReportJob::REPORT_TIME_ZONE), format: :long) %></div>
+      <div style="margin-top:14px;"><%= link_to "Karte öffnen", board_task_url(movement.task.board, movement.task), style: "display:inline-block;padding:9px 12px;border-radius:7px;background:#1d4ed8;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;" %></div>
+    </div>
+  <% end %>
+<% end %>
+
+<% if @report.comments.any? %>
+  <h2 style="margin:28px 0 12px;font-size:17px;color:#101828;">Neue Kommentare</h2>
+  <% @report.comments.each do |comment| %>
+    <div style="margin:0 0 10px;padding:16px;border-left:3px solid #12b76a;background:#f9fefb;border-radius:0 12px 12px 0;">
+      <div style="font-weight:700;color:#101828;font-size:15px;"><%= comment.task.name %></div>
+      <div style="margin-top:6px;color:#475467;font-size:13px;"><%= comment.author_label %> · <%= l(comment.occurred_at.in_time_zone(DailyAdminActivityReportJob::REPORT_TIME_ZONE), format: :long) %></div>
+      <p style="margin:10px 0 0;color:#344054;font-size:14px;line-height:21px;"><%= comment.excerpt %></p>
+      <div style="margin-top:14px;"><%= link_to "Karte öffnen", board_task_url(comment.task.board, comment.task), style: "color:#175cd3;text-decoration:none;font-size:13px;font-weight:700;" %></div>
+    </div>
+  <% end %>
+<% end %>
