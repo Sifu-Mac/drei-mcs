@@ -1,8 +1,10 @@
-You have been invited to join DREI Asset Review as a <%= @invite.client? ? "client" : "team member" %>.
+Hallo,
 
-Accept your invite here:
+du wurdest zu DB × DREI eingeladen<%= @invite.client? ? " als Client." : " mit Administratorrechten." %>
+
+Richte über folgenden Link dein Passwort ein und aktiviere deinen Zugang:
 <%= invite_url(@invite.token) %>
 
-This link will expire in <%= distance_of_time_in_words(Time.current, @invite.expires_at) %>.
+Der Link ist bis <%= @invite.expires_at.utc.strftime("%d.%m.%Y um %H:%M UTC") %> gültig.
 
-If you did not expect this invite, you can safely ignore this email.
+Falls du diese Einladung nicht erwartet hast, kannst du diese E-Mail ignorieren.
