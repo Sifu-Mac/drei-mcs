@@ -1,0 +1,22 @@
+TAGESÜBERSICHT
+
+Änderungen vom <%= @period_start.in_time_zone(DailyAdminActivityReportJob::REPORT_TIME_ZONE).strftime("%d.%m., %H:%M") %> bis <%= @period_end.in_time_zone(DailyAdminActivityReportJob::REPORT_TIME_ZONE).strftime("%d.%m.%Y, %H:%M") %> Uhr.
+
+<%= @report.movements.size %> Karten bewegt · <%= @report.comments.size %> neue Kommentare
+
+<% if @report.movements.any? %>
+KARTENBEWEGUNGEN
+<% @report.movements.each do |movement| %>
+- <%= movement.task.name %> (<%= movement.task.board.campaign.name %> / <%= movement.task.board.name %>): <%= movement.from_label %> → <%= movement.to_label %> · <%= movement.actor_label %> · <%= l(movement.occurred_at.in_time_zone(DailyAdminActivityReportJob::REPORT_TIME_ZONE), format: :long) %>
+  <%= board_task_url(movement.task.board, movement.task) %>
+<% end %>
+<% end %>
+
+<% if @report.comments.any? %>
+NEUE KOMMENTARE
+<% @report.comments.each do |comment| %>
+- <%= comment.task.name %> · <%= comment.author_label %> · <%= l(comment.occurred_at.in_time_zone(DailyAdminActivityReportJob::REPORT_TIME_ZONE), format: :long) %>
+  <%= comment.excerpt %>
+  <%= board_task_url(comment.task.board, comment.task) %>
+<% end %>
+<% end %>

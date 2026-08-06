@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_02_190000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_05_010000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_190000) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "admin_activity_report_deliveries", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "period_end_at", null: false
+    t.datetime "period_start_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "period_end_at"], name: "index_admin_report_deliveries_on_user_and_period_end", unique: true
+    t.index ["user_id"], name: "index_admin_activity_report_deliveries_on_user_id"
   end
 
   create_table "api_tokens", force: :cascade do |t|
@@ -474,6 +484,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_190000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "admin_activity_report_deliveries", "users", on_delete: :cascade
   add_foreign_key "api_tokens", "users"
   add_foreign_key "api_usage_records", "users"
   add_foreign_key "audit_events", "users", column: "actor_id", on_delete: :nullify
