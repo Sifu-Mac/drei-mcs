@@ -1,7 +1,7 @@
 class CreateAdminActivityReportDeliveries < ActiveRecord::Migration[8.1]
   def change
     create_table :admin_activity_report_deliveries do |t|
-      t.references :user, null: false, foreign_key: true
+      t.references :user, null: false, foreign_key: { on_delete: :cascade }
       t.datetime :period_start_at, null: false
       t.datetime :period_end_at, null: false
 

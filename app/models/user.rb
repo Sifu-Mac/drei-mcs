@@ -6,6 +6,7 @@ class User < ApplicationRecord
   has_many :tasks, dependent: :destroy
   has_many :task_comments, dependent: :destroy
   has_many :api_tokens, dependent: :destroy
+  has_many :admin_activity_report_deliveries, dependent: :delete_all
   has_many :workspace_memberships, dependent: :destroy
   has_many :workspaces, through: :workspace_memberships
   has_many :owned_workspaces, class_name: "Workspace", foreign_key: :owner_id, dependent: :destroy

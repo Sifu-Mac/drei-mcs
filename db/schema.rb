@@ -484,7 +484,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_05_010000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "admin_activity_report_deliveries", "users"
+  add_foreign_key "admin_activity_report_deliveries", "users", on_delete: :cascade
   add_foreign_key "api_tokens", "users"
   add_foreign_key "api_usage_records", "users"
   add_foreign_key "audit_events", "users", column: "actor_id", on_delete: :nullify
