@@ -39,6 +39,11 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
+/* Auth fields use their labelled container as the single focus indicator. */
+.auth-field-input:focus-visible {
+  outline: none;
+}
+
 /* Prevent scrolling on homepage - mobile overscroll fix */
 html.overflow-hidden,
 body.overflow-hidden {
