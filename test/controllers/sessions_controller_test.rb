@@ -6,6 +6,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   test "new" do
     get new_session_path
     assert_response :success
+    assert_select ".auth-field", count: 2
+    assert_select "input.auth-field-input", count: 2
   end
 
   test "create with valid credentials logs in user" do

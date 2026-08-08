@@ -4,6 +4,8 @@ class InvitesControllerTest < ActionDispatch::IntegrationTest
   test "show renders form for a usable invite" do
     get invite_path(invites(:pending_internal).token)
     assert_response :success
+    assert_select ".auth-field", count: 2
+    assert_select "input.auth-field-input", count: 2
   end
 
   test "show redirects for an unusable invite" do
