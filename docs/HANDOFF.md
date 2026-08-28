@@ -1,6 +1,17 @@
 # HANDOFF.md
 
-Stand: 2026-08-08
+Stand: 2026-08-28
+
+## Security-Deployment vom 2026-08-28
+
+- Merge-Commit `c9ed83c` ist auf `main` und GitHub gepusht. Production läuft
+  mit dem Login-Enumeration-Fix, einer restriktiven CSP mit zufälligen
+  Response-Nonces sowie `json 2.21.2`.
+- Verifikation vor Release: vollständige isolierte Rails-Suite (`196 runs,
+  1061 assertions`), RuboCop, Brakeman (`0` Warnungen), Bundler-Audit und
+  Importmap-Audit ohne Befund. Unabhängiges `QA & Review`: Go.
+- Production: `web` neu gestartet, `db` healthy und
+  `https://drei.digitalbackup.cloud/up` liefert `200`.
 
 ## Aktueller Release-Stand
 
