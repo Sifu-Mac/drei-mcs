@@ -10,17 +10,7 @@ class SessionsController < ApplicationController
   def create
     user = User.find_by(email_address: params[:email_address])
 
-    if user.nil?
-      redirect_to new_session_path, alert: "No account found with that email. Please sign up first."
-      return
-    end
-
-    if !user.password_user?
-      redirect_to new_password_path, alert: "Please set a password using the password reset flow."
-      return
-    end
-
-    if user.authenticate(params[:password])
+    if user&.password_user? && user.authenticate(params[:password])
       start_new_session_for user
       redirect_to after_authentication_url, notice: "Welcome back!"
     else

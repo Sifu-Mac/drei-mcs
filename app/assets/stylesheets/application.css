@@ -53,3 +53,14 @@ body.overflow-hidden {
   width: 100%;
   height: 100%;
 }
+
+/* CSP-compatible replacements for previously inline hover event handlers. */
+.task-card:hover {
+  border-color: #bfdbfe !important;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08) !important;
+}
+
+.home-task-link:not(.home-task-link--done):hover {
+  background: #eef2ff !important;
+  border-color: #bfdbfe !important;
+}
