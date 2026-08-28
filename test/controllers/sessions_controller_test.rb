@@ -17,18 +17,28 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert cookies[:session_id]
   end
 
-  test "create with invalid password shows error" do
+  test "create with invalid password shows the generic authentication error" do
     post session_path, params: { email_address: @user.email_address, password: "wrongpassword" }
 
     assert_redirected_to new_session_path
     assert_equal "Invalid email or password.", flash[:alert]
   end
 
-  test "create with non-existent email shows error" do
+  test "create with non-existent email shows the generic authentication error" do
     post session_path, params: { email_address: "nonexistent@example.com", password: "password123" }
 
     assert_redirected_to new_session_path
-    assert_equal "No account found with that email. Please sign up first.", flash[:alert]
+    assert_equal "Invalid email or password.", flash[:alert]
+  end
+
+  test "create with an account without a password shows the generic authentication error" do
+    user = User.create!(email_address: "passwordless@example.com", password: "password123", password_confirmation: "password123")
+    user.update_column(:password_digest, nil)
+
+    post session_path, params: { email_address: user.email_address, password: "password123" }
+
+    assert_redirected_to new_session_path
+    assert_equal "Invalid email or password.", flash[:alert]
   end
 
   test "destroy" do
