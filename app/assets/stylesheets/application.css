@@ -55,13 +55,6 @@ body.overflow-hidden {
 }
 
 /* CSP-compatible replacements for previously inline hover event handlers. */
-.task-card {
-  background: #ffffff !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 12px !important;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
-}
-
 .task-card:hover {
   border-color: #bfdbfe !important;
   box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08) !important;
