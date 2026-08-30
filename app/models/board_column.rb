@@ -28,8 +28,8 @@ class BoardColumn < ApplicationRecord
       ["In Bearbeitung", "active"],
       ["DREI-Review", "review"],
       ["Korrekturen", "blocked"],
-      ["Freigegeben", "review"],
-      ["Fertig", "done"]
+      ["Freigabe", "review"],
+      ["Angeliefert", "done"]
     ]
   end
 
