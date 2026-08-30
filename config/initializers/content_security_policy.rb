@@ -12,6 +12,9 @@ Rails.application.configure do
     policy.object_src :none
     policy.script_src :self, "https://plausible.io"
     policy.style_src :self, :unsafe_inline, "https://fonts.googleapis.com", "https://api.fontshare.com"
+    # The board intentionally uses inline style attributes for card and column presentation.
+    # Keep script/style elements nonce-protected while allowing only style attributes.
+    policy.style_src_attr :unsafe_inline
     policy.connect_src :self, "https://plausible.io"
     policy.base_uri :self
     policy.frame_ancestors :none

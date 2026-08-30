@@ -12,6 +12,7 @@ class ContentSecurityPolicyTest < ActionDispatch::IntegrationTest
     assert_includes policy, "frame-ancestors 'none'"
     assert_includes policy, "script-src 'self' https://plausible.io 'nonce-"
     assert_includes policy, "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://api.fontshare.com 'nonce-"
+    assert_includes policy, "style-src-attr 'unsafe-inline'"
     assert_select "script[type='importmap'][nonce]", count: 1
     assert_select "script:not([nonce])", count: 0
   end
