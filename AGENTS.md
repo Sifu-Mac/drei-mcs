@@ -7,8 +7,17 @@ DREI Asset Review (`drei-mcs`) ist eine selbst gehostete Rails-Anwendung fuer As
 Wichtige Architekturpunkte:
 - Runtime-App: Rails-Webservice im Docker-Compose-Service `web`.
 - Datenbank: PostgreSQL im Compose-Service `db`.
-- Production-Deployment: `/docker/drei-review` auf dem VPS.
-- Live-URL: `https://drei.digitalbackup.cloud`.
+- Entwicklungs- und Test-Checkout auf KVM2: `/srv/drei-review` (Git-Repository,
+  Branch `main`, GitHub-Remote nur lesend über einen Deploy Key).
+- Production-Runtime auf KVM2: `/docker/drei-review` (kein Git-Repository;
+  Compose-Artefakte und ausgerollter Quellstand).
+- Production-Deployment: `docker compose --project-name drei-production
+  --env-file .env.production --file docker-compose.production.yml` im
+  Runtime-Ordner.
+- Live-URL: `https://digital-drei.at`.
+- KVM4 ist ausschließlich ein Rollback-Stand und darf bis zu seiner separaten
+  Stilllegungsfreigabe weder deployed noch für Jobs oder Datenänderungen
+  verwendet werden.
 - Testumgebung: separater Compose-Stack `docker-compose.test.yml` mit eigenem `test-db` und `Dockerfile.test`.
 - Production-Container bleibt schlank; Development-/Test-Gems gehoeren nur in das Test-Image.
 
@@ -33,20 +42,26 @@ Wichtige Architekturpunkte:
 - Bei groesseren Aufgaben zuerst einen verstaendlichen Plan erstellen, parallelisierbare Teile ausweisen und die Freigabe des Benutzers abwarten.
 - Nach der Freigabe selbststaendig umsetzen und nur bei einem echten technischen Risiko oder einer erforderlichen fachlichen Entscheidung stoppen.
 - Vor Merge und Deployment alle relevanten Tests vollstaendig ausfuehren.
-- Nach erfolgreichem Merge `main` zu GitHub pushen, auf `/docker/drei-review` deployen und Production pruefen.
+- Nach erfolgreichem Merge `main` zu GitHub pushen, den Commit im KVM2-Checkout
+  `/srv/drei-review` prüfen und erst nach frischem Backup sowie bestätigtem
+  Rollbackpunkt gezielt in `/docker/drei-review` ausrollen. Danach ausschließlich
+  die KVM2-Production prüfen.
 - Reine Dokumentationsaenderungen erfordern keinen Production-Rebuild; der Healthcheck bleibt dennoch Pflicht.
 - Vor jedem Abschlussbericht `docs/HANDOFF.md` aktualisieren.
 
 ## VPS- und Docker-Struktur
 
 Nur dieses Projekt bearbeiten:
-- VPS-Pfad: `/docker/drei-review`
-- Production Compose: `docker-compose.yml`
+- Entwicklungs-/Test-Checkout: `/srv/drei-review`
+- VPS-Runtime-Pfad: `/docker/drei-review`
+- Production Compose: `docker-compose.production.yml`, Compose-Projekt
+  `drei-production`
 - Production Services: `web`, `db`
-- Production Volumes: `drei-review-postgres`, `drei-review-storage`
+- Production Volumes: `drei-production_drei-production-postgres`,
+  `drei-production_drei-production-storage`
 - Test Compose: `docker-compose.test.yml`
 - Test Services: `test`, `test-db`
-- Test Volume: `drei-review-test-postgres`
+- Test-Projekt: `drei-kvm2-test`; Test Volume: `drei-review-test-postgres`
 
 Die bestehende Mission-Control-Instanz niemals veraendern. Keine Kommandos in fremden Docker-Stacks, fremden Repositories oder alten App-Pfaden ausfuehren.
 
@@ -65,15 +80,17 @@ Die bestehende Mission-Control-Instanz niemals veraendern. Keine Kommandos in fr
 Vor Merge und Deployment passende Tests ausfuehren:
 
 ```bash
-docker compose -f docker-compose.test.yml build test
-docker compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from test test
+cd /srv/drei-review
+docker compose --project-name drei-kvm2-test -f docker-compose.test.yml build test
+docker compose --project-name drei-kvm2-test -f docker-compose.test.yml up --no-build --abort-on-container-exit --exit-code-from test test
 ```
 
 Production pruefen:
 
 ```bash
-docker compose --env-file .env.production ps
-curl -k -s -o /dev/null -w "%{http_code}" https://drei.digitalbackup.cloud/up
+cd /docker/drei-review
+docker compose --project-name drei-production --env-file .env.production --file docker-compose.production.yml ps
+curl -s -o /dev/null -w "%{http_code}" https://digital-drei.at/up
 ```
 
 Production nur neu bauen, wenn Runtime-Code, Gem-Abhaengigkeiten, Assets, Dockerfile oder Compose-Konfiguration fuer Production geaendert wurden.

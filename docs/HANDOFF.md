@@ -2,6 +2,31 @@
 
 Stand: 2026-08-30
 
+## KVM2 als einziges Entwicklungs-, Test- und Deploymentziel
+
+- Der dedizierte KVM2 ist jetzt der alleinige DB × DREI-Betriebshost:
+  Entwicklung und Tests erfolgen im sauberen Git-Checkout `/srv/drei-review`;
+  die produktive Runtime verbleibt getrennt unter `/docker/drei-review`.
+  Der Runtime-Ordner ist absichtlich kein Git-Repository.
+- GitHub-main wurde auf KVM2 mit dem reinen Deploy Key verifiziert und bei
+  `ccbf75703d67cd40bd3a29338c92aacbbcf43fe0` ausgecheckt. Der getrennte
+  Docker-Teststack `drei-kvm2-test` lief mit eigenem `test-db` und Testvolume:
+  `197 runs`, `1065 assertions`, `0 failures`, `0 errors`, `0 skips`.
+- Nach frischem erfolgreichen DB-/Storage-Backup, einem Runtime-Quellarchiv
+  ohne `.env`-Dateien und einem getaggten bisherigen Webimage als Rollback wurde
+  genau dieser Commit auf KVM2 ausgerollt. KVM2 meldet keine ausstehenden
+  Migrationen; interner und öffentlicher Healthcheck liefern `200`, TLS ist
+  gültig und der ausgerollte Quellstand stimmt mit dem Checkout überein.
+- Die Live-URL ist ausschließlich `https://digital-drei.at`. KVM4 ist nicht
+  mehr als Entwicklungs-, Test- oder Deploymentziel zu verwenden und bleibt
+  bis zu einer separaten Stilllegungsfreigabe lediglich unverändert als
+  Rollback-Stand erhalten.
+- Maßgeblicher Ablauf für künftige Releases: in `/srv/drei-review` Branch und
+  GitHub-main abgleichen, Tests mit Compose-Projekt `drei-kvm2-test` ausführen,
+  dann Backup/Rollbackpunkt bestätigen und nur den KVM2-Runtime-Stack
+  `drei-production` aus `/docker/drei-review/docker-compose.production.yml`
+  aktualisieren.
+
 ## Standardspalten-Umbenennung vom 2026-08-30
 
 - Merge-Commit `67c1e46` ist auf `main` und GitHub gepusht sowie in Production
@@ -110,3 +135,11 @@ Stand: 2026-08-30
 - `docs/RESTORE.md` und `docker-compose.restore.yml`: isolierter Restore-Ablauf.
 - `app/models/task.rb`, `app/models/board_column.rb`, `app/controllers/boards/tasks_controller.rb`: Karten- und Spaltenkern.
 - `app/controllers/admin/users_controller.rb`, `app/models/audit_event.rb`: Admin- und Audit-Funktionen.
+
+## KVM2 Karten-Darstellungsfix vom 2026-08-30
+
+- Sichtbarer Kundenbefund: Karten in Board-Spalten verloren ihre weiße Kartenfläche, den Rahmen und die Trennung zur Spaltenfläche.
+- Fix auf GitHub-`main` und KVM2-Release: Commit `9765a5b` stellt die explizite, CSP-kompatible Grunddarstellung für `.task-card` wieder her.
+- Der Client-Kommentar-Systemtest scrollt nun gezielt in den inneren Kartenpanel-Bereich. Das Kommentarfeld war vorhanden, lag bei kleinem Panel-Viewport jedoch außerhalb des sichtbaren Scrollbereichs.
+- Verifikation auf KVM2: fokussierter Selenium-Test `1 Run, 13 Assertions`, vollständige isolierte Rails-Suite `197 Runs, 1065 Assertions`; beide ohne Fehler. Production-Backup vor Release erfolgreich; vorheriges Web-Image als Rollback-Tag gesichert.
+- Production auf `https://digital-drei.at`: `web` läuft, Datenbank healthy, `/up` liefert `200` mit gültigem TLS. Die ausgelieferte Datei `application-0aaf1756.css` enthält die `.task-card`-Regel.
