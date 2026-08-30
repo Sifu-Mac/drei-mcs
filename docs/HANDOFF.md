@@ -143,3 +143,9 @@ Stand: 2026-08-30
 - Der Client-Kommentar-Systemtest scrollt nun gezielt in den inneren Kartenpanel-Bereich. Das Kommentarfeld war vorhanden, lag bei kleinem Panel-Viewport jedoch außerhalb des sichtbaren Scrollbereichs.
 - Verifikation auf KVM2: fokussierter Selenium-Test `1 Run, 13 Assertions`, vollständige isolierte Rails-Suite `197 Runs, 1065 Assertions`; beide ohne Fehler. Production-Backup vor Release erfolgreich; vorheriges Web-Image als Rollback-Tag gesichert.
 - Production auf `https://digital-drei.at`: `web` läuft, Datenbank healthy, `/up` liefert `200` mit gültigem TLS. Die ausgelieferte Datei `application-0aaf1756.css` enthält die `.task-card`-Regel.
+
+## Kartenstil auf Vortagesstand zurückgesetzt (2026-08-30)
+
+- Nach Kundenrückmeldung wurde der ausschließlich am 2026-08-30 ergänzte `.task-card`-Grundstil wieder entfernt. Der funktionale Selenium-Scroll-Fix für das Kommentarfeld bleibt bestehen.
+- Release-Commit `e964df1` entspricht damit beim Karten-CSS wieder dem zuvor auf KVM2 und KVM4 verwendeten Stand. Vollständige isolierte Rails-Suite: `197 Runs, 1065 Assertions`, ohne Fehler; fokussierter Selenium-Lauf: `1 Run, 13 Assertions`, ohne Fehler.
+- Vor dem Release wurde ein frischer Produktionsbackup-Lauf durchgeführt und das vorherige Web-Image als Rollback gesichert. Production liefert wieder `application-653e3123.css`; interner und externer Healthcheck von `https://digital-drei.at/up` liefern `200` mit gültigem TLS.
