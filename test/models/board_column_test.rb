@@ -1,6 +1,7 @@
 require "test_helper"
 require Rails.root.join("db/migrate/20260731110000_make_finished_the_final_board_column")
 require Rails.root.join("db/migrate/20260805000000_rename_standard_board_columns")
+require Rails.root.join("db/migrate/20260830000000_rename_approval_and_delivery_columns")
 
 class BoardColumnTest < ActiveSupport::TestCase
   test "creates with name kind and position" do
@@ -24,8 +25,8 @@ class BoardColumnTest < ActiveSupport::TestCase
       ["In Bearbeitung", "active"],
       ["DREI-Review", "review"],
       ["Korrekturen", "blocked"],
-      ["Freigegeben", "review"],
-      ["Fertig", "done"]
+      ["Freigabe", "review"],
+      ["Angeliefert", "done"]
     ], BoardColumn.standard_review_template
   end
 
@@ -61,6 +62,22 @@ class BoardColumnTest < ActiveSupport::TestCase
     assert existing_finished.reload.kind_done?
     assert_equal [true, false, "done"], finished_task.reload.attributes.values_at("completed", "blocked", "status")
     assert_equal 1, board.board_columns.where(name: "Fertig").count
+  end
+
+  test "approval and delivery migration renames the global standard columns" do
+    board = boards(:one)
+    approval = board.board_columns.create!(name: "Freigegeben", kind: :review)
+    delivery = board.board_columns.create!(name: "Fertig", kind: :done)
+
+    RenameApprovalAndDeliveryColumns.new.up
+
+    assert_equal "Freigabe", approval.reload.name
+    assert_equal "Angeliefert", delivery.reload.name
+
+    RenameApprovalAndDeliveryColumns.new.down
+
+    assert_equal "Freigegeben", approval.reload.name
+    assert_equal "Fertig", delivery.reload.name
   end
 
   test "moves left and right" do

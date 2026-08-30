@@ -24,13 +24,13 @@ one_blocked:
 
 one_approved:
   board: one
-  name: Freigegeben
+  name: Freigabe
   kind: review
   position: 5
 
 one_done:
   board: one
-  name: Fertig
+  name: Angeliefert
   kind: done
   position: 6
 
