@@ -37,7 +37,9 @@ class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
     assert_equal title, task.reload.name
 
     comment = "Client-Kommentar #{SecureRandom.hex(4)}"
-    fill_in "Write a comment...", with: comment
+    comment_field = find("textarea[placeholder='Write a comment...']", visible: :all)
+    page.execute_script("arguments[0].scrollIntoView({ block: 'center', inline: 'nearest' })", comment_field)
+    comment_field.fill_in with: comment
     click_button "Post comment"
 
     assert_text comment
