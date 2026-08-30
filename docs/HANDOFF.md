@@ -1,6 +1,21 @@
 # HANDOFF.md
 
-Stand: 2026-08-28
+Stand: 2026-08-30
+
+## Standardspalten-Umbenennung vom 2026-08-30
+
+- Merge-Commit `67c1e46` ist auf `main` und GitHub gepusht sowie in Production
+  bereitgestellt. Die bestehenden Standardspalten heißen nun global
+  `Freigabe` (weiterhin `review`) und `Angeliefert` (weiterhin `done`).
+  Kartenstatus, Completion-Synchronisierung und Kartenpositionen blieben
+  unverändert. Neue Standard-Review-Boards verwenden ebenfalls diese Namen.
+- Die reversible Migration `20260830000000` verändert nur Spalten mit den
+  bisherigen Standardnamen und passendem Kind; bewusst individuell umbenannte
+  Spalten bleiben unangetastet.
+- Verifikation: echter isolierter `db:migrate:reset`, volle Rails-Suite
+  (`197 runs, 1065 assertions`), RuboCop und Diff-/Secret-Prüfung grün.
+  Unabhängiges `QA & Review`: Go. Production: `web` läuft, `db` ist healthy
+  und `https://drei.digitalbackup.cloud/up` liefert `200`.
 
 ## Security-Deployment vom 2026-08-28
 
@@ -30,7 +45,7 @@ Stand: 2026-08-28
 - Admin-only Audit-Protokoll für Verwaltungsereignisse; keine Passwörter, Tokens oder Inhalte werden gespeichert.
 - Kampagnen, Boards, dynamische Spalten und Karten inklusive Archivierung, Wiederherstellung, kontrollierter endgültiger Kampagnenlöschung und CSV-Boardexport.
 - Kartenfunktionen für Admins und Clients: Anlegen, Duplizieren, Löschen, Inline-Titel/-Beschreibung, Farbe, Asset-Checkliste, Kommentare mit Zeitstempel, Bearbeiten/Löschen des eigenen Kommentars, Zitate und sichere klickbare HTTP(S)-Links. Agentensteuerung bleibt intern.
-- `Freigegeben` bleibt eine sichtbare Review-Stufe, `Fertig` ist die finale Spalte; Karten werden in keinem Status ausgegraut.
+- `Freigabe` bleibt eine sichtbare Review-Stufe, `Angeliefert` ist die finale Spalte; Karten werden in keinem Status ausgegraut.
 - UI-Navigation, mobile Rückwege, Board-Dichte, textuelle Kartenaktion und die Wortmarke `DB × DREI` sind umgesetzt.
 - Browser-Titel aller Rails-Layouts lautet `DB × DREI`; das bereitgestellte DB-Symbol wird als sicheres, lokales SVG-Favicon ausgeliefert.
 - Sidebar-Aktionsmenüs für Kampagnen und Boards sowie „Board hinzufügen“ verwenden den zentralen Dropdown-Controller: Menüs schließen sich gegenseitig, per Escape und bei Klick außerhalb. Die seitlichen Aktionsmenüs öffnen nach rechts, damit sie keine benachbarten Bedienelemente verdecken.
