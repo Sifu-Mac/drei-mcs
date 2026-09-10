@@ -1,6 +1,6 @@
 # HANDOFF.md
 
-Stand: 2026-08-30
+Stand: 2026-09-10
 
 ## KVM2 als einziges Entwicklungs-, Test- und Deploymentziel
 
@@ -156,4 +156,5 @@ Stand: 2026-08-30
 - Die bestehende Löschfunktion über das Drei-Punkte-Menü der Karte und die serverseitigen Löschendpunkte bleiben erhalten.
 - Controller- und Browsertests prüfen ausdrücklich, dass die Löschaktion nicht mehr im Kartenpanel gerendert wird.
 - Lead und unabhängige QA kommunizieren direkt über einen internen QA-Subagenten; der Benutzer wird nicht als Nachrichtenbrücke eingesetzt. Das QA-Go bleibt an den exakt geprüften Commit gebunden.
-- Merge, GitHub-Push und Production-Deployment erfolgen erst nach vollständiger Prüfung dieses auf dem aktuellen GitHub-`main` aufgebauten Kandidaten und dokumentiertem QA-Go.
+- Release-Commit `f3ce615` wurde nach vollständiger isolierter Rails-Suite (`197 Runs, 1067 Assertions`, ohne Fehler) und unabhängigem, exakt commitgebundenem QA-Go per Fast-forward in GitHub-`main` übernommen.
+- Vor dem KVM2-Release lief `drei-production-backup.service` erfolgreich; das vorherige Web-Image wurde als `drei-production-web:rollback-b5e0d17-20260910` gesichert. Der Webservice wurde ausschließlich auf KVM2 neu gebaut und gestartet. Datenbank healthy, `/up` liefert `200`; der laufende Container enthält keine Panel-Löschaktion und weiterhin die Löschoption im Drei-Punkte-Menü. KVM4 blieb unberührt.
