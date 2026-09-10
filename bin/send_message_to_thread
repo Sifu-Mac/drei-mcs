@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+qa_thread_id="${DIGITAL_DREI_QA_THREAD_ID:-01a061b3-5673-7cf1-bcf9-a1ec14510950}"
+
+if [[ $# -gt 0 ]]; then
+  message="$*"
+else
+  message="$(cat)"
+fi
+
+if [[ -z "$message" ]]; then
+  echo "Message must not be empty." >&2
+  exit 64
+fi
+
+exec codex exec resume --skip-git-repo-check --json -- "$qa_thread_id" "$message"

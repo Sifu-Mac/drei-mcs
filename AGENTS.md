@@ -48,16 +48,20 @@ Wichtige Architekturpunkte:
   die KVM2-Production prüfen.
 - Reine Dokumentationsaenderungen erfordern keinen Production-Rebuild; der Healthcheck bleibt dennoch Pflicht.
 - Vor jedem Abschlussbericht `docs/HANDOFF.md` aktualisieren.
-- Unabhaengige QA-Pruefungen werden vom Lead Agent selbst als interner
-  QA-Subagent gestartet und koordiniert. Der Benutzer darf nicht als
-  Nachrichtenbruecke zwischen Lead und QA eingesetzt werden.
-- Der QA-Subagent prueft einen konkreten Commit unabhaengig und liefert sein
-  dokumentiertes `QA-Go` oder `QA-No-Go` direkt an den Lead Agent. Jedes Go
+- Unabhaengige QA-Pruefungen werden vom Lead Agent direkt im sichtbaren Codex-
+  Task `Digital-Drei – QA & Review` gestartet und koordiniert. Der Benutzer darf
+  nicht als Nachrichtenbruecke zwischen Lead und QA eingesetzt werden.
+- Ist das eingebaute `send_message_to_thread` nicht verfuegbar, verwendet der
+  Lead Agent `bin/send_message_to_thread MESSAGE`.
+  Das Kommando setzt den bestehenden sichtbaren QA-Task fort; Anfrage,
+  Aktivitaeten und Antwort bleiben dort fuer den Benutzer einsehbar.
+- Der sichtbare QA-Task prueft einen konkreten Commit unabhaengig und liefert
+  sein dokumentiertes `QA-Go` oder `QA-No-Go` direkt an den Lead Agent. Jedes Go
   bleibt an den exakten Commit und Pruefumfang gebunden; bei nachtraeglichen
   Codeaenderungen ist eine neue QA erforderlich.
-- Ist die interne Agentenkommunikation technisch nicht verfuegbar, meldet der
-  Lead Agent den technischen Blocker. Ein manueller Prompt-Transfer durch den
-  Benutzer ist kein regulaerer Ersatzworkflow.
+- Ist auch der dokumentierte Kommando-Fallback technisch nicht verfuegbar,
+  meldet der Lead Agent den technischen Blocker. Ein manueller Prompt-Transfer
+  durch den Benutzer ist kein regulaerer Ersatzworkflow.
 
 ## VPS- und Docker-Struktur
 

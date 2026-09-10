@@ -158,3 +158,9 @@ Stand: 2026-09-10
 - Lead und unabhängige QA kommunizieren direkt über einen internen QA-Subagenten; der Benutzer wird nicht als Nachrichtenbrücke eingesetzt. Das QA-Go bleibt an den exakt geprüften Commit gebunden.
 - Release-Commit `f3ce615` wurde nach vollständiger isolierter Rails-Suite (`197 Runs, 1067 Assertions`, ohne Fehler) und unabhängigem, exakt commitgebundenem QA-Go per Fast-forward in GitHub-`main` übernommen.
 - Vor dem KVM2-Release lief `drei-production-backup.service` erfolgreich; das vorherige Web-Image wurde als `drei-production-web:rollback-b5e0d17-20260910` gesichert. Der Webservice wurde ausschließlich auf KVM2 neu gebaut und gestartet. Datenbank healthy, `/up` liefert `200`; der laufende Container enthält keine Panel-Löschaktion und weiterhin die Löschoption im Drei-Punkte-Menü. KVM4 blieb unberührt.
+
+## Sichtbare Lead-zu-QA-Kommunikation (2026-09-10)
+
+- Der separate Codex-Task `Digital-Drei – QA & Review` ist die sichtbare QA-Instanz. QA-Anfragen und Antworten müssen dort einsehbar sein.
+- Fehlt dem Lead das eingebaute Tool `send_message_to_thread`, setzt `bin/send_message_to_thread MESSAGE` den sichtbaren QA-Task über seine feste Task-ID und die installierte Codex-CLI direkt fort. Ein optionales `DIGITAL_DREI_QA_THREAD_ID` erlaubt eine kontrollierte spätere Neuzuordnung. Der Benutzer muss keine Nachrichten zwischen Tasks kopieren.
+- Ein realer Verbindungstest wurde erfolgreich im sichtbaren QA-Task verarbeitet; dabei wurden keine Dateien, keine Production-Daten und kein KVM4-System verändert.
