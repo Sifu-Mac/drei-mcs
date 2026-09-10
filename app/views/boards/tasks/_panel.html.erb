@@ -3,8 +3,7 @@
 
 <div data-controller="task-modal"
      data-task-modal-task-id-value="<%= task.id %>"
-     data-task-modal-update-url-value="<%= board_task_path(@board, task) %>"
-     data-task-modal-delete-url-value="<%= board_task_path(@board, task) %>">
+     data-task-modal-update-url-value="<%= board_task_path(@board, task) %>">
   <div data-task-modal-target="backdrop" data-action="click->task-modal#close"
        class="hidden opacity-0 transition-opacity duration-200 ease-out"
        style="position:fixed;inset:0;background:rgba(15,23,42,.28);backdrop-filter:blur(3px);z-index:200"></div>
@@ -12,11 +11,7 @@
   <section data-task-modal-target="modal"
            aria-label="Karte bearbeiten"
            class="hidden opacity-0 fixed inset-0 z-[201] flex flex-col overflow-hidden bg-bg-surface transition-opacity duration-200 ease-out md:inset-auto md:top-1/2 md:left-1/2 md:h-[min(86vh,900px)] md:w-[min(860px,calc(100vw-32px))] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-[18px] md:border md:border-border md:shadow-[0_30px_80px_rgba(15,23,42,0.18)]">
-    <header class="flex items-center justify-between gap-3 border-b border-border px-4 py-3 md:px-5 md:py-4">
-      <button type="button" data-action="click->task-modal#deleteTask"
-              class="min-h-10 rounded-lg border border-red-500/25 bg-red-500/10 px-3 text-xs font-bold text-red-700 transition-colors hover:bg-red-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500">
-        Karte löschen
-      </button>
+    <header class="flex items-center justify-end gap-3 border-b border-border px-4 py-3 md:px-5 md:py-4">
       <button type="button" data-action="click->task-modal#close" aria-label="Karte schließen"
               class="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-bg-elevated text-base text-content-muted transition-colors hover:bg-bg-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">✕</button>
     </header>

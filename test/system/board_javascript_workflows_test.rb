@@ -26,7 +26,7 @@ class BoardJavascriptWorkflowsTest < ApplicationSystemTestCase
     assert_no_selector "input[type='file'][name='task[cover_image]']"
     assert_no_selector "[data-action='click->task-modal#cyclePriority']"
     assert_no_selector "[data-action='click->task-modal#toggleAgent']"
-    assert_selector "[data-action='click->task-modal#deleteTask']"
+    assert_no_selector "[data-action='click->task-modal#deleteTask']"
 
     title = "Client-Titel #{SecureRandom.hex(4)}"
     title_field = find("#task_name")

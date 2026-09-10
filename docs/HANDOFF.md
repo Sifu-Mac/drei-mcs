@@ -149,3 +149,11 @@ Stand: 2026-08-30
 - Nach Kundenrückmeldung wurde der ausschließlich am 2026-08-30 ergänzte `.task-card`-Grundstil wieder entfernt. Der funktionale Selenium-Scroll-Fix für das Kommentarfeld bleibt bestehen.
 - Release-Commit `e964df1` entspricht damit beim Karten-CSS wieder dem zuvor auf KVM2 und KVM4 verwendeten Stand. Vollständige isolierte Rails-Suite: `197 Runs, 1065 Assertions`, ohne Fehler; fokussierter Selenium-Lauf: `1 Run, 13 Assertions`, ohne Fehler.
 - Vor dem Release wurde ein frischer Produktionsbackup-Lauf durchgeführt und das vorherige Web-Image als Rollback gesichert. Production liefert wieder `application-653e3123.css`; interner und externer Healthcheck von `https://digital-drei.at/up` liefern `200` mit gültigem TLS.
+
+## Kartenpanel: prominente Löschaktion entfernt (2026-09-10)
+
+- Im Kartenpanel wurde der rote Button `Karte löschen` samt ausschließlich dafür verwendeter Stimulus-Anbindung entfernt.
+- Die bestehende Löschfunktion über das Drei-Punkte-Menü der Karte und die serverseitigen Löschendpunkte bleiben erhalten.
+- Controller- und Browsertests prüfen ausdrücklich, dass die Löschaktion nicht mehr im Kartenpanel gerendert wird.
+- Lead und unabhängige QA kommunizieren direkt über einen internen QA-Subagenten; der Benutzer wird nicht als Nachrichtenbrücke eingesetzt. Das QA-Go bleibt an den exakt geprüften Commit gebunden.
+- Merge, GitHub-Push und Production-Deployment erfolgen erst nach vollständiger Prüfung dieses auf dem aktuellen GitHub-`main` aufgebauten Kandidaten und dokumentiertem QA-Go.

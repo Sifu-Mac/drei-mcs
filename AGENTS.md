@@ -48,6 +48,16 @@ Wichtige Architekturpunkte:
   die KVM2-Production prüfen.
 - Reine Dokumentationsaenderungen erfordern keinen Production-Rebuild; der Healthcheck bleibt dennoch Pflicht.
 - Vor jedem Abschlussbericht `docs/HANDOFF.md` aktualisieren.
+- Unabhaengige QA-Pruefungen werden vom Lead Agent selbst als interner
+  QA-Subagent gestartet und koordiniert. Der Benutzer darf nicht als
+  Nachrichtenbruecke zwischen Lead und QA eingesetzt werden.
+- Der QA-Subagent prueft einen konkreten Commit unabhaengig und liefert sein
+  dokumentiertes `QA-Go` oder `QA-No-Go` direkt an den Lead Agent. Jedes Go
+  bleibt an den exakten Commit und Pruefumfang gebunden; bei nachtraeglichen
+  Codeaenderungen ist eine neue QA erforderlich.
+- Ist die interne Agentenkommunikation technisch nicht verfuegbar, meldet der
+  Lead Agent den technischen Blocker. Ein manueller Prompt-Transfer durch den
+  Benutzer ist kein regulaerer Ersatzworkflow.
 
 ## VPS- und Docker-Struktur
 

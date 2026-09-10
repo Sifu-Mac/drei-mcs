@@ -180,7 +180,7 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "data-task-modal-update-url-value"
     assert_not_includes response.body, "data-task-modal-assign-url-value"
     assert_not_includes response.body, "data-task-modal-unassign-url-value"
-    assert_includes response.body, "data-task-modal-delete-url-value"
+    assert_not_includes response.body, "data-task-modal-delete-url-value"
     assert_includes response.body, 'name="task[name]"'
     assert_includes response.body, "Spalte"
     assert_not_includes response.body, 'name="task[priority]"'
@@ -188,7 +188,7 @@ class BoardsTasksControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, 'name="task[owner]"'
     assert_includes response.body, board_task_subtask_path(boards(:one), task, task.subtasks.first)
     assert_not_includes response.body, "click-&gt;task-modal#toggleAgent"
-    assert_includes response.body, "click->task-modal#deleteTask"
+    assert_not_includes response.body, "click->task-modal#deleteTask"
     assert_includes response.body, "Klicken zum Bearbeiten"
     assert_not_includes response.body, "Activity"
   end
